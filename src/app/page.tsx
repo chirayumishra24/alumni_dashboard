@@ -389,10 +389,11 @@ Thank you for registering on the CCGS Alumni Hub portal for ${profile.school}!
 
 In order to complete your profile verification and publish your details to the school website directory, we need to quickly verify your email and credentials.
 
-Please reply to this email or contact one of our alumni coordinators to confirm your graduation details. Once verified, your profile and company/role information will go live immediately on the school platform.
+Please reply directly to this email or contact our support team at support@skillizee.io to confirm your graduation details. Once verified, your profile and company/role information will go live immediately on the school platform.
 
 Warm regards,
-CCGS Alumni Coordinator Team`;
+CCGS Alumni Coordinator Team
+support@skillizee.io`;
 
   // Copy text helper
   const handleCopyEmail = (profile: AlumniProfile) => {
@@ -513,7 +514,7 @@ CCGS Alumni Coordinator Team`;
             <span className="font-semibold text-slate-400">Simulation User:</span>
             {activeRole === "ADMIN" && (
               <span className="font-bold text-violet-700 flex items-center gap-1.5 bg-violet-100 px-2.5 py-0.5 rounded border border-violet-200">
-                <UserCheck size={12} /> CCGS Admin (nldimsr@yopmail.com)
+                <UserCheck size={12} /> CCGS Admin (pa2@skillizee.io)
               </span>
             )}
             {activeRole === "ALUMNI" && (

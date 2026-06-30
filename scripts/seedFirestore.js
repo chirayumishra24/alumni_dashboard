@@ -63,7 +63,7 @@ async function main() {
   console.log('Seeding CCGS Group Admin...');
   const adminUserRef = db.collection('users').doc('admin_ccgs');
   await adminUserRef.set({
-    email: 'nldimsr@yopmail.com',
+    email: 'pa2@skillizee.io',
     name: 'CCGS Group Admin',
     role: 'ADMIN',
     avatarUrl: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=120',
