@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { firestore } from '@/lib/firebaseAdmin';
 import { QueryDocumentSnapshot } from 'firebase-admin/firestore';
+import { sendVerificationEmail } from '@/lib/email';
 
 export const dynamic = 'force-dynamic';
 
@@ -169,6 +170,16 @@ export async function PATCH(request: Request) {
       });
 
       const updated = (await profileRef.get()).data();
+      
+      // Trigger automatic verification email in background
+      if (updated && updated.user) {
+        try {
+          await sendVerificationEmail(updated.user.email, updated.user.name, updated.school);
+        } catch (err) {
+          console.error('Failed to send verification email:', err);
+        }
+      }
+
       return NextResponse.json({ success: true, profile: updated });
     }
 

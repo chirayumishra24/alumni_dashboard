@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { firestore } from '@/lib/firebaseAdmin';
 import { QueryDocumentSnapshot } from 'firebase-admin/firestore';
+import { sendRegistrationEmail } from '@/lib/email';
 
 export const dynamic = 'force-dynamic';
 
@@ -131,6 +132,13 @@ export async function POST(request: Request) {
       isApproved: false,
       alumni: profileData
     });
+
+    // Trigger automatic registration received email in background
+    try {
+      await sendRegistrationEmail(email, name, school);
+    } catch (err) {
+      console.error('Failed to send registration email:', err);
+    }
 
     const response = NextResponse.json({ success: true, profile: profileData });
     response.headers.set('Access-Control-Allow-Origin', '*');
