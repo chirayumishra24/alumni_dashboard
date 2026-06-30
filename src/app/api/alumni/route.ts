@@ -78,7 +78,7 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { name, email, batch, program, school, company, role, skills } = body;
+    const { name, email, batch, program, school, company, role, skills, linkedin } = body;
 
     if (!name || !email || !batch || !program || !school || !skills) {
       return NextResponse.json({ error: 'Missing required registration fields' }, { status: 400 });
@@ -124,7 +124,8 @@ export async function POST(request: Request) {
       isVerified: false,
       isMentor: false,
       profileComplete: 40,
-      user: userData
+      user: userData,
+      linkedin: linkedin || ''
     };
     await profileRef.set(profileData);
 

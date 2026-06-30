@@ -109,7 +109,8 @@ export default function Home() {
     school: "CCHS",
     company: "",
     role: "",
-    skills: ""
+    skills: "",
+    linkedin: ""
   });
 
   // Student inputs
@@ -148,6 +149,14 @@ export default function Home() {
 
   useEffect(() => {
     fetchData();
+    
+    // Auto-open registration modal if ?register=true is present in query parameters
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('register') === 'true') {
+        setShowRegModal(true);
+      }
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -236,6 +245,17 @@ export default function Home() {
   // Submit Alumni Self-Registration
   const handleSelfRegistration = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Validate optional LinkedIn URL
+    if (regForm.linkedin) {
+      const trimmed = regForm.linkedin.trim();
+      const pattern = /^https?:\/\/(www\.)?linkedin\.com\/.*$/i;
+      if (!pattern.test(trimmed)) {
+        showToast("Please enter a valid LinkedIn URL (e.g. https://linkedin.com/in/username)", "error");
+        return;
+      }
+    }
+
     try {
       const res = await fetch("/api/alumni", {
         method: "POST",
@@ -254,7 +274,8 @@ export default function Home() {
           school: "CCHS",
           company: "",
           role: "",
-          skills: ""
+          skills: "",
+          linkedin: ""
         });
         fetchData();
       } else {
@@ -1306,6 +1327,17 @@ support@skillizee.io`;
                   value={regForm.skills} 
                   onChange={e => setRegForm({...regForm, skills: e.target.value})}
                   placeholder="Comma-separated (e.g. React, UX Design, Product Management)"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-800 focus:outline-none focus:border-violet-500"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">LinkedIn Profile Link (Optional)</label>
+                <input 
+                  type="text" 
+                  value={regForm.linkedin} 
+                  onChange={e => setRegForm({...regForm, linkedin: e.target.value})}
+                  placeholder="e.g. https://linkedin.com/in/username"
                   className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-800 focus:outline-none focus:border-violet-500"
                 />
               </div>
