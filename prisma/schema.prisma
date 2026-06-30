@@ -1,0 +1,94 @@
+// This is your Prisma schema file
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model User {
+  id            String    @id @default(uuid())
+  email         String    @unique
+  name          String
+  role          String    @default("STUDENT") // "ADMIN", "ALUMNI", "STUDENT"
+  avatarUrl     String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  alumniProfile   AlumniProfile?
+  studentProfile  StudentProfile?
+}
+
+model AlumniProfile {
+  id              String      @id @default(uuid())
+  userId          String      @unique
+  user            User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  batch           Int         // e.g. 2018
+  program         String      // e.g. "MBA", "B.Tech"
+  company         String?
+  role            String?
+  industry        String?
+  country         String
+  city            String
+  latitude        Float?      // For 3D Globe plots
+  longitude       Float?      // For 3D Globe plots
+  skills          String      // Comma-separated list for SQLite compatibility
+  isMentor        Boolean     @default(false)
+  profileComplete Int         @default(0) // Percentage (0-100)
+  school          String      @default("CCHS") // "CCHS" or "CCWS"
+  isVerified      Boolean     @default(false)
+
+  mentorships     Mentorship[] @relation("MentorAlumni")
+  widgetLauds     WidgetSpeak[]
+}
+
+model StudentProfile {
+  id              String      @id @default(uuid())
+  userId          String      @unique
+  user            User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  batch           Int         // Expected graduation year
+  program         String
+  preferences     CareerPreference[]
+  mentorships     Mentorship[] @relation("StudentMentee")
+}
+
+model CareerPreference {
+  id               String         @id @default(uuid())
+  studentProfileId String
+  studentProfile   StudentProfile @relation(fields: [studentProfileId], references: [id], onDelete: Cascade)
+  careerChoice     String         // e.g. "Software Engineer", "Consultant"
+  country          String         // Preferred location
+  preferenceOrder  Int            // e.g. 1, 2, 3
+}
+
+model Mentorship {
+  id               String         @id @default(uuid())
+  studentId        String
+  student          StudentProfile @relation("StudentMentee", fields: [studentId], references: [id], onDelete: Cascade)
+  alumniId         String
+  alumni           AlumniProfile  @relation("MentorAlumni", fields: [alumniId], references: [id], onDelete: Cascade)
+  status           String         @default("PENDING") // "PENDING", "ACCEPTED", "DECLINED"
+  notes            String?
+  createdAt        DateTime       @default(now())
+}
+
+model Event {
+  id          String   @id @default(uuid())
+  title       String
+  description String
+  eventDate   DateTime
+  bannerUrl   String?
+  location    String   // "Online" or Physical Address
+  meetingUrl  String?  // Zoom link etc.
+  createdAt   DateTime @default(now())
+}
+
+model WidgetSpeak {
+  id              String        @id @default(uuid())
+  alumniProfileId String
+  alumni          AlumniProfile @relation(fields: [alumniProfileId], references: [id], onDelete: Cascade)
+  quote           String
+  isApproved      Boolean       @default(false)
+}
