@@ -21,7 +21,7 @@ export async function GET() {
     // Sort events by eventDate ascending with proper type definitions
     const events = eventsSnap.docs
       .map((doc: QueryDocumentSnapshot) => doc.data() as { eventDate: string })
-      .sort((a, b) => new Date(a.eventDate).getTime() - new Date(b.eventDate).getTime());
+      .sort((a: { eventDate: string }, b: { eventDate: string }) => new Date(a.eventDate).getTime() - new Date(b.eventDate).getTime());
 
     const widgets = widgetsSnap.docs.map((doc: QueryDocumentSnapshot) => doc.data());
 
