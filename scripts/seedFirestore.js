@@ -141,6 +141,7 @@ async function main() {
       profileComplete: 90,
       school: "CCHS",
       isVerified: true,
+      phone: "+91 98765 43210",
       user: {
         id: userId,
         email: item.email,
@@ -193,6 +194,7 @@ async function main() {
       profileComplete: 85,
       school: "CCWS",
       isVerified: true,
+      phone: "+91 98765 43210",
       user: {
         id: userId,
         email: item.email,
@@ -244,6 +246,7 @@ async function main() {
       profileComplete: 40,
       school: item.school,
       isVerified: false,
+      phone: "+91 98765 43210",
       user: {
         id: userId,
         email: item.email,
