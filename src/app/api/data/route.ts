@@ -1,64 +1,39 @@
 import { NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
+import { firestore } from '@/lib/firebaseAdmin';
+import { QueryDocumentSnapshot } from 'firebase-admin/firestore';
 
-// Disable Static Optimization for this Route to ensure dynamic SQLite fetches work correctly
 export const dynamic = 'force-dynamic';
 
 export async function GET() {
   try {
-    const [alumni, students, mentorships, events, widgets] = await Promise.all([
-      prisma.alumniProfile.findMany({
-        include: {
-          user: true,
-          widgetLauds: true,
-        },
-      }),
-      prisma.studentProfile.findMany({
-        include: {
-          user: true,
-          preferences: {
-            orderBy: {
-              preferenceOrder: 'asc',
-            },
-          },
-        },
-      }),
-      prisma.mentorship.findMany({
-        include: {
-          student: {
-            include: { user: true },
-          },
-          alumni: {
-            include: { user: true },
-          },
-        },
-        orderBy: {
-          createdAt: 'desc',
-        },
-      }),
-      prisma.event.findMany({
-        orderBy: {
-          eventDate: 'asc',
-        },
-      }),
-      prisma.widgetSpeak.findMany({
-        include: {
-          alumni: {
-            include: { user: true },
-          },
-        },
-      }),
+    const [alumniSnap, studentsSnap, mentorshipSnap, eventsSnap, widgetsSnap] = await Promise.all([
+      firestore.collection('alumni_profiles').get(),
+      firestore.collection('student_profiles').get(),
+      firestore.collection('mentorship_connections').get(),
+      firestore.collection('events').get(),
+      firestore.collection('widget_testimonials').get()
     ]);
+
+    const alumni = alumniSnap.docs.map((doc: QueryDocumentSnapshot) => doc.data());
+    const students = studentsSnap.docs.map((doc: QueryDocumentSnapshot) => doc.data());
+    const mentorships = mentorshipSnap.docs.map((doc: QueryDocumentSnapshot) => doc.data());
+    
+    // Sort events by eventDate ascending with proper type definitions
+    const events = eventsSnap.docs
+      .map((doc: QueryDocumentSnapshot) => doc.data() as { eventDate: string })
+      .sort((a, b) => new Date(a.eventDate).getTime() - new Date(b.eventDate).getTime());
+
+    const widgets = widgetsSnap.docs.map((doc: QueryDocumentSnapshot) => doc.data());
 
     return NextResponse.json({
       alumni,
       students,
       mentorships,
       events,
-      widgets,
+      widgets
     });
   } catch (error) {
-    console.error('API GET error: ', error);
+    console.error('Firestore API GET error: ', error);
     return NextResponse.json({ error: 'Failed to fetch data' }, { status: 500 });
   }
 }
@@ -72,56 +47,73 @@ export async function POST(request: Request) {
       const { studentId, alumniId, notes } = payload;
       
       // Prevent duplicate requests
-      const existing = await prisma.mentorship.findFirst({
-        where: { studentId, alumniId },
-      });
-      if (existing) {
+      const existingQuery = await firestore.collection('mentorship_connections')
+        .where('studentId', '==', studentId)
+        .where('alumniId', '==', alumniId)
+        .limit(1)
+        .get();
+
+      if (!existingQuery.empty) {
         return NextResponse.json({ error: 'Request already exists' }, { status: 400 });
       }
 
-      const connection = await prisma.mentorship.create({
-        data: {
-          studentId,
-          alumniId,
-          notes,
-          status: 'PENDING',
-        },
-        include: {
-          student: { include: { user: true } },
-          alumni: { include: { user: true } },
-        },
-      });
-      return NextResponse.json({ success: true, connection });
+      // Fetch student and alumni profiles to snapshot details inside connection
+      const [studentDoc, alumniDoc] = await Promise.all([
+        firestore.collection('student_profiles').doc(studentId).get(),
+        firestore.collection('alumni_profiles').doc(alumniId).get()
+      ]);
+
+      if (!studentDoc.exists || !alumniDoc.exists) {
+        return NextResponse.json({ error: 'Student or Alumni profile not found' }, { status: 404 });
+      }
+
+      const studentData = studentDoc.data();
+      const alumniData = alumniDoc.data();
+
+      const connectionRef = firestore.collection('mentorship_connections').doc();
+      const connectionData = {
+        id: connectionRef.id,
+        studentId,
+        alumniId,
+        notes,
+        status: 'PENDING',
+        createdAt: new Date().toISOString(),
+        student: studentData,
+        alumni: alumniData
+      };
+
+      await connectionRef.set(connectionData);
+      return NextResponse.json({ success: true, connection: connectionData });
     }
 
     if (action === 'updatePreferences') {
-      const { studentProfileId, preferences } = payload; // preferences: Array<{careerChoice: string, country: string}>
+      const { studentProfileId, preferences } = payload;
 
-      // Clear existing preferences
-      await prisma.careerPreference.deleteMany({
-        where: { studentProfileId },
+      // Update the student preferences array nested inside the profile doc
+      const studentDocRef = firestore.collection('student_profiles').doc(studentProfileId);
+      const studentDoc = await studentDocRef.get();
+
+      if (!studentDoc.exists) {
+        return NextResponse.json({ error: 'Student profile not found' }, { status: 404 });
+      }
+
+      const formattedPrefs = preferences.map((pref: { careerChoice: string; country: string }, idx: number) => ({
+        id: `${studentProfileId}_pref_${idx}`,
+        careerChoice: pref.careerChoice,
+        country: pref.country,
+        preferenceOrder: idx + 1
+      }));
+
+      await studentDocRef.update({
+        preferences: formattedPrefs
       });
 
-      // Insert new preferences
-      const created = await Promise.all(
-        preferences.map((pref: { careerChoice: string; country: string }, idx: number) =>
-          prisma.careerPreference.create({
-            data: {
-              studentProfileId,
-              careerChoice: pref.careerChoice,
-              country: pref.country,
-              preferenceOrder: idx + 1,
-            },
-          })
-        )
-      );
-
-      return NextResponse.json({ success: true, preferences: created });
+      return NextResponse.json({ success: true, preferences: formattedPrefs });
     }
 
     return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
   } catch (error) {
-    console.error('API POST error: ', error);
+    console.error('Firestore API POST error: ', error);
     return NextResponse.json({ error: 'Failed to process request' }, { status: 500 });
   }
 }
@@ -132,36 +124,57 @@ export async function PATCH(request: Request) {
     const { action, id, status, isApproved } = body;
 
     if (action === 'updateMentorshipStatus') {
-      const updated = await prisma.mentorship.update({
-        where: { id },
-        data: { status },
-        include: {
-          student: { include: { user: true } },
-          alumni: { include: { user: true } },
-        },
-      });
+      const connectionRef = firestore.collection('mentorship_connections').doc(id);
+      
+      // If we are updating dummy connection (from checklist checkbox action), return success
+      if (id === 'dummy') {
+        return NextResponse.json({ success: true });
+      }
+
+      const connectionDoc = await connectionRef.get();
+      if (!connectionDoc.exists) {
+        return NextResponse.json({ error: 'Connection not found' }, { status: 404 });
+      }
+
+      await connectionRef.update({ status });
+      const updated = (await connectionRef.get()).data();
       return NextResponse.json({ success: true, connection: updated });
     }
 
     if (action === 'updateWidgetApproval') {
-      const updated = await prisma.widgetSpeak.update({
-        where: { id },
-        data: { isApproved },
-      });
+      const widgetRef = firestore.collection('widget_testimonials').doc(id);
+      const widgetDoc = await widgetRef.get();
+
+      if (!widgetDoc.exists) {
+        return NextResponse.json({ error: 'Widget testimonial not found' }, { status: 404 });
+      }
+
+      await widgetRef.update({ isApproved });
+      const updated = (await widgetRef.get()).data();
       return NextResponse.json({ success: true, widget: updated });
     }
 
     if (action === 'verifyAlumni') {
-      const updated = await prisma.alumniProfile.update({
-        where: { id },
-        data: { isVerified: true, profileComplete: 80 },
+      const profileRef = firestore.collection('alumni_profiles').doc(id);
+      const profileDoc = await profileRef.get();
+
+      if (!profileDoc.exists) {
+        return NextResponse.json({ error: 'Alumni profile not found' }, { status: 404 });
+      }
+
+      // Update both isVerified flag and profileComplete percentage
+      await profileRef.update({
+        isVerified: true,
+        profileComplete: 80
       });
+
+      const updated = (await profileRef.get()).data();
       return NextResponse.json({ success: true, profile: updated });
     }
 
     return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
   } catch (error) {
-    console.error('API PATCH error: ', error);
+    console.error('Firestore API PATCH error: ', error);
     return NextResponse.json({ error: 'Failed to update resource' }, { status: 500 });
   }
 }

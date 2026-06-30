@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
+import { firestore } from '@/lib/firebaseAdmin';
+import { QueryDocumentSnapshot } from 'firebase-admin/firestore';
 
 export const dynamic = 'force-dynamic';
 
@@ -8,72 +9,61 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const school = searchParams.get('school'); // e.g. "CCHS", "CCWS", "CCIS"
 
+    const alumniRef = firestore.collection('alumni_profiles');
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let alumniList: any[] = [];
+    let list: any[] = [];
 
     if (school === 'CCHS') {
-      alumniList = await prisma.alumniProfile.findMany({
-        where: { school: 'CCHS', isVerified: true },
-        include: { user: true },
-        orderBy: [
-          { batch: 'desc' },
-          { id: 'desc' }
-        ]
-      });
+      const snapshot = await alumniRef
+        .where('school', '==', 'CCHS')
+        .where('isVerified', '==', true)
+        .orderBy('batch', 'desc')
+        .get();
+      list = snapshot.docs.map((doc: QueryDocumentSnapshot) => doc.data());
     } else if (school === 'CCWS') {
-      alumniList = await prisma.alumniProfile.findMany({
-        where: { school: 'CCWS', isVerified: true },
-        include: { user: true },
-        orderBy: [
-          { batch: 'desc' },
-          { id: 'desc' }
-        ]
-      });
+      const snapshot = await alumniRef
+        .where('school', '==', 'CCWS')
+        .where('isVerified', '==', true)
+        .orderBy('batch', 'desc')
+        .get();
+      list = snapshot.docs.map((doc: QueryDocumentSnapshot) => doc.data());
     } else if (school === 'CCIS') {
       // CCIS displays data for both CCHS and CCWS, top 25 profiles each on page 1
-      const [cchsTop, ccwsTop] = await Promise.all([
-        prisma.alumniProfile.findMany({
-          where: { school: 'CCHS', isVerified: true },
-          include: { user: true },
-          orderBy: [
-            { batch: 'desc' },
-            { id: 'desc' }
-          ],
-          take: 25
-        }),
-        prisma.alumniProfile.findMany({
-          where: { school: 'CCWS', isVerified: true },
-          include: { user: true },
-          orderBy: [
-            { batch: 'desc' },
-            { id: 'desc' }
-          ],
-          take: 25
-        })
+      const [cchsSnapshot, ccwsSnapshot] = await Promise.all([
+        alumniRef
+          .where('school', '==', 'CCHS')
+          .where('isVerified', '==', true)
+          .orderBy('batch', 'desc')
+          .limit(25)
+          .get(),
+        alumniRef
+          .where('school', '==', 'CCWS')
+          .where('isVerified', '==', true)
+          .orderBy('batch', 'desc')
+          .limit(25)
+          .get()
       ]);
 
-      // Combine CCHS and CCWS top 25 profiles (total 50 profiles)
-      alumniList = [...cchsTop, ...ccwsTop];
+      const cchsTop = cchsSnapshot.docs.map((doc: QueryDocumentSnapshot) => doc.data());
+      const ccwsTop = ccwsSnapshot.docs.map((doc: QueryDocumentSnapshot) => doc.data());
+      list = [...cchsTop, ...ccwsTop];
     } else {
       // Return all verified if no school parameter specified
-      alumniList = await prisma.alumniProfile.findMany({
-        where: { isVerified: true },
-        include: { user: true },
-        orderBy: [
-          { batch: 'desc' },
-          { id: 'desc' }
-        ]
-      });
+      const snapshot = await alumniRef
+        .where('isVerified', '==', true)
+        .orderBy('batch', 'desc')
+        .get();
+      list = snapshot.docs.map((doc: QueryDocumentSnapshot) => doc.data());
     }
 
-    const response = NextResponse.json(alumniList);
+    const response = NextResponse.json(list);
     response.headers.set('Access-Control-Allow-Origin', '*');
     response.headers.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
     response.headers.set('Access-Control-Allow-Headers', 'Content-Type');
 
     return response;
   } catch (error) {
-    console.error('Group API Error: ', error);
+    console.error('Group Firestore API GET Error: ', error);
     return NextResponse.json({ error: 'Failed to fetch group alumni' }, { status: 500 });
   }
 }
@@ -88,61 +78,67 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Missing required registration fields' }, { status: 400 });
     }
 
-    // Check if user already exists
-    const existingUser = await prisma.user.findUnique({
-      where: { email }
-    });
+    // Check if user already exists in Firestore
+    const userQuery = await firestore.collection('users')
+      .where('email', '==', email)
+      .limit(1)
+      .get();
 
-    if (existingUser) {
+    if (!userQuery.empty) {
       return NextResponse.json({ error: 'An account with this email already exists' }, { status: 409 });
     }
 
-    // Create the User first
-    const newUser = await prisma.user.create({
-      data: {
-        email,
-        name,
-        role: 'ALUMNI',
-        avatarUrl: `https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=120` // Default placeholder avatar
-      }
+    // Create the User first in Firestore
+    const userRef = firestore.collection('users').doc();
+    const userId = userRef.id;
+    const userData = {
+      id: userId,
+      email,
+      name,
+      role: 'ALUMNI',
+      avatarUrl: `https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=120` // Default placeholder avatar
+    };
+    await userRef.set(userData);
+
+    // Create the Alumni Profile (Unverified by default) in Firestore
+    const profileRef = firestore.collection('alumni_profiles').doc();
+    const profileId = profileRef.id;
+    const profileData = {
+      id: profileId,
+      userId,
+      batch: Number(batch),
+      program,
+      school,
+      company: company || '',
+      role: role || '',
+      industry: skills.split(',')[0]?.trim() || 'General',
+      country: 'India', // Default to India
+      city: 'Mumbai', // Default to Mumbai
+      skills,
+      isVerified: false,
+      isMentor: false,
+      profileComplete: 40,
+      user: userData
+    };
+    await profileRef.set(profileData);
+
+    // Create widget testimonial placeholder in Firestore
+    const testimonialRef = firestore.collection('widget_testimonials').doc();
+    await testimonialRef.set({
+      id: testimonialRef.id,
+      alumniProfileId: profileId,
+      quote: `${name} registered as a graduate from Batch of ${batch}.`,
+      isApproved: false,
+      alumni: profileData
     });
 
-    // Create the Alumni Profile (Unverified by default)
-    const newProfile = await prisma.alumniProfile.create({
-      data: {
-        userId: newUser.id,
-        batch: Number(batch),
-        program,
-        school,
-        company: company || '',
-        role: role || '',
-        industry: skills.split(',')[0]?.trim() || 'General',
-        country: 'India', // Default to India for self-registered profiles
-        city: 'Mumbai', // Default to Mumbai
-        skills,
-        isVerified: false, // Explicitly unverified until Admin approves
-        isMentor: false,
-        profileComplete: 40
-      },
-      include: { user: true }
-    });
-
-    // Optional: Auto-create a widget entry
-    await prisma.widgetSpeak.create({
-      data: {
-        alumniProfileId: newProfile.id,
-        quote: `${name} registered as a graduate from Batch of ${batch}.`,
-        isApproved: false
-      }
-    });
-
-    const response = NextResponse.json({ success: true, profile: newProfile });
+    const response = NextResponse.json({ success: true, profile: profileData });
     response.headers.set('Access-Control-Allow-Origin', '*');
     response.headers.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
     response.headers.set('Access-Control-Allow-Headers', 'Content-Type');
     return response;
   } catch (error) {
-    console.error('Registration Error: ', error);
+    console.error('Registration Firestore Error: ', error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }
