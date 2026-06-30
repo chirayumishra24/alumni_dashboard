@@ -78,7 +78,7 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { name, email, batch, program, school, company, role, skills, linkedin, phone } = body;
+    const { name, email, batch, program, school, company, role, skills, linkedin, phone, city } = body;
 
     if (!name || !email || !batch || !program || !school || !skills) {
       return NextResponse.json({ error: 'Missing required registration fields' }, { status: 400 });
@@ -119,7 +119,7 @@ export async function POST(request: Request) {
       role: role || '',
       industry: skills.split(',')[0]?.trim() || 'General',
       country: 'India', // Default to India
-      city: 'Mumbai', // Default to Mumbai
+      city: city || 'Mumbai',
       skills,
       isVerified: false,
       isMentor: false,
