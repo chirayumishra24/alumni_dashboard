@@ -18,43 +18,48 @@ export async function GET(request: Request) {
       const snapshot = await alumniRef
         .where('school', '==', 'CCHS')
         .where('isVerified', '==', true)
-        .orderBy('batch', 'desc')
         .get();
-      list = snapshot.docs.map((doc: QueryDocumentSnapshot) => doc.data());
+      list = snapshot.docs
+        .map((doc: QueryDocumentSnapshot) => doc.data())
+        .sort((a: { batch?: number }, b: { batch?: number }) => (b.batch || 0) - (a.batch || 0));
     } else if (school === 'CCWS') {
       const snapshot = await alumniRef
         .where('school', '==', 'CCWS')
         .where('isVerified', '==', true)
-        .orderBy('batch', 'desc')
         .get();
-      list = snapshot.docs.map((doc: QueryDocumentSnapshot) => doc.data());
+      list = snapshot.docs
+        .map((doc: QueryDocumentSnapshot) => doc.data())
+        .sort((a: { batch?: number }, b: { batch?: number }) => (b.batch || 0) - (a.batch || 0));
     } else if (school === 'CCIS') {
       // CCIS displays data for both CCHS and CCWS, top 25 profiles each on page 1
       const [cchsSnapshot, ccwsSnapshot] = await Promise.all([
         alumniRef
           .where('school', '==', 'CCHS')
           .where('isVerified', '==', true)
-          .orderBy('batch', 'desc')
-          .limit(25)
           .get(),
         alumniRef
           .where('school', '==', 'CCWS')
           .where('isVerified', '==', true)
-          .orderBy('batch', 'desc')
-          .limit(25)
           .get()
       ]);
 
-      const cchsTop = cchsSnapshot.docs.map((doc: QueryDocumentSnapshot) => doc.data());
-      const ccwsTop = ccwsSnapshot.docs.map((doc: QueryDocumentSnapshot) => doc.data());
+      const cchsTop = cchsSnapshot.docs
+        .map((doc: QueryDocumentSnapshot) => doc.data())
+        .sort((a: { batch?: number }, b: { batch?: number }) => (b.batch || 0) - (a.batch || 0))
+        .slice(0, 25);
+      const ccwsTop = ccwsSnapshot.docs
+        .map((doc: QueryDocumentSnapshot) => doc.data())
+        .sort((a: { batch?: number }, b: { batch?: number }) => (b.batch || 0) - (a.batch || 0))
+        .slice(0, 25);
       list = [...cchsTop, ...ccwsTop];
     } else {
       // Return all verified if no school parameter specified
       const snapshot = await alumniRef
         .where('isVerified', '==', true)
-        .orderBy('batch', 'desc')
         .get();
-      list = snapshot.docs.map((doc: QueryDocumentSnapshot) => doc.data());
+      list = snapshot.docs
+        .map((doc: QueryDocumentSnapshot) => doc.data())
+        .sort((a: { batch?: number }, b: { batch?: number }) => (b.batch || 0) - (a.batch || 0));
     }
 
     const response = NextResponse.json(list);
