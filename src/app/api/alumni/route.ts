@@ -62,7 +62,11 @@ export async function GET(request: Request) {
         .sort((a: { batch?: number }, b: { batch?: number }) => (b.batch || 0) - (a.batch || 0));
     }
 
-    const response = NextResponse.json(list);
+    // Strip phone field from public view
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const publicList = list.map(({ phone, ...rest }) => rest);
+
+    const response = NextResponse.json(publicList);
     response.headers.set('Access-Control-Allow-Origin', '*');
     response.headers.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
     response.headers.set('Access-Control-Allow-Headers', 'Content-Type');
@@ -78,7 +82,7 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { name, email, batch, program, school, company, role, skills, linkedin, phone, city } = body;
+    const { name, email, batch, program, school, company, role, skills, linkedin, phone, city, avatarUrl } = body;
 
     if (!name || !email || !batch || !program || !school || !skills) {
       return NextResponse.json({ error: 'Missing required registration fields' }, { status: 400 });
@@ -102,7 +106,7 @@ export async function POST(request: Request) {
       email,
       name,
       role: 'ALUMNI',
-      avatarUrl: `https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=120` // Default placeholder avatar
+      avatarUrl: avatarUrl || `https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=120` // Use uploaded avatarUrl or default placeholder
     };
     await userRef.set(userData);
 
