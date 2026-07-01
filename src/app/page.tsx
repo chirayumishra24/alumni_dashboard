@@ -362,9 +362,19 @@ export default function PublicAlumniPage() {
           Inspiring Future <span className="font-serif italic font-extrabold text-navy-650">Leaders</span>
         </h2>
 
-        <p className="text-base md:text-lg text-slate-650 max-w-2xl mx-auto leading-relaxed font-sans font-medium italic">
-          &quot;Our legacy is built in the halls of Cambridge Court; our destiny is reflected in the global achievements of our alumni.&quot;
-        </p>
+        {/* Legacy Quote Card Block */}
+        <div className="max-w-4xl mx-auto my-8 relative overflow-hidden bg-[#001f3f] text-white shadow-xl border border-white/5 p-8 md:p-12 transition-all duration-300">
+          {/* Custom corner triangle decorations to match CCHS style */}
+          <div className="absolute top-0 left-0 w-24 h-full bg-[#001326] [clip-path:polygon(0_0,0_100%,100%_100%)] opacity-40 pointer-events-none" />
+          <div className="absolute top-0 right-0 w-24 h-full bg-white/5 [clip-path:polygon(0_0,100%_0,100%_100%)] pointer-events-none" />
+          
+          <div className="relative z-10 space-y-4">
+            <blockquote className="text-lg md:text-xl md:leading-relaxed font-serif italic text-white/95">
+              &quot;Our legacy is not just in the buildings we have raised, but in the thousands of lives we have shaped with values, vision, and wisdom.&quot;
+            </blockquote>
+            <div className="w-12 h-[2px] bg-red-700 mx-auto mt-4" />
+          </div>
+        </div>
 
         <div className="flex flex-wrap items-center justify-center gap-x-12 gap-y-4 pt-6 max-w-3xl mx-auto border-t border-slate-200/40">
           <div className="text-center">
