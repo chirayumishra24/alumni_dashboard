@@ -135,16 +135,42 @@ export default function PublicAlumniPage() {
   };
 
   const fetchAlumni = async () => {
-    setLoading(true);
+    // Stale-While-Revalidate: Check if we have cached data first
+    let hasCache = false;
+    if (typeof window !== "undefined") {
+      const cached = localStorage.getItem("ccgs_alumni_data_cache");
+      if (cached) {
+        try {
+          const parsed = JSON.parse(cached);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            setAlumni(parsed);
+            setLoading(false); // Disable initial loader immediately
+            hasCache = true;
+          }
+        } catch (e) {
+          console.error("Failed to parse cached alumni data:", e);
+        }
+      }
+    }
+
+    if (!hasCache) {
+      setLoading(true);
+    }
+
     try {
       const res = await fetch("/api/alumni");
       const json = await res.json();
       if (res.ok) {
         setAlumni(json);
+        if (typeof window !== "undefined") {
+          localStorage.setItem("ccgs_alumni_data_cache", JSON.stringify(json));
+        }
       }
     } catch (e) {
       console.error(e);
-      showToast("Failed to fetch alumni directory", "error");
+      if (!hasCache) {
+        showToast("Failed to fetch alumni directory", "error");
+      }
     } finally {
       setLoading(false);
     }

@@ -77,6 +77,7 @@ export async function GET(request: Request) {
     response.headers.set('Access-Control-Allow-Origin', '*');
     response.headers.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
     response.headers.set('Access-Control-Allow-Headers', 'Content-Type');
+    response.headers.set('Cache-Control', 'public, s-maxage=30, stale-while-revalidate=60');
 
     return response;
   } catch (error) {
