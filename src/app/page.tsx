@@ -64,6 +64,15 @@ export default function PublicAlumniPage() {
   const [schoolFilter, setSchoolFilter] = useState("All");
   const [batchFilter, setBatchFilter] = useState("All");
 
+  // Pagination State
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 30; // 5 columns * 6 rows
+
+  // Reset pagination to first page when search filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, schoolFilter, batchFilter]);
+
   // Registration form modal state
   const [showRegModal, setShowRegModal] = useState(false);
   const [toast, setToast] = useState<{ message: string; type: "success" | "error" } | null>(null);
@@ -192,6 +201,13 @@ export default function PublicAlumniPage() {
                         a.city.toLowerCase().includes(searchQuery.toLowerCase());
     return matchSchool && matchBatch && matchSearch;
   });
+
+  // Pagination calculation
+  const totalPages = Math.ceil(filteredAlumni.length / itemsPerPage);
+  const paginatedAlumni = filteredAlumni.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
 
   // Unique Batch list for filtering dropdown
   const batchYears = Array.from(new Set(alumni.map(a => a.batch.toString()))).sort((a, b) => b.localeCompare(a));
@@ -327,28 +343,28 @@ export default function PublicAlumniPage() {
                 <p className="text-[11px] text-slate-500 mt-1">Try adjusting your filters or search keywords.</p>
               </div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {filteredAlumni.map((alum) => (
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-5">
+                {paginatedAlumni.map((alum) => (
                   <div 
                     key={alum.id} 
-                    className="group rounded-[2rem] glass-card glass-card-hover p-6 space-y-5 flex flex-col justify-between"
+                    className="group rounded-[2rem] glass-card glass-card-hover p-5 space-y-4 flex flex-col justify-between"
                   >
-                    <div className="space-y-4">
-                      {/* Avatar & Header */}
-                      <div className="flex items-center gap-3">
+                    <div className="space-y-3.5">
+                      {/* Avatar & Header (Stacked Centered Layout) */}
+                      <div className="flex flex-col items-center text-center space-y-2.5">
                         <div className={`relative p-0.5 rounded-2xl border-2 ${
                           alum.school === "CCHS" ? "border-maroon-600/30 bg-maroon-50/20" : "border-navy-600/30 bg-navy-50/20"
-                        } shrink-0`}>
+                        } shrink-0 shadow-sm transition-transform duration-300 group-hover:scale-105`}>
                           <img 
                             src={alum.user.avatarUrl || `https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=120`} 
-                            className="h-11 w-11 rounded-xl object-cover shadow-sm" 
+                            className="h-16 w-16 rounded-xl object-cover" 
                             alt="avatar" 
                           />
                         </div>
-                        <div className="min-w-0 flex-1">
-                          <div className="flex items-center gap-1.5 flex-wrap">
-                            <h3 className="text-sm font-bold text-slate-900 truncate">{alum.user.name}</h3>
-                            <span className={`px-1.5 py-0.5 rounded text-[8px] font-bold uppercase ${
+                        <div className="min-w-0 w-full space-y-0.5">
+                          <div className="flex items-center justify-center gap-1.5 flex-wrap">
+                            <h3 className="text-xs font-extrabold text-slate-900 truncate max-w-[130px]">{alum.user.name}</h3>
+                            <span className={`px-1.5 py-0.5 rounded text-[7px] font-extrabold uppercase tracking-wide ${
                               alum.school === "CCHS" 
                                 ? "bg-maroon-50 text-maroon-700 border border-maroon-100/50" 
                                 : "bg-navy-50/80 text-navy-700 border border-navy-100/50"
@@ -356,42 +372,42 @@ export default function PublicAlumniPage() {
                               {alum.school}
                             </span>
                           </div>
-                          <span className="text-[10px] text-slate-500 font-semibold uppercase block mt-0.5">Class of {alum.batch}</span>
+                          <span className="text-[9px] text-slate-400 font-bold uppercase tracking-wider block">Class of {alum.batch}</span>
                         </div>
                       </div>
 
-                      {/* Biography Block - Left Maroon/Navy Accent Line */}
+                      {/* Biography Block - Centered Quote */}
                       {alum.bio && (
-                        <div className={`pl-3 border-l-2 py-0.5 my-2.5 ${
-                          alum.school === "CCHS" ? "border-maroon-600/60" : "border-navy-600/60"
-                        }`}>
-                          <p className="text-[11px] text-slate-600 leading-relaxed line-clamp-3 italic">
+                        <div className="px-2.5 py-1.5 bg-slate-950/[0.015] rounded-xl border border-black/[0.01] text-center my-1.5">
+                          <p className="text-[10px] text-slate-550 leading-normal line-clamp-2 italic">
                             &quot;{alum.bio}&quot;
                           </p>
                         </div>
                       )}
 
                       {/* Professional Details */}
-                      <div className="space-y-1.5">
-                        <p className="text-xs text-slate-700 font-semibold truncate">
+                      <div className="space-y-0.5 text-center">
+                        <p className="text-[11px] text-slate-800 font-extrabold truncate">
                           {alum.role || "Graduate"} 
-                          {alum.company && (
-                            <span> @ <span className="text-slate-950 font-bold">{alum.company}</span></span>
-                          )}
                         </p>
-                        <p className="text-[10px] text-slate-500 flex items-center gap-1">
-                          <MapPin size={12} className="text-slate-400 shrink-0" /> {alum.city}, {alum.country}
+                        {alum.company && (
+                          <p className="text-[9.5px] text-slate-500 font-medium truncate">
+                            at <span className="text-slate-900 font-bold">{alum.company}</span>
+                          </p>
+                        )}
+                        <p className="text-[9px] text-slate-400 flex items-center justify-center gap-0.5 mt-1 font-semibold uppercase tracking-wider">
+                          <MapPin size={10} className="text-slate-400 shrink-0" /> {alum.city}, {alum.country}
                         </p>
                       </div>
 
                       {/* Direct Contacts Badges */}
-                      <div className="flex flex-wrap items-center gap-2 pt-3 border-t border-black/[0.04] mt-1.5">
+                      <div className="flex flex-wrap items-center justify-center gap-1 pt-2 border-t border-black/[0.04]">
                         <a 
                           href={`mailto:${alum.user.email}`}
-                          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/40 hover:bg-white/80 border border-white/60 text-[10px] font-bold text-slate-700 hover:text-maroon-700 transition-all shadow-sm max-w-[130px]"
+                          className="flex items-center gap-1 px-2 py-1 rounded-lg bg-white/40 hover:bg-white/80 border border-white/60 text-[9px] font-bold text-slate-700 hover:text-maroon-700 transition-all shadow-sm max-w-[105px]"
                           title={`Email ${alum.user.name}`}
                         >
-                          <Mail size={12} className="text-maroon-600 shrink-0" />
+                          <Mail size={10} className="text-maroon-600 shrink-0" />
                           <span className="truncate">{alum.user.email}</span>
                         </a>
                         
@@ -400,41 +416,96 @@ export default function PublicAlumniPage() {
                             href={alum.linkedin} 
                             target="_blank" 
                             rel="noopener noreferrer"
-                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/40 hover:bg-white/80 border border-white/60 text-[10px] font-bold text-slate-700 hover:text-navy-700 transition-all shadow-sm"
+                            className="flex items-center gap-1 px-2 py-1 rounded-lg bg-white/40 hover:bg-white/80 border border-white/60 text-[9px] font-bold text-slate-700 hover:text-navy-700 transition-all shadow-sm"
                             title="LinkedIn Profile"
                           >
-                            <LinkedinIcon size={12} className="text-navy-600 shrink-0" />
+                            <LinkedinIcon size={10} className="text-navy-600 shrink-0" />
                             <span>LinkedIn</span>
                           </a>
                         )}
                       </div>
 
                       {/* Skills Tags */}
-                      <div className="flex flex-wrap gap-1.5 pt-1">
-                        {alum.skills.split(",").slice(0, 3).map((skill, idx) => (
-                          <span key={idx} className="px-2.5 py-0.5 rounded-lg glass-badge text-[9px] font-semibold text-slate-600">
+                      <div className="flex flex-wrap justify-center gap-1 pt-0.5">
+                        {alum.skills.split(",").slice(0, 2).map((skill, idx) => (
+                          <span key={idx} className="px-1.5 py-0.5 rounded bg-white/20 border border-white/50 text-[8.5px] font-bold text-slate-500">
                             {skill.trim()}
                           </span>
                         ))}
-                        {alum.skills.split(",").length > 3 && (
-                          <span className="px-2 py-0.5 rounded-lg glass-badge text-[9px] font-semibold text-slate-500">
-                            +{alum.skills.split(",").length - 3} more
+                        {alum.skills.split(",").length > 2 && (
+                          <span className="px-1 py-0.5 rounded bg-white/20 border border-white/50 text-[8.5px] font-bold text-slate-400">
+                            +{alum.skills.split(",").length - 2}
                           </span>
                         )}
                       </div>
                     </div>
 
                     {/* Actions bar */}
-                    <div className="pt-4 border-t border-white/40 mt-auto">
+                    <div className="pt-3 border-t border-white/40 mt-auto">
                       <button 
                         onClick={() => setSelectedAlumni(alum)}
-                        className="w-full py-2.5 rounded-xl glass-button text-[10px] font-bold text-slate-700 hover:bg-maroon-600 hover:text-white hover:border-maroon-600 transition-all shadow-sm flex items-center justify-center gap-1.5"
+                        className="w-full py-2 rounded-xl glass-button text-[9px] font-extrabold text-slate-700 hover:bg-maroon-600 hover:text-white hover:border-maroon-600 transition-all shadow-sm flex items-center justify-center gap-1"
                       >
-                        View Profile Details
+                        View Details
                       </button>
                     </div>
                   </div>
                 ))}
+              </div>
+            )}
+
+            {/* Pagination Controls */}
+            {totalPages > 1 && (
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-10 p-4 rounded-2xl bg-white/10 border border-white/20 backdrop-blur-md shadow-sm">
+                <span className="text-[10px] text-slate-500 font-extrabold uppercase tracking-wider">
+                  Showing {(currentPage - 1) * itemsPerPage + 1} - {Math.min(currentPage * itemsPerPage, filteredAlumni.length)} of {filteredAlumni.length} alumni
+                </span>
+                
+                <div className="flex items-center gap-1.5">
+                  <button
+                    disabled={currentPage === 1}
+                    onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                    className="px-3.5 py-2 rounded-xl text-[10px] font-extrabold uppercase tracking-wider transition-all bg-white/40 hover:bg-white/80 border border-white/60 text-slate-700 disabled:opacity-40 disabled:hover:bg-white/40 shadow-sm flex items-center gap-1 active:scale-95 disabled:active:scale-100"
+                  >
+                    Previous
+                  </button>
+
+                  <div className="flex items-center gap-0.5">
+                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => {
+                      const isNear = Math.abs(pageNum - currentPage) <= 1;
+                      const isFirstOrLast = pageNum === 1 || pageNum === totalPages;
+                      
+                      if (!isNear && !isFirstOrLast) {
+                        if (pageNum === 2 || pageNum === totalPages - 1) {
+                          return <span key={pageNum} className="px-1.5 text-xs text-slate-400 font-extrabold select-none">...</span>;
+                        }
+                        return null;
+                      }
+
+                      return (
+                        <button
+                          key={pageNum}
+                          onClick={() => setCurrentPage(pageNum)}
+                          className={`w-8 h-8 rounded-xl text-[10px] font-extrabold transition-all border shadow-sm active:scale-95 ${
+                            currentPage === pageNum
+                              ? "bg-gradient-to-r from-maroon-600 to-navy-700 text-white border-transparent"
+                              : "bg-white/40 hover:bg-white/80 border-white/60 text-slate-750"
+                          }`}
+                        >
+                          {pageNum}
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  <button
+                    disabled={currentPage === totalPages}
+                    onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                    className="px-3.5 py-2 rounded-xl text-[10px] font-extrabold uppercase tracking-wider transition-all bg-white/40 hover:bg-white/80 border border-white/60 text-slate-700 disabled:opacity-40 disabled:hover:bg-white/40 shadow-sm flex items-center gap-1 active:scale-95 disabled:active:scale-100"
+                  >
+                    Next
+                  </button>
+                </div>
               </div>
             )}
           </>
