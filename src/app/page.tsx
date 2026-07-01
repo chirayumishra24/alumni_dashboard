@@ -232,7 +232,7 @@ export default function PublicAlumniPage() {
   return (
     <div className="min-h-screen executive-mesh-bg text-slate-800 font-sans relative overflow-x-hidden selection:bg-maroon-600 selection:text-white grid-bg">
       {/* ================= HERO BACKGROUND IMAGE CAROUSEL (INFINITE MARQUEE) ================= */}
-      <div className="absolute top-0 left-0 right-0 h-[650px] overflow-hidden pointer-events-none z-0 opacity-15">
+      <div className="absolute top-0 left-0 right-0 h-[650px] overflow-hidden pointer-events-none z-0 opacity-30">
         {/* Fading Edge Masks */}
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#f8fafc]/50 to-[#f8fafc] z-10" />
         <div className="absolute inset-0 bg-gradient-to-r from-[#f8fafc] via-transparent to-[#f8fafc] z-10" />
@@ -297,9 +297,9 @@ export default function PublicAlumniPage() {
       {/* Hero Showcase Section */}
       <section className="max-w-7xl mx-auto px-8 pt-20 pb-12 text-center space-y-6 relative z-10">
         
-        <h2 className="text-5xl md:text-[5.5rem] font-serif font-bold text-[#1b2a41] tracking-tight leading-[1.05] max-w-4xl mx-auto">
-          Where Legacy <br />
-          Meets <span className="font-serif italic font-extrabold text-maroon-600">Destiny</span>
+        <h2 className="text-4xl md:text-[4.5rem] font-serif font-bold text-[#1b2a41] tracking-tight leading-[1.1] max-w-5xl mx-auto">
+          Connecting Past <span className="font-serif italic font-extrabold text-maroon-600">Achievers</span>, <br className="hidden md:inline" />
+          Inspiring Future <span className="font-serif italic font-extrabold text-navy-650">Leaders</span>
         </h2>
 
         <p className="text-base md:text-lg text-slate-650 max-w-2xl mx-auto leading-relaxed font-sans font-medium italic">
@@ -491,104 +491,84 @@ export default function PublicAlumniPage() {
                 {paginatedAlumni.map((alum) => (
                   <div 
                     key={alum.id} 
-                    className="group rounded-[2rem] glass-card glass-card-hover p-5 space-y-4 flex flex-col justify-between"
+                    className="group rounded-3xl bg-white border border-slate-200/50 hover:border-slate-300 shadow-[0_4px_20px_rgba(0,0,0,0.015)] hover:shadow-xl hover:-translate-y-1 transition-all duration-300 p-5 flex flex-col justify-between relative overflow-hidden h-[440px]"
                   >
-                    <div className="space-y-3.5">
-                      {/* Avatar & Header (Stacked Centered Layout) */}
-                      <div className="flex flex-col items-center text-center space-y-2.5">
-                        <div className={`relative p-0.5 rounded-2xl border-2 ${
-                          alum.school === "CCHS" ? "border-maroon-600/30 bg-maroon-50/20" : "border-navy-600/30 bg-navy-50/20"
-                        } shrink-0 shadow-sm transition-transform duration-300 group-hover:scale-105`}>
+                    {/* Top School Accent Strip */}
+                    <div className={`absolute top-0 left-0 right-0 h-1.5 ${
+                      alum.school === "CCHS" ? "bg-maroon-600" : "bg-navy-600"
+                    }`} />
+
+                    <div className="space-y-4">
+                      {/* Avatar Header */}
+                      <div className="flex flex-col items-center text-center">
+                        <div className={`h-16 w-16 rounded-full overflow-hidden ring-4 ring-white shadow-md shrink-0 transition-transform duration-300 group-hover:scale-105 ${
+                          alum.school === "CCHS" ? "ring-maroon-50" : "ring-navy-50"
+                        }`}>
                           <img 
                             src={alum.user.avatarUrl || `https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=120`} 
-                            className="h-16 w-16 rounded-xl object-cover" 
-                            alt="avatar" 
+                            className="w-full h-full object-cover" 
+                            alt={alum.user.name} 
                           />
                         </div>
-                        <div className="min-w-0 w-full space-y-0.5">
-                          <div className="flex items-center justify-center gap-1.5 flex-wrap">
-                            <h3 className="text-xs font-extrabold text-slate-900 truncate max-w-[130px]">{alum.user.name}</h3>
-                            <span className={`px-1.5 py-0.5 rounded text-[7px] font-extrabold uppercase tracking-wide ${
-                              alum.school === "CCHS" 
-                                ? "bg-maroon-50 text-maroon-700 border border-maroon-100/50" 
-                                : "bg-navy-50/80 text-navy-700 border border-navy-100/50"
-                            }`}>
-                              {alum.school}
-                            </span>
-                          </div>
-                          <span className="text-[9px] text-slate-400 font-bold uppercase tracking-wider block">Class of {alum.batch}</span>
+
+                        <h3 className="text-sm font-display font-extrabold text-slate-900 mt-3 group-hover:text-maroon-700 transition-colors line-clamp-1">
+                          {alum.user.name}
+                        </h3>
+
+                        <div className="flex items-center gap-1.5 mt-1">
+                          <span className={`px-1.5 py-0.5 rounded text-[8px] font-black uppercase tracking-wide ${
+                            alum.school === "CCHS" 
+                              ? "bg-maroon-50 text-maroon-700 border border-maroon-100/50" 
+                              : "bg-navy-50 text-navy-700 border border-navy-100/50"
+                          }`}>
+                            {alum.school}
+                          </span>
+                          <span className="text-[10px] text-slate-400 font-extrabold uppercase tracking-wider">
+                            Class of {alum.batch}
+                          </span>
                         </div>
                       </div>
 
-                      {/* Biography Block - Centered Quote */}
-                      {alum.bio && (
-                        <div className="px-2.5 py-1.5 bg-slate-950/[0.015] rounded-xl border border-black/[0.01] text-center my-1.5">
-                          <p className="text-[10px] text-slate-550 leading-normal line-clamp-2 italic">
-                            &quot;{alum.bio}&quot;
-                          </p>
-                        </div>
+                      {/* Bio */}
+                      {alum.bio ? (
+                        <p className="text-[11px] text-slate-500 italic text-center line-clamp-2 leading-relaxed max-w-[90%] mx-auto font-medium">
+                          &quot;{alum.bio}&quot;
+                        </p>
+                      ) : (
+                        <div className="h-8" /> /* Spacing helper to keep alignment */
                       )}
 
                       {/* Professional Details */}
-                      <div className="space-y-0.5 text-center">
-                        <p className="text-[11px] text-slate-800 font-extrabold truncate">
-                          {alum.role || "Graduate"} 
+                      <div className="space-y-0.5 text-center pt-1">
+                        <p className="text-[11px] font-extrabold text-slate-800 uppercase tracking-wide truncate max-w-full">
+                          {alum.role || "Graduate"}
                         </p>
                         {alum.company && (
-                          <p className="text-[9.5px] text-slate-500 font-medium truncate">
+                          <p className="text-[10px] text-slate-500 font-semibold truncate">
                             at <span className="text-slate-900 font-bold">{alum.company}</span>
                           </p>
                         )}
-                        <p className="text-[9px] text-slate-400 flex items-center justify-center gap-0.5 mt-1 font-semibold uppercase tracking-wider">
-                          <MapPin size={10} className="text-slate-400 shrink-0" /> {alum.city}, {alum.country}
+                        <p className="text-[9.5px] text-slate-450 flex items-center justify-center gap-0.5 mt-1.5 font-bold uppercase tracking-wider">
+                          <MapPin size={9} className="text-slate-400 shrink-0" /> {alum.city}, {alum.country}
                         </p>
-                      </div>
-
-                      {/* Direct Contacts Badges */}
-                      <div className="flex flex-wrap items-center justify-center gap-1 pt-2 border-t border-black/[0.04]">
-                        <a 
-                          href={`mailto:${alum.user.email}`}
-                          className="flex items-center gap-1 px-2 py-1 rounded-lg bg-white/40 hover:bg-white/80 border border-white/60 text-[9px] font-bold text-slate-700 hover:text-maroon-700 transition-all shadow-sm max-w-[105px]"
-                          title={`Email ${alum.user.name}`}
-                        >
-                          <Mail size={10} className="text-maroon-600 shrink-0" />
-                          <span className="truncate">{alum.user.email}</span>
-                        </a>
-                        
-                        {alum.linkedin && (
-                          <a 
-                            href={alum.linkedin} 
-                            target="_blank" 
-                            rel="noopener noreferrer"
-                            className="flex items-center gap-1 px-2 py-1 rounded-lg bg-white/40 hover:bg-white/80 border border-white/60 text-[9px] font-bold text-slate-700 hover:text-navy-700 transition-all shadow-sm"
-                            title="LinkedIn Profile"
-                          >
-                            <LinkedinIcon size={10} className="text-navy-600 shrink-0" />
-                            <span>LinkedIn</span>
-                          </a>
-                        )}
-                      </div>
-
-                      {/* Skills Tags */}
-                      <div className="flex flex-wrap justify-center gap-1 pt-0.5">
-                        {alum.skills.split(",").slice(0, 2).map((skill, idx) => (
-                          <span key={idx} className="px-1.5 py-0.5 rounded bg-white/20 border border-white/50 text-[8.5px] font-bold text-slate-500">
-                            {skill.trim()}
-                          </span>
-                        ))}
-                        {alum.skills.split(",").length > 2 && (
-                          <span className="px-1 py-0.5 rounded bg-white/20 border border-white/50 text-[8.5px] font-bold text-slate-400">
-                            +{alum.skills.split(",").length - 2}
-                          </span>
-                        )}
                       </div>
                     </div>
 
-                    {/* Actions bar */}
-                    <div className="pt-3 border-t border-white/40 mt-auto">
+                    {/* Footer Actions & Details */}
+                    <div className="space-y-3.5 pt-3 border-t border-slate-100 mt-auto">
+                      {/* Skill tags preview */}
+                      <div className="flex flex-wrap justify-center gap-1">
+                        {alum.skills.split(",").slice(0, 2).map((skill, idx) => (
+                          <span key={idx} className="px-1.5 py-0.5 rounded bg-slate-50 text-[8.5px] font-bold text-slate-500 border border-slate-100">
+                            {skill.trim()}
+                          </span>
+                        ))}
+                      </div>
+
+                      {/* View details */}
                       <button 
                         onClick={() => setSelectedAlumni(alum)}
-                        className="w-full py-2 rounded-xl glass-button text-[9px] font-extrabold text-slate-700 hover:bg-maroon-600 hover:text-white hover:border-maroon-600 transition-all shadow-sm flex items-center justify-center gap-1"
+                        className="w-full py-2.5 rounded-xl border border-slate-200 hover:border-slate-350 hover:bg-slate-50 text-[10px] font-black uppercase tracking-wider text-slate-700 transition-all flex items-center justify-center gap-1.5 active:scale-[0.98]"
                       >
                         View Details
                       </button>
