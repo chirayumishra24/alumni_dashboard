@@ -524,10 +524,10 @@ export default function PublicAlumniPage() {
                       alum.school === "CCHS" ? "bg-maroon-600" : "bg-navy-600"
                     }`} />
 
-                    <div className="space-y-4">
+                    <div className="space-y-2.5">
                       {/* Avatar Header */}
                       <div className="flex flex-col items-center text-center">
-                        <div className={`h-16 w-16 rounded-full overflow-hidden ring-4 ring-white shadow-md shrink-0 transition-transform duration-300 group-hover:scale-105 ${
+                        <div className={`h-24 w-24 rounded-full overflow-hidden ring-4 ring-white shadow-md shrink-0 transition-transform duration-300 group-hover:scale-105 ${
                           alum.school === "CCHS" ? "ring-maroon-50" : "ring-navy-50"
                         }`}>
                           <img 
@@ -537,7 +537,7 @@ export default function PublicAlumniPage() {
                           />
                         </div>
 
-                        <h3 className="text-sm font-display font-extrabold text-slate-900 mt-3 group-hover:text-maroon-700 transition-colors line-clamp-1">
+                        <h3 className="text-sm font-display font-extrabold text-slate-900 mt-2.5 group-hover:text-maroon-700 transition-colors line-clamp-1">
                           {alum.user.name}
                         </h3>
 
@@ -561,7 +561,7 @@ export default function PublicAlumniPage() {
                           &quot;{alum.bio}&quot;
                         </p>
                       ) : (
-                        <div className="h-8" /> /* Spacing helper to keep alignment */
+                        <div className="h-2" /> /* Reduced height helper */
                       )}
 
                       {/* Professional Details */}
