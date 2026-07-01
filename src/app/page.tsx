@@ -968,10 +968,10 @@ export default function PublicAlumniPage() {
 
       {/* ================= REGISTER CTA SECTION ================= */}
       <section className="max-w-7xl mx-auto px-8 mt-24 relative z-10">
-        <div className="bg-gradient-to-r from-maroon-700 via-maroon-800 to-navy-900 rounded-[2.5rem] p-12 text-center text-white relative overflow-hidden shadow-2xl border border-white/10">
+        <div className="bg-maroon-700 rounded-[2.5rem] p-12 text-center text-white relative overflow-hidden shadow-2xl border border-white/10">
           {/* Subtle background glow */}
           <div className="absolute -top-24 -left-24 w-96 h-96 bg-maroon-500/10 rounded-full blur-3xl" />
-          <div className="absolute -bottom-24 -right-24 w-96 h-96 bg-navy-500/15 rounded-full blur-3xl" />
+          <div className="absolute -bottom-24 -right-24 w-96 h-96 bg-maroon-500/10 rounded-full blur-3xl" />
           
           <div className="relative z-10 space-y-6 max-w-2xl mx-auto">
             <div className="inline-flex -space-x-2 justify-center mb-2">
