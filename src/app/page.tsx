@@ -266,17 +266,14 @@ export default function PublicAlumniPage() {
 
       {/* Hero Showcase Section */}
       <section className="max-w-7xl mx-auto px-8 pt-20 pb-12 text-center space-y-6 relative z-10">
-        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-900/5 border border-slate-900/10 text-xs font-semibold text-slate-800 uppercase tracking-widest bg-white shadow-sm">
-          <span className="w-1.5 h-1.5 rounded-full bg-maroon-600 animate-pulse" /> CCHS LEGACY
-        </div>
         
         <h2 className="text-5xl md:text-[5.5rem] font-serif font-bold text-[#1b2a41] tracking-tight leading-[1.05] max-w-4xl mx-auto">
           Where Legacy <br />
           Meets <span className="font-serif italic font-extrabold text-maroon-600">Destiny</span>
         </h2>
 
-        <p className="text-base md:text-lg text-slate-650 max-w-2xl mx-auto leading-relaxed font-sans font-medium">
-          Celebrating the professional journeys and global contributions of Cambridge Court Group of Schools graduates.
+        <p className="text-base md:text-lg text-slate-650 max-w-2xl mx-auto leading-relaxed font-sans font-medium italic">
+          &quot;Our legacy is built in the halls of Cambridge Court; our destiny is reflected in the global achievements of our alumni.&quot;
         </p>
 
         <div className="flex flex-wrap items-center justify-center gap-x-12 gap-y-4 pt-6 max-w-3xl mx-auto border-t border-slate-200/40">
@@ -969,17 +966,128 @@ export default function PublicAlumniPage() {
         </div>
       )}
 
-      {/* Footer - Refactored to glass-panel style */}
-      <footer className="border-t border-slate-200/50 bg-[#eff6ff]/30 py-12 text-center text-xs text-slate-500 mt-20 relative z-10">
-        <div className="max-w-7xl mx-auto px-8 flex flex-col md:flex-row items-center justify-between gap-6">
-          <p>© 2026 CCGS Educational Group. CCHS & CCWS Joint Alumni Directories.</p>
-          <div className="flex items-center gap-4">
-            <span 
-              onClick={() => window.open("/admin", "_blank")}
-              className="hover:text-maroon-700 cursor-pointer font-bold text-maroon-600 transition-colors"
-            >
-              Coordinator Portal Access
-            </span>
+      {/* ================= REGISTER CTA SECTION ================= */}
+      <section className="max-w-7xl mx-auto px-8 mt-24 relative z-10">
+        <div className="bg-gradient-to-r from-maroon-700 via-maroon-800 to-navy-900 rounded-[2.5rem] p-12 text-center text-white relative overflow-hidden shadow-2xl border border-white/10">
+          {/* Subtle background glow */}
+          <div className="absolute -top-24 -left-24 w-96 h-96 bg-maroon-500/10 rounded-full blur-3xl" />
+          <div className="absolute -bottom-24 -right-24 w-96 h-96 bg-navy-500/15 rounded-full blur-3xl" />
+          
+          <div className="relative z-10 space-y-6 max-w-2xl mx-auto">
+            <div className="inline-flex -space-x-2 justify-center mb-2">
+              <img className="w-10 h-10 rounded-full border-2 border-white object-cover shadow" src="https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?auto=format&fit=crop&q=80&w=120" alt="alumni" />
+              <img className="w-10 h-10 rounded-full border-2 border-white object-cover shadow" src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=120" alt="alumni" />
+              <img className="w-10 h-10 rounded-full border-2 border-white object-cover shadow" src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=120" alt="alumni" />
+              <div className="w-10 h-10 rounded-full border-2 border-white bg-slate-800 flex items-center justify-center text-[10px] font-bold shadow text-slate-200 uppercase">
+                +1k
+              </div>
+            </div>
+
+            <h3 className="text-3xl font-display font-black tracking-tight leading-tight">
+              Share Your Journey. Inspire the Next Generation.
+            </h3>
+            
+            <p className="text-sm text-slate-200 leading-relaxed font-medium">
+              Join verified graduates from CCHS & CCWS. Showcase your professional milestones, connect with peers, and help guide students on their career paths.
+            </p>
+
+            <div className="pt-2">
+              <button
+                onClick={() => setShowRegModal(true)}
+                className="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl bg-white hover:bg-slate-100 text-slate-900 font-extrabold text-xs tracking-wider uppercase transition-all duration-300 hover:scale-[1.03] active:scale-95 shadow-xl"
+              >
+                <PlusCircle size={14} className="text-maroon-600" />
+                Register Your Profile
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ================= PREMIUM FOOTER ================= */}
+      <footer className="bg-slate-900 border-t border-slate-800 pt-16 pb-8 mt-20 relative z-10 text-slate-400">
+        <div className="max-w-7xl mx-auto px-8 grid grid-cols-1 md:grid-cols-4 gap-10">
+          
+          {/* Column 1: Brand & Legacy */}
+          <div className="space-y-4">
+            <div className="bg-white/5 inline-block p-1.5 rounded-xl border border-white/10">
+              <Logo size={36} />
+            </div>
+            <p className="text-xs text-slate-400 leading-relaxed font-sans font-medium">
+              A professional joint directories network connecting verified graduates from Cambridge Court High School and Cambridge Court World School globally.
+            </p>
+          </div>
+
+          {/* Column 2: School Networks */}
+          <div className="space-y-3">
+            <h4 className="text-xs font-black uppercase tracking-wider text-slate-200">School Networks</h4>
+            <ul className="space-y-2 text-xs font-semibold">
+              <li>
+                <a href="https://cambridgecourtgroup.com" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">
+                  Cambridge Court Group
+                </a>
+              </li>
+              <li>
+                <a href="https://cambridgecourthighschool.org" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">
+                  Cambridge Court High School (CCHS)
+                </a>
+              </li>
+              <li>
+                <a href="https://cambridgecourtworldschool.org" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">
+                  Cambridge Court World School (CCWS)
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          {/* Column 3: Quick Navigation */}
+          <div className="space-y-3">
+            <h4 className="text-xs font-black uppercase tracking-wider text-slate-200">Portal</h4>
+            <ul className="space-y-2 text-xs font-semibold">
+              <li>
+                <span 
+                  onClick={() => setShowRegModal(true)} 
+                  className="hover:text-white transition-colors cursor-pointer"
+                >
+                  Register Profile
+                </span>
+              </li>
+              <li>
+                <span 
+                  onClick={() => window.open("/admin", "_blank")} 
+                  className="hover:text-white transition-colors cursor-pointer text-maroon-400 font-bold"
+                >
+                  Coordinator Portal Access
+                </span>
+              </li>
+              <li>
+                <a href="#filters" className="hover:text-white transition-colors">
+                  Browse Directory
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          {/* Column 4: Contact & Socials */}
+          <div className="space-y-3">
+            <h4 className="text-xs font-black uppercase tracking-wider text-slate-200">Contact Details</h4>
+            <p className="text-xs leading-relaxed font-medium">
+              Sector 8, Madhyam Marg, Mansarovar,<br />
+              Jaipur, Rajasthan 302020<br />
+              <a href="mailto:info@cambridgecourtgroup.com" className="text-slate-200 hover:text-white underline transition-colors">
+                info@cambridgecourtgroup.com
+              </a>
+            </p>
+          </div>
+
+        </div>
+
+        {/* Bottom Legal Stripe */}
+        <div className="max-w-7xl mx-auto px-8 pt-8 mt-12 border-t border-slate-800 flex flex-col md:flex-row items-center justify-between gap-4 text-[11px] text-slate-500 font-medium">
+          <p>© 2026 CCGS Educational Group. All rights reserved.</p>
+          <div className="flex items-center gap-6">
+            <a href="#" className="hover:text-slate-350 transition-colors">Privacy Policy</a>
+            <a href="#" className="hover:text-slate-350 transition-colors">Terms of Use</a>
           </div>
         </div>
       </footer>
