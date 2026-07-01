@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { 
-  MapPin, Search, X, Sparkles, PlusCircle, RefreshCw, Users, Mail
+  MapPin, Search, X, Sparkles, PlusCircle, RefreshCw, Users, Mail, Play, Video
 } from "lucide-react";
 import { uploadFileToStorage } from "@/lib/firebase";
 import Logo from "@/components/Logo";
@@ -54,10 +54,27 @@ interface AlumniProfile {
   bio?: string | null;
 }
 
+const ALUMNI_VIDEOS_L2R = [
+  { id: "EngW7tLk6rM", title: "Building Green Energy Solutions", name: "Neha Gupta", role: "CEO at EcoTech Solutions", image: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&q=80&w=360" },
+  { id: "k3vBZs812-Y", title: "AI Research at Google DeepMind", name: "Rahul Sharma", role: "AI Research Scientist", image: "https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&q=80&w=360" },
+  { id: "9h-xV31X3_o", title: "Designing for the Next Billion Users", name: "Sarah Al-Fatah", role: "Lead Product Designer", image: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=360" },
+  { id: "EngW7tLk6rM", title: "Scale-up Strategy at Unicorns", name: "Marcus Chen", role: "VP Growth", image: "https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?auto=format&fit=crop&q=80&w=360" },
+  { id: "k3vBZs812-Y", title: "From Campus to VC Funding", name: "Emily Watson", role: "Managing Partner", image: "https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&q=80&w=360" },
+];
+
+const ALUMNI_VIDEOS_R2L = [
+  { id: "9h-xV31X3_o", title: "Launching Space Tech Ventures", name: "Elena Rostova", role: "Aerospace Systems Lead", image: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=360" },
+  { id: "EngW7tLk6rM", title: "Fintech Revolution & Web3", name: "Aarav Mehta", role: "Co-Founder @ PaySphere", image: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&q=80&w=360" },
+  { id: "k3vBZs812-Y", title: "Non-Profit Impact in Africa", name: "Zola Dlamini", role: "Executive Director", image: "https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?auto=format&fit=crop&q=80&w=360" },
+  { id: "9h-xV31X3_o", title: "Surgical Robotics Innovation", name: "Kenji Sato", role: "Robotics Architect", image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=360" },
+  { id: "EngW7tLk6rM", title: "E-Commerce Logistics Scaling", name: "Clara Dupont", role: "Global Operations Lead", image: "https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&q=80&w=360" },
+];
+
 export default function PublicAlumniPage() {
   const [alumni, setAlumni] = useState<AlumniProfile[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [selectedAlumni, setSelectedAlumni] = useState<AlumniProfile | null>(null);
+  const [activeVideoId, setActiveVideoId] = useState<string | null>(null);
   
   // Search & Filter States
   const [searchQuery, setSearchQuery] = useState("");
@@ -248,37 +265,135 @@ export default function PublicAlumniPage() {
       </header>
 
       {/* Hero Showcase Section */}
-      <section className="max-w-7xl mx-auto px-8 pt-16 pb-12 text-center space-y-6 relative z-10">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-maroon-500/10 border border-maroon-500/15 text-[10px] font-bold text-maroon-700 uppercase tracking-wider">
-          <Sparkles size={12} className="text-maroon-600" /> CCHS & CCWS Combined Directories
+      <section className="max-w-7xl mx-auto px-8 pt-20 pb-12 text-center space-y-6 relative z-10">
+        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-900/5 border border-slate-900/10 text-xs font-semibold text-slate-800 uppercase tracking-widest bg-white shadow-sm">
+          <span className="w-1.5 h-1.5 rounded-full bg-maroon-600 animate-pulse" /> CCHS LEGACY
         </div>
-        <h2 className="text-4xl md:text-[3.25rem] font-display font-extrabold tracking-tight text-slate-900 leading-[1.1]">
-          Discover Our Professional <br />
-          <span className="font-black bg-clip-text text-transparent bg-gradient-to-r from-maroon-650 via-maroon-500 to-navy-700">
-            Graduate Alumni Network
-          </span>
+        
+        <h2 className="text-5xl md:text-[5.5rem] font-serif font-bold text-[#1b2a41] tracking-tight leading-[1.05] max-w-4xl mx-auto">
+          Where Legacy <br />
+          Meets <span className="font-serif italic font-extrabold text-maroon-600">Destiny</span>
         </h2>
-        <p className="text-xs md:text-sm text-slate-600 max-w-xl mx-auto leading-relaxed">
-          Explore and connect with verified graduates from the CCHS and CCWS school networks building modern careers across top global industries.
+
+        <p className="text-base md:text-lg text-slate-650 max-w-2xl mx-auto leading-relaxed font-sans font-medium">
+          Celebrating the professional journeys and global contributions of Cambridge Court Group of Schools graduates.
         </p>
 
-        <div className="flex items-center justify-center gap-4 pt-4">
-          <div className="px-5 py-2.5 rounded-3xl glass-card text-center min-w-[120px]">
-            <span className="block text-xl font-black text-slate-900">{alumni.length}</span>
-            <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Verified Alumni</span>
+        <div className="flex flex-wrap items-center justify-center gap-x-12 gap-y-4 pt-6 max-w-3xl mx-auto border-t border-slate-200/40">
+          <div className="text-center">
+            <span className="block text-3xl font-black text-slate-900 font-display">1,500+</span>
+            <span className="text-[11px] text-slate-500 font-extrabold uppercase tracking-widest block mt-0.5">Alumni</span>
           </div>
-          <div className="px-5 py-2.5 rounded-3xl glass-card text-center min-w-[120px]">
-            <span className="block text-xl font-black text-slate-900">
-              {alumni.filter(a => a.school === "CCHS").length}
-            </span>
-            <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">CCHS Graduates</span>
+          <div className="w-1.5 h-1.5 rounded-full bg-slate-350 hidden sm:block" />
+          <div className="text-center">
+            <span className="block text-3xl font-black text-slate-900 font-display">20+</span>
+            <span className="text-[11px] text-slate-500 font-extrabold uppercase tracking-widest block mt-0.5">Countries</span>
           </div>
-          <div className="px-5 py-2.5 rounded-3xl glass-card text-center min-w-[120px]">
-            <span className="block text-xl font-black text-slate-900">
-              {alumni.filter(a => a.school === "CCWS").length}
-            </span>
-            <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">CCWS Graduates</span>
+          <div className="w-1.5 h-1.5 rounded-full bg-slate-350 hidden sm:block" />
+          <div className="text-center">
+            <span className="block text-3xl font-black text-slate-900 font-display">4+</span>
+            <span className="text-[11px] text-slate-500 font-extrabold uppercase tracking-widest block mt-0.5">Key Fields</span>
           </div>
+        </div>
+      </section>
+
+      {/* ================= ALUMNI SPOTLIGHT VIDEO RIBBONS ================= */}
+      <section className="py-6 space-y-6 relative z-10 max-w-[100vw] overflow-hidden">
+        <div className="max-w-7xl mx-auto px-8 text-center md:text-left">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-900/5 border border-slate-900/10 text-[10px] font-bold text-slate-700 uppercase tracking-wider mb-2">
+            <Video size={12} className="text-slate-600 animate-pulse" /> Alumni Success Spotlights
+          </div>
+          <h3 className="text-2xl font-display font-extrabold text-slate-900 tracking-tight">
+            Hear From Our Global Graduates
+          </h3>
+          <p className="text-xs text-slate-500 max-w-xl mt-1">
+            Muted previews from CCHS & CCWS graduates sharing career pathways, startup journeys, and industry insights. Click to play.
+          </p>
+        </div>
+
+        {/* Continuous Video marquee tracks with Fading Mask */}
+        <div className="marquee-container marquee-mask py-2 space-y-4">
+          
+          {/* Row 1: Left to Right */}
+          <div className="marquee-track-left gap-4">
+            {[...ALUMNI_VIDEOS_L2R, ...ALUMNI_VIDEOS_L2R].map((video, idx) => (
+              <div 
+                key={`l2r-${idx}`}
+                onClick={() => setActiveVideoId(video.id)}
+                className="group relative w-[280px] aspect-[16/10] rounded-2xl overflow-hidden cursor-pointer border border-slate-200/60 shadow-md hover:shadow-xl transition-all duration-300 hover:scale-[1.03]"
+              >
+                {/* Thumbnail */}
+                <img 
+                  src={video.image} 
+                  alt={video.title} 
+                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" 
+                />
+                {/* Dark Vignette overlay */}
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-slate-950/20 group-hover:via-slate-950/50 transition-all" />
+                
+                {/* Play Button Overlay */}
+                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  <div className="p-3.5 rounded-full bg-white/90 text-slate-900 shadow-lg scale-90 group-hover:scale-100 transition-transform duration-300">
+                    <Play size={18} fill="currentColor" className="ml-0.5" />
+                  </div>
+                </div>
+
+                {/* Video Info details */}
+                <div className="absolute bottom-4 left-4 right-4 text-left space-y-1">
+                  <span className="inline-block px-1.5 py-0.5 rounded text-[8px] font-black uppercase tracking-wider bg-white/20 text-white backdrop-blur-md">
+                    Watch Story
+                  </span>
+                  <h4 className="text-xs font-bold text-white leading-snug tracking-tight drop-shadow-sm line-clamp-1 font-display">
+                    {video.title}
+                  </h4>
+                  <p className="text-[10px] text-slate-200 font-semibold truncate drop-shadow-sm">
+                    {video.name} · <span className="text-slate-350">{video.role}</span>
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Row 2: Right to Left */}
+          <div className="marquee-track-right gap-4">
+            {[...ALUMNI_VIDEOS_R2L, ...ALUMNI_VIDEOS_R2L].map((video, idx) => (
+              <div 
+                key={`r2l-${idx}`}
+                onClick={() => setActiveVideoId(video.id)}
+                className="group relative w-[280px] aspect-[16/10] rounded-2xl overflow-hidden cursor-pointer border border-slate-200/60 shadow-md hover:shadow-xl transition-all duration-300 hover:scale-[1.03]"
+              >
+                {/* Thumbnail */}
+                <img 
+                  src={video.image} 
+                  alt={video.title} 
+                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" 
+                />
+                {/* Dark Vignette overlay */}
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-slate-950/20 group-hover:via-slate-950/50 transition-all" />
+                
+                {/* Play Button Overlay */}
+                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  <div className="p-3.5 rounded-full bg-white/90 text-slate-900 shadow-lg scale-90 group-hover:scale-100 transition-transform duration-300">
+                    <Play size={18} fill="currentColor" className="ml-0.5" />
+                  </div>
+                </div>
+
+                {/* Video Info details */}
+                <div className="absolute bottom-4 left-4 right-4 text-left space-y-1">
+                  <span className="inline-block px-1.5 py-0.5 rounded text-[8px] font-black uppercase tracking-wider bg-white/20 text-white backdrop-blur-md">
+                    Watch Story
+                  </span>
+                  <h4 className="text-xs font-bold text-white leading-snug tracking-tight drop-shadow-sm line-clamp-1 font-display">
+                    {video.title}
+                  </h4>
+                  <p className="text-[10px] text-slate-200 font-semibold truncate drop-shadow-sm">
+                    {video.name} · <span className="text-slate-350">{video.role}</span>
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+
         </div>
       </section>
 
@@ -868,6 +983,33 @@ export default function PublicAlumniPage() {
           </div>
         </div>
       </footer>
+
+      {/* ================= VIDEO LIGHTBOX MODAL ================= */}
+      {activeVideoId && (
+        <div 
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4 animate-fade-in"
+          onClick={() => setActiveVideoId(null)}
+        >
+          <div 
+            className="w-full max-w-3xl aspect-video bg-black rounded-3xl overflow-hidden shadow-2xl relative border border-white/10 animate-scale-in"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Close Button */}
+            <button 
+              onClick={() => setActiveVideoId(null)}
+              className="absolute top-4 right-4 p-2 rounded-full bg-white/10 text-white hover:bg-white/20 transition-all z-10"
+            >
+              <X size={18} />
+            </button>
+            <iframe 
+              src={`https://www.youtube.com/embed/${activeVideoId}?autoplay=1&rel=0`}
+              className="w-full h-full border-0"
+              allow="autoplay; encrypted-media"
+              allowFullScreen
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }

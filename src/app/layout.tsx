@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, Plus_Jakarta_Sans } from "next/font/google";
+import { Inter, Plus_Jakarta_Sans, Playfair_Display } from "next/font/google";
 import "./globals.css";
 
 const inter = Inter({
@@ -10,6 +10,11 @@ const inter = Inter({
 const plusJakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
   variable: "--font-plus-jakarta",
+});
+
+const playfair = Playfair_Display({
+  subsets: ["latin"],
+  variable: "--font-playfair",
 });
 
 export const metadata: Metadata = {
@@ -27,7 +32,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${inter.variable} ${plusJakarta.variable} font-sans bg-[#f8fafc] text-slate-900 antialiased`}>
+      <body className={`${inter.variable} ${plusJakarta.variable} ${playfair.variable} font-sans bg-[#f8fafc] text-slate-900 antialiased`}>
         {children}
       </body>
     </html>

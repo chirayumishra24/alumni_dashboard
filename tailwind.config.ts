@@ -58,6 +58,7 @@ const config: Config = {
       fontFamily: {
         sans: ["var(--font-inter)", "sans-serif"],
         display: ["var(--font-plus-jakarta)", "sans-serif"],
+        serif: ["var(--font-playfair)", "serif"],
       },
     },
   },

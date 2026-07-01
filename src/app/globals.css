@@ -302,4 +302,33 @@ body {
   }
 }
 
+/* Continuous Marquee Showcase styles */
+.marquee-container {
+  overflow: hidden;
+  position: relative;
+  width: 100%;
+}
+
+.marquee-mask {
+  mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+  -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+}
+
+.marquee-track-left {
+  display: flex;
+  width: max-content;
+  animation: marquee-left 50s linear infinite;
+}
+
+.marquee-track-right {
+  display: flex;
+  width: max-content;
+  animation: marquee-right 50s linear infinite;
+}
+
+.marquee-track-left:hover,
+.marquee-track-right:hover {
+  animation-play-state: paused;
+}
+
 
