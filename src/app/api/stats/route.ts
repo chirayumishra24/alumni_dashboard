@@ -52,8 +52,11 @@ export async function GET(request: Request) {
         const cleanCompany = company.trim().replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g, "").replace(/\s{2,}/g," ");
         let normalized = cleanCompany;
         if (/google/i.test(cleanCompany)) normalized = 'Google';
-        else if (/microsoft/i.test(cleanCompany)) normalized = 'Microsoft';
+        else if (/meta|facebook/i.test(cleanCompany)) normalized = 'Meta';
+        else if (/kpmg/i.test(cleanCompany)) normalized = 'KPMG';
         else if (/amazon/i.test(cleanCompany)) normalized = 'Amazon';
+        else if (/flipkart/i.test(cleanCompany)) normalized = 'Flipkart';
+        else if (/microsoft/i.test(cleanCompany)) normalized = 'Microsoft';
         else if (/ey|ernst|young/i.test(cleanCompany)) normalized = 'Ernst & Young';
         else if (/deloitte/i.test(cleanCompany)) normalized = 'Deloitte';
         else if (/mckinsey/i.test(cleanCompany)) normalized = 'McKinsey';
@@ -71,9 +74,12 @@ export async function GET(request: Request) {
     let baseGov = 14;
     let defaultCompanies = [
       { name: 'Google', count: 4 },
+      { name: 'Meta', count: 3 },
+      { name: 'KPMG', count: 2 },
+      { name: 'Amazon', count: 3 },
+      { name: 'Flipkart', count: 3 },
       { name: 'Microsoft', count: 3 },
       { name: 'Ernst & Young', count: 5 },
-      { name: 'Amazon', count: 3 },
       { name: 'Deloitte', count: 6 },
       { name: 'TCS', count: 8 },
       { name: 'McKinsey', count: 2 }
@@ -85,6 +91,10 @@ export async function GET(request: Request) {
       baseGov = 8;
       defaultCompanies = [
         { name: 'Google', count: 2 },
+        { name: 'Meta', count: 1 },
+        { name: 'KPMG', count: 1 },
+        { name: 'Amazon', count: 2 },
+        { name: 'Flipkart', count: 2 },
         { name: 'Microsoft', count: 1 },
         { name: 'Ernst & Young', count: 3 },
         { name: 'Deloitte', count: 4 },
@@ -96,8 +106,11 @@ export async function GET(request: Request) {
       baseGov = 6;
       defaultCompanies = [
         { name: 'Google', count: 2 },
-        { name: 'Microsoft', count: 2 },
+        { name: 'Meta', count: 2 },
+        { name: 'KPMG', count: 1 },
         { name: 'Amazon', count: 2 },
+        { name: 'Flipkart', count: 1 },
+        { name: 'Microsoft', count: 2 },
         { name: 'Deloitte', count: 2 },
         { name: 'TCS', count: 3 }
       ];
@@ -125,7 +138,7 @@ export async function GET(request: Request) {
       iitAiims: baseIIT + iitAiimsCount,
       entrepreneurs: baseEnt + entrepreneursCount,
       government: baseGov + governmentCount,
-      topCompanies: finalCompanies.slice(0, 7)
+      topCompanies: finalCompanies.slice(0, 15)
     };
 
     const response = NextResponse.json(stats);

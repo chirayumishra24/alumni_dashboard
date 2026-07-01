@@ -430,17 +430,40 @@ export default function PublicAlumniPage() {
 
             </div>
 
-            {/* Row 2: Top placements on a new line */}
-            <div className="pt-6 border-t border-white/10 flex flex-col md:flex-row items-center gap-4">
+            {/* Row 2: Top placements on a new line (Infinite Marquee) */}
+            <div className="pt-6 border-t border-white/10 flex flex-col md:flex-row items-center gap-4 overflow-hidden">
               <span className="text-[10px] font-black uppercase tracking-wider text-white/70 shrink-0">Top Placements:</span>
-              <div className="flex flex-wrap items-center justify-center md:justify-start gap-2 select-none">
-                {stats.topCompanies.map((tc, idx) => (
-                  <div key={idx} className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white/5 border border-white/10 text-xs font-bold text-white hover:bg-white/10 hover:border-white/20 transition-all duration-200">
-                    <span>{tc.name}</span>
-                    <span className="w-1 h-1 rounded-full bg-white/30" />
-                    <span className="text-white font-extrabold">{tc.count}</span>
-                  </div>
-                ))}
+              <div className="relative w-full overflow-hidden">
+                {/* Gradient masks on sides for smooth fade-in/fade-out */}
+                <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-[#001f3f] to-transparent z-10 pointer-events-none" />
+                <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-[#001f3f] to-transparent z-10 pointer-events-none" />
+                
+                {/* Inline CSS styling block for self-contained marquee animation */}
+                <style dangerouslySetInnerHTML={{__html: `
+                  @keyframes marquee-scroll {
+                    0% { transform: translateX(0); }
+                    100% { transform: translateX(-50%); }
+                  }
+                  .animate-marquee-scroll {
+                    display: flex;
+                    width: max-content;
+                    animation: marquee-scroll 35s linear infinite;
+                  }
+                  .animate-marquee-scroll:hover {
+                    animation-play-state: paused;
+                  }
+                `}} />
+                
+                <div className="animate-marquee-scroll flex gap-2 select-none">
+                  {/* Duplicated list for seamless looping */}
+                  {[...stats.topCompanies, ...stats.topCompanies].map((tc, idx) => (
+                    <div key={idx} className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white/5 border border-white/10 text-xs font-bold text-white hover:bg-white/10 hover:border-white/20 transition-all duration-200 shrink-0">
+                      <span>{tc.name}</span>
+                      <span className="w-1 h-1 rounded-full bg-white/30" />
+                      <span className="text-white font-extrabold">{tc.count}</span>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
 
