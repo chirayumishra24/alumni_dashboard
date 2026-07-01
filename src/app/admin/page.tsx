@@ -488,19 +488,20 @@ support@skillizee.io`;
   return (
     <div className="min-h-screen bg-[#f8fafc] text-slate-800 font-sans flex flex-col lg:flex-row lg:p-6 lg:gap-6 overflow-x-hidden selection:bg-violet-600 selection:text-white grid-bg relative">
       
-      {/* Liquid 3D Spheres placed behind everything */}
-      <div className="absolute top-[10%] left-[10%] w-36 h-36 rounded-full sphere-3d pointer-events-none animate-float" />
-      <div className="absolute top-[40%] right-[5%] w-48 h-48 rounded-full sphere-3d pointer-events-none animate-float-slow" />
-      <div className="absolute bottom-[15%] left-[5%] w-44 h-44 rounded-full sphere-3d pointer-events-none animate-float" />
-      <div className="absolute bottom-[5%] right-[20%] w-32 h-32 rounded-full sphere-3d pointer-events-none animate-float-slow" />
-      <div className="absolute top-[70%] left-[30%] w-24 h-24 rounded-full sphere-3d pointer-events-none animate-float" />
+      {/* Liquid Glassmorphic Gradient Orbs placed behind everything */}
+      <div className="gradient-orb gradient-orb-1" />
+      <div className="gradient-orb gradient-orb-2" />
+      <div className="gradient-orb gradient-orb-3" />
+      <div className="gradient-orb gradient-orb-4" />
+      <div className="gradient-orb gradient-orb-5" />
+      <div className="gradient-orb gradient-orb-6" />
 
       {/* Toast Alert */}
       {toast && (
-        <div className={`fixed top-6 right-6 z-50 flex items-center gap-3 rounded-2xl border p-4 shadow-xl backdrop-blur-xl animate-fade-in ${
+        <div className={`fixed top-6 right-6 z-50 flex items-center gap-3 rounded-2xl border p-4 shadow-xl glass-card animate-fade-in ${
           toast.type === "success" 
-            ? "border-emerald-200 bg-emerald-50 text-emerald-805" 
-            : "border-rose-200 bg-rose-50 text-rose-805"
+            ? "border-emerald-200/50 bg-emerald-50/70 text-emerald-805" 
+            : "border-rose-200/50 bg-rose-50/70 text-rose-805"
         }`}>
           <Sparkles size={18} className={toast.type === "success" ? "text-emerald-600" : "text-rose-600"} />
           <span className="text-sm font-semibold">{toast.message}</span>
@@ -519,7 +520,7 @@ support@skillizee.io`;
       <div className="flex-1 flex flex-col min-w-0 z-10">
         
         {/* Top Navbar */}
-        <header className="mb-6 p-5 rounded-[2rem] liquid-glass flex flex-col sm:flex-row sm:items-center justify-between gap-4 sticky top-6 z-30 shadow-lg">
+        <header className="mb-6 p-5 rounded-[2rem] glass-panel flex flex-col sm:flex-row sm:items-center justify-between gap-4 sticky top-6 z-30 shadow-lg">
           <div>
             <span className="text-[10px] text-violet-600 font-bold uppercase tracking-wider">Dashboard</span>
             <h1 className="text-lg font-bold text-slate-900 tracking-tight flex items-center gap-2 mt-0.5">
@@ -536,7 +537,7 @@ support@skillizee.io`;
             </button>
 
             {/* Quick perspective swapping for testing */}
-            <div className="flex items-center gap-1.5 rounded-xl bg-white/40 border border-white/60 p-1">
+            <div className="flex items-center gap-1.5 rounded-xl bg-white/30 border border-white/60 p-1">
               {(["ADMIN", "ALUMNI", "STUDENT"] as const).map(role => (
                 <button
                   key={role}
@@ -555,7 +556,7 @@ support@skillizee.io`;
         </header>
 
         {/* Simulation Selector Bar */}
-        <div className="mb-6 p-4 rounded-2xl bg-white/40 border border-white/60 text-xs text-slate-550 flex items-center justify-between shadow-sm backdrop-blur-md">
+        <div className="mb-6 p-4 rounded-2xl glass-card text-xs text-slate-550 flex items-center justify-between shadow-sm">
           <div className="flex items-center gap-2">
             <span className="font-semibold text-slate-400">Perspective Identity:</span>
             {activeRole === "ADMIN" && (
@@ -567,7 +568,7 @@ support@skillizee.io`;
               <select 
                 value={selectedUser} 
                 onChange={(e) => setSelectedUser(e.target.value)}
-                className="bg-white/50 border border-white/80 rounded px-2 py-0.5 text-xs text-slate-800 font-semibold focus:outline-none focus:border-violet-500"
+                className="glass-input rounded px-2 py-0.5 text-xs text-slate-800 font-semibold focus:outline-none"
               >
                 {data?.alumni.filter(a => a.isVerified).map(a => (
                   <option key={a.id} value={a.id}>{a.user.name} ({a.school} Alumni)</option>
@@ -578,7 +579,7 @@ support@skillizee.io`;
               <select 
                 value={selectedUser} 
                 onChange={(e) => setSelectedUser(e.target.value)}
-                className="bg-white/50 border border-white/80 rounded px-2 py-0.5 text-xs text-slate-800 font-semibold focus:outline-none focus:border-violet-500"
+                className="glass-input rounded px-2 py-0.5 text-xs text-slate-800 font-semibold focus:outline-none"
               >
                 {data?.students.map(s => (
                   <option key={s.id} value={s.id}>{s.user.name} (Grad Batch {s.batch})</option>
@@ -594,7 +595,7 @@ support@skillizee.io`;
 
           {/* School filter toggle (shown on Overview & Directory & Testimonials) */}
           {(currentTab === "OVERVIEW" || currentTab === "DIRECTORY" || currentTab === "TESTIMONIALS" || currentTab === "PENDING") && (
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 liquid-glass p-4.5 shadow-sm">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 glass-panel p-4.5 shadow-sm">
               <div className="flex items-center gap-2">
                 <Filter size={16} className="text-slate-400" />
                 <span className="text-xs font-bold text-slate-600 uppercase tracking-wider">Filter School Network:</span>
@@ -607,7 +608,7 @@ support@skillizee.io`;
                      className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all border ${
                        adminSchoolFilter === sch
                          ? "bg-slate-900 border-slate-900 text-white shadow-sm"
-                         : "bg-white/40 border-white/60 text-slate-605 hover:bg-white/70"
+                         : "glass-button"
                     }`}
                   >
                     {sch === "All" ? "CCIS Combined" : `${sch} Network`}
@@ -622,27 +623,27 @@ support@skillizee.io`;
             <div className="space-y-8 animate-fade-in">
               {/* Metrics cards grid */}
               <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-                <div className="liquid-glass border border-white/60 p-6 relative overflow-hidden group shadow-lg">
+                <div className="glass-card p-6 relative overflow-hidden group shadow-lg">
                   <div className="absolute top-0 left-0 w-1.5 h-full bg-violet-600" />
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-violet-50 text-violet-600 border border-violet-100">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-violet-50/50 text-violet-600 border border-violet-100">
                     <Users size={20} />
                   </div>
                   <h3 className="mt-4 text-3xl font-extrabold text-slate-900">{totalAlumni}</h3>
                   <p className="text-xs text-slate-500 font-semibold mt-1">Directory Count ({adminSchoolFilter === "All" ? "Group" : adminSchoolFilter})</p>
                 </div>
 
-                <div className="liquid-glass border border-white/60 p-6 relative overflow-hidden group shadow-lg">
+                <div className="glass-card p-6 relative overflow-hidden group shadow-lg">
                   <div className="absolute top-0 left-0 w-1.5 h-full bg-amber-500" />
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-50 text-amber-600 border border-amber-100">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-50/50 text-amber-600 border border-amber-100">
                     <ShieldCheck size={20} />
                   </div>
                   <h3 className="mt-4 text-3xl font-extrabold text-slate-900">{filteredPendingAlumni.length}</h3>
                   <p className="text-xs text-slate-500 font-semibold mt-1">Pending Approval Queue</p>
                 </div>
 
-                <div className="liquid-glass border border-white/60 p-6 relative overflow-hidden group shadow-lg">
+                <div className="glass-card p-6 relative overflow-hidden group shadow-lg">
                   <div className="absolute top-0 left-0 w-1.5 h-full bg-emerald-500" />
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 border border-emerald-100">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-50/50 text-emerald-600 border border-emerald-100">
                     <Star size={20} />
                   </div>
                   <h3 className="mt-4 text-3xl font-extrabold text-slate-900">
@@ -651,9 +652,9 @@ support@skillizee.io`;
                   <p className="text-xs text-slate-500 font-semibold mt-1">Active Mentorship Matches</p>
                 </div>
 
-                <div className="liquid-glass border border-white/60 p-6 relative overflow-hidden group shadow-lg">
+                <div className="glass-card p-6 relative overflow-hidden group shadow-lg">
                   <div className="absolute top-0 left-0 w-1.5 h-full bg-indigo-500" />
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600 border border-indigo-100">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-50/50 text-indigo-600 border border-indigo-100">
                     <Calendar size={20} />
                   </div>
                   <h3 className="mt-4 text-3xl font-extrabold text-slate-900">{data?.events.length || 0}</h3>
@@ -664,7 +665,7 @@ support@skillizee.io`;
               {/* Completion funnel and widget manager */}
               <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
                 {/* Onboarding Complete Funnel */}
-                <div className="rounded-3xl liquid-glass border border-white/60 p-8 flex flex-col justify-between shadow-lg">
+                <div className="rounded-3xl glass-panel p-8 flex flex-col justify-between shadow-lg">
                   <div>
                     <h2 className="text-sm font-bold text-slate-900">Profile Completeness Funnel</h2>
                     <p className="text-xs text-slate-500 mb-6">Database fields filled index percentages.</p>
@@ -705,7 +706,7 @@ support@skillizee.io`;
                   <div className="mt-8 pt-4 border-t border-slate-200/60">
                     <button 
                       onClick={() => showToast("Profile completion alerts pushed to target emails!", "success")}
-                      className="w-full py-2.5 rounded-xl border border-violet-200 bg-violet-50 hover:bg-violet-100 text-xs font-bold text-violet-700 transition-all"
+                      className="w-full py-2.5 rounded-xl glass-button text-xs font-bold text-violet-755 transition-all"
                     >
                       Send Completion Reminders
                     </button>
@@ -713,16 +714,16 @@ support@skillizee.io`;
                 </div>
 
                 {/* Testimonials iframe manager */}
-                <div className="lg:col-span-2 rounded-3xl liquid-glass border border-white/60 p-8 flex flex-col justify-between shadow-lg">
+                <div className="lg:col-span-2 rounded-3xl glass-panel p-8 flex flex-col justify-between shadow-lg">
                   <div>
                     <h2 className="text-sm font-bold text-slate-900">Embeddable Testimonials Widget</h2>
                     <p className="text-xs text-slate-500 mb-4">Export approved testimonials quote widgets directly into CCHS or CCWS school CMS systems.</p>
                   </div>
 
                   <div className="space-y-4">
-                    <div className="rounded-2xl bg-white/40 border border-white/60 p-4 space-y-2">
+                    <div className="rounded-2xl bg-white/20 border border-white/60 p-4 space-y-2">
                       <span className="text-[10px] uppercase font-bold text-violet-650 tracking-wider block">Widget Preview Frame (Active Filters)</span>
-                      <div className="border border-white/60 bg-white/60 rounded-xl p-4 text-xs italic text-slate-500 leading-relaxed min-h-[80px] flex items-center justify-center shadow-sm">
+                      <div className="border border-white/60 bg-white/30 rounded-xl p-4 text-xs italic text-slate-500 leading-relaxed min-h-[80px] flex items-center justify-center shadow-sm">
                         {data?.widgets.filter(w => w.isApproved && (adminSchoolFilter === "All" || w.alumni.school === adminSchoolFilter)).length === 0 ? (
                           <span>No approved testimonials for this school network selection.</span>
                         ) : (
@@ -743,35 +744,35 @@ support@skillizee.io`;
           {/* ================= TAB: PENDING ================= */}
           {currentTab === "PENDING" && (
             <div className="space-y-6 animate-fade-in">
-              <div className="rounded-3xl liquid-glass border border-white/60 p-8 shadow-lg">
+              <div className="rounded-3xl glass-panel p-8 shadow-lg">
                 <div className="flex items-center justify-between mb-6">
                   <div>
                     <h2 className="text-sm font-bold text-slate-900">Pending Registrations Review Queue</h2>
                     <p className="text-xs text-slate-500">Validate graduates self-registration data before activating live profiles.</p>
                   </div>
-                  <span className="px-3 py-1 rounded-full text-xs font-bold bg-white/50 text-slate-655 border border-white/80">
+                  <span className="px-3 py-1 rounded-full text-xs font-bold bg-white/30 text-slate-655 border border-white/60">
                     {filteredPendingAlumni.length} Requests
                   </span>
                 </div>
 
                 <div className="space-y-4">
                   {filteredPendingAlumni.length === 0 ? (
-                    <div className="text-center py-16 text-slate-400 border border-dashed border-slate-200/80 rounded-2xl bg-white/30">
+                    <div className="text-center py-16 text-slate-400 border border-dashed border-slate-200/80 rounded-2xl bg-white/10">
                       <Check size={28} className="mx-auto mb-2 text-emerald-500" />
                       <span className="text-xs font-bold uppercase tracking-wider block text-slate-500">Queue is Clear</span>
                       <p className="text-[10px] text-slate-400 mt-1">All self-registrations currently verified.</p>
                     </div>
                   ) : (
                     filteredPendingAlumni.map((alum) => (
-                      <div key={alum.id} className="rounded-2xl border border-white/60 bg-white/40 p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 hover:bg-white/70 transition-all duration-300">
+                      <div key={alum.id} className="glass-card p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 hover:bg-white/50 transition-all duration-300">
                         <div className="flex items-start gap-4">
                           <img src={alum.user.avatarUrl || ""} className="h-11 w-11 rounded-xl border border-slate-200" alt="avatar" />
                           <div>
                             <div className="flex items-center gap-2 flex-wrap">
                               <h4 className="text-sm font-bold text-slate-900">{alum.user.name}</h4>
                               <span className={`px-1.5 py-0.5 rounded text-[8px] font-bold uppercase ${
-                                alum.school === "CCHS" ? "bg-violet-50 text-violet-600 border border-violet-100" : "bg-emerald-50 text-emerald-600 border border-emerald-100"
-                              } border`}>
+                                alum.school === "CCHS" ? "bg-violet-50 text-violet-650 border border-violet-100/50" : "bg-emerald-50 text-emerald-650 border border-emerald-100/50"
+                              }`}>
                                 {alum.school}
                               </span>
                             </div>
@@ -812,7 +813,7 @@ support@skillizee.io`;
           {/* ================= TAB: DIRECTORY ================= */}
           {currentTab === "DIRECTORY" && (
             <div className="space-y-6 animate-fade-in">
-              <div className="rounded-3xl liquid-glass border border-white/60 p-8 shadow-lg">
+              <div className="rounded-3xl glass-panel p-8 shadow-lg">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
                   <div>
                     <h2 className="text-sm font-bold text-slate-900">Alumni Directory</h2>
@@ -829,7 +830,7 @@ support@skillizee.io`;
                       placeholder="Search name, role, company..." 
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      className="w-full bg-white/50 border border-white/80 rounded-xl pl-9 pr-4 py-2 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-violet-500"
+                      className="w-full glass-input rounded-xl pl-9 pr-4 py-2 text-xs text-slate-800 placeholder-slate-400 focus:outline-none"
                     />
                   </div>
                 </div>
@@ -904,7 +905,7 @@ support@skillizee.io`;
           {/* ================= TAB: TESTIMONIALS ================= */}
           {currentTab === "TESTIMONIALS" && (
             <div className="space-y-6 animate-fade-in">
-              <div className="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
+              <div className="rounded-3xl glass-panel p-8 shadow-lg">
                 <h2 className="text-sm font-bold text-slate-900 mb-2">Alumni Testimonials</h2>
                 <p className="text-xs text-slate-500 mb-6">Review, approve, or hide testimonials submitted by verified graduates.</p>
 
@@ -912,7 +913,7 @@ support@skillizee.io`;
                   {data?.widgets
                     .filter(w => adminSchoolFilter === "All" || w.alumni.school === adminSchoolFilter)
                     .map((widget) => (
-                      <div key={widget.id} className="rounded-2xl border border-slate-200 bg-slate-50 p-5 space-y-4 flex flex-col justify-between shadow-sm">
+                      <div key={widget.id} className="glass-card p-5 space-y-4 flex flex-col justify-between shadow-sm">
                         <div className="space-y-2">
                           <div className="flex items-center gap-3 justify-between">
                             <div className="flex items-center gap-2">
@@ -947,7 +948,7 @@ support@skillizee.io`;
           {/* ================= TAB: MENTORSHIPS ================= */}
           {currentTab === "MENTORSHIPS" && (
             <div className="space-y-6 animate-fade-in">
-              <div className="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
+              <div className="rounded-3xl glass-panel p-8 shadow-lg">
                 <h2 className="text-sm font-bold text-slate-900 mb-2">Mentorship Connections & Inquiries</h2>
                 <p className="text-xs text-slate-500 mb-6">Overview of student-to-alumni mentor matchmaking and request status.</p>
 
@@ -1004,7 +1005,7 @@ support@skillizee.io`;
           {/* ================= TAB: STUDENT_PERSPECTIVE ================= */}
           {currentTab === "STUDENT_PERSPECTIVE" && activeStudent && (
             <div className="space-y-8 animate-fade-in">
-              <div className="rounded-3xl border border-slate-200 bg-white p-8 flex flex-col md:flex-row justify-between gap-6 shadow-sm">
+              <div className="rounded-3xl glass-panel p-8 flex flex-col md:flex-row justify-between gap-6 shadow-lg">
                 <div className="flex items-center gap-4">
                   <img src={activeStudent.user.avatarUrl || ""} className="h-14 w-14 rounded-xl border border-slate-200 shadow-sm" alt="avatar" />
                   <div>
@@ -1015,7 +1016,7 @@ support@skillizee.io`;
                 </div>
 
                 {/* Resume upload widget */}
-                <div className="flex flex-col gap-2 rounded-2xl bg-slate-50 border border-slate-200 p-4 max-w-sm w-full shadow-sm">
+                <div className="flex flex-col gap-2 rounded-2xl glass-card p-4 max-w-sm w-full shadow-sm">
                   <span className="text-xs font-bold text-slate-800">Resume Vault (Firebase Storage)</span>
                   <p className="text-[10px] text-slate-400">Store your PDF CV directly inside the Firebase Storage project bucket.</p>
                   
@@ -1042,7 +1043,7 @@ support@skillizee.io`;
               {/* Preferences Configuration & Recommendations */}
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 {/* Configuration form */}
-                <div className="rounded-3xl border border-slate-200 bg-white p-8 space-y-6 shadow-sm">
+                <div className="rounded-3xl glass-panel p-8 space-y-6 shadow-lg">
                   <div>
                     <h3 className="text-sm font-bold text-slate-900">Configure Goals</h3>
                     <p className="text-xs text-slate-500">Trigger recommendation matchmaking index calculations.</p>
@@ -1056,14 +1057,14 @@ support@skillizee.io`;
                         value={pref1Role} 
                         onChange={(e) => setPref1Role(e.target.value)}
                         placeholder="e.g. Software Engineer"
-                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-800 focus:outline-none focus:border-violet-500 focus:bg-white transition-all"
+                        className="w-full glass-input rounded-xl px-4 py-2.5 text-xs text-slate-800 focus:outline-none"
                       />
                       <input 
                         type="text" 
                         value={pref1Country} 
                         onChange={(e) => setPref1Country(e.target.value)}
                         placeholder="Target Location (e.g. United Kingdom)"
-                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-800 focus:outline-none focus:border-violet-500 focus:bg-white transition-all"
+                        className="w-full glass-input rounded-xl px-4 py-2.5 text-xs text-slate-800 focus:outline-none"
                       />
                     </div>
 
@@ -1074,14 +1075,14 @@ support@skillizee.io`;
                         value={pref2Role} 
                         onChange={(e) => setPref2Role(e.target.value)}
                         placeholder="e.g. IAS Officer"
-                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-800 focus:outline-none focus:border-violet-500 focus:bg-white transition-all"
+                        className="w-full glass-input rounded-xl px-4 py-2.5 text-xs text-slate-800 focus:outline-none"
                       />
                       <input 
                         type="text" 
                         value={pref2Country} 
                         onChange={(e) => setPref2Country(e.target.value)}
                         placeholder="Target Location (e.g. India)"
-                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-800 focus:outline-none focus:border-violet-500 focus:bg-white transition-all"
+                        className="w-full glass-input rounded-xl px-4 py-2.5 text-xs text-slate-800 focus:outline-none"
                       />
                     </div>
                   </div>
@@ -1092,17 +1093,15 @@ support@skillizee.io`;
                   >
                     Save Preferences
                   </button>
-                </div>
-
-                {/* Matchmaking directory */}
-                <div className="lg:col-span-2 rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
+                </div>                {/* Matchmaking directory */}
+                <div className="lg:col-span-2 rounded-3xl glass-panel p-8 shadow-lg">
                   <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
                     <div>
                       <h3 className="text-sm font-bold text-slate-900">Target Matchmaking Index</h3>
                       <p className="text-xs text-slate-400">Match score based on your specified target fields.</p>
                     </div>
 
-                    <div className="flex gap-1.5 rounded-lg bg-slate-50 p-1 border border-slate-200 self-start">
+                    <div className="flex gap-1.5 rounded-lg bg-white/20 p-1 border border-white/60 self-start">
                       {["All", "CCHS", "CCWS"].map(sch => (
                         <button
                           key={sch}
@@ -1110,7 +1109,7 @@ support@skillizee.io`;
                           className={`px-3 py-1.5 rounded text-[10px] font-bold transition-all ${
                             studentSchoolFilter === sch
                               ? "bg-white text-slate-800 shadow-sm border border-slate-200"
-                              : "text-slate-500 hover:text-slate-800"
+                              : "text-slate-500 hover:text-slate-805"
                           }`}
                         >
                           {sch}
@@ -1129,7 +1128,7 @@ support@skillizee.io`;
                       }))
                       .sort((a, b) => b.score - a.score)
                       .map(({ alum, score }) => (
-                        <div key={alum.id} className="rounded-2xl border border-slate-200/60 bg-slate-50/50 p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 hover:border-slate-350 transition-all">
+                        <div key={alum.id} className="glass-card p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 hover:scale-[1.005] transition-all">
                           <div className="flex gap-4">
                             <img src={alum.user.avatarUrl || ""} className="h-11 w-11 rounded-xl border border-slate-200" alt="avatar" />
                             <div className="space-y-0.5">
@@ -1164,7 +1163,7 @@ support@skillizee.io`;
                                   value={mentorshipNote} 
                                   onChange={(e) => setMentorshipNote(e.target.value)}
                                   placeholder="Type note to send..."
-                                  className="w-full md:w-64 h-16 bg-white border border-slate-200 rounded-lg p-2 text-xs text-slate-800"
+                                  className="w-full md:w-64 h-16 glass-input rounded-lg p-2 text-xs text-slate-800 focus:outline-none"
                                 />
                                 <div className="flex items-center gap-2">
                                   <button
@@ -1200,12 +1199,10 @@ support@skillizee.io`;
                 </div>
               </div>
             </div>
-          )}
-
-          {/* ================= TAB: ALUMNI_PERSPECTIVE ================= */}
+          )}          {/* ================= TAB: ALUMNI_PERSPECTIVE ================= */}
           {currentTab === "ALUMNI_PERSPECTIVE" && activeAlumni && (
             <div className="space-y-8 animate-fade-in">
-              <div className="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
+              <div className="rounded-3xl glass-panel p-8 shadow-lg">
                 <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
                   <div className="flex items-center gap-4">
                     <img src={activeAlumni.user.avatarUrl || ""} className="h-16 w-16 rounded-xl border border-slate-200 shadow-sm" alt="avatar" />
@@ -1222,12 +1219,12 @@ support@skillizee.io`;
                   </div>
 
                   <div className="flex flex-wrap items-center gap-4">
-                    <div className="rounded-xl bg-slate-50 border border-slate-200 px-4 py-3 text-center shadow-sm">
+                    <div className="rounded-xl glass-card px-4 py-3 text-center shadow-sm">
                       <span className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Profile Completeness</span>
                       <span className="text-lg font-extrabold text-emerald-600">{activeAlumni.profileComplete}%</span>
                     </div>
 
-                    <div className="rounded-xl bg-slate-50 border border-slate-200 px-4 py-3 flex items-center gap-4 shadow-sm">
+                    <div className="rounded-xl glass-card px-4 py-3 flex items-center gap-4 shadow-sm">
                       <div>
                         <span className="block text-xs font-bold text-slate-805">Mentoring Status</span>
                         <span className="text-[10px] text-slate-400 leading-normal">Open to guide students</span>
@@ -1253,18 +1250,18 @@ support@skillizee.io`;
 
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 {/* Requests Inbound List */}
-                <div className="lg:col-span-2 rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
+                <div className="lg:col-span-2 rounded-3xl glass-panel p-8 shadow-lg">
                   <h3 className="text-sm font-bold text-slate-900 mb-2">Student Mentorship Inquiries</h3>
                   <p className="text-xs text-slate-400 mb-6">Manage incoming guidance request inquiries from current students.</p>
 
                   <div className="space-y-4">
                     {data?.mentorships.filter(m => m.alumniId === activeAlumni.id).length === 0 ? (
-                      <div className="text-center py-12 text-slate-400 border border-dashed border-slate-200 rounded-2xl bg-slate-50">
+                      <div className="text-center py-12 text-slate-405 border border-dashed border-slate-200 rounded-2xl bg-slate-50/50">
                         No mentorship requests received at this time.
                       </div>
                     ) : (
                       data?.mentorships.filter(m => m.alumniId === activeAlumni.id).map((req) => (
-                        <div key={req.id} className="rounded-2xl border border-slate-200 bg-slate-50/50 p-5 space-y-4 shadow-sm">
+                        <div key={req.id} className="glass-card p-5 space-y-4 shadow-sm">
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-3">
                               <img src={req.student.user.avatarUrl || ""} className="h-9 w-9 rounded-xl border border-slate-200" alt="avatar" />
@@ -1302,7 +1299,7 @@ support@skillizee.io`;
                             </div>
                           </div>
 
-                          <div className="rounded-xl bg-white p-3.5 border border-slate-200/60 text-xs text-slate-600 italic leading-relaxed shadow-sm">
+                          <div className="rounded-xl bg-white/20 p-3.5 border border-white/40 text-xs text-slate-600 italic leading-relaxed shadow-sm">
                             &quot;{req.notes}&quot;
                           </div>
                         </div>
@@ -1312,7 +1309,7 @@ support@skillizee.io`;
                 </div>
 
                 {/* Skills & Testimonial quote submit */}
-                <div className="rounded-3xl border border-slate-200 bg-white p-8 space-y-6 shadow-sm">
+                <div className="rounded-3xl glass-panel p-8 space-y-6 shadow-lg">
                   <div>
                     <h3 className="text-sm font-bold text-slate-900">Highlight Skills</h3>
                     <p className="text-xs text-slate-400">Expertise fields currently searchable by students.</p>
@@ -1320,7 +1317,7 @@ support@skillizee.io`;
 
                   <div className="flex flex-wrap gap-1.5">
                     {activeAlumni.skills.split(",").map((skill, idx) => (
-                      <span key={idx} className="px-2.5 py-1 rounded-lg bg-violet-50 text-violet-650 border border-violet-100 text-[10px] font-bold">
+                      <span key={idx} className="px-2.5 py-1 rounded-lg glass-badge text-[10px] font-bold">
                         {skill.trim()}
                       </span>
                     ))}
@@ -1330,7 +1327,7 @@ support@skillizee.io`;
                     <h4 className="text-xs font-bold uppercase tracking-wider text-slate-450 mb-3">Submit Website Testimonial</h4>
                     <textarea 
                       placeholder="Write a quick quote about your career growth after graduating..." 
-                      className="w-full h-24 bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-violet-500 focus:bg-white"
+                      className="w-full h-24 glass-input rounded-xl p-3 text-xs text-slate-800 placeholder-slate-400 focus:outline-none"
                     />
                     <button 
                       onClick={() => showToast("Testimonial submitted for coordinator review!", "success")}
@@ -1349,8 +1346,8 @@ support@skillizee.io`;
 
       {/* ================= MODAL: SELF-REGISTRATION ================= */}
       {showRegModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4 backdrop-blur-sm animate-fade-in">
-          <div className="w-full max-w-lg rounded-3xl border border-slate-200 bg-white p-8 shadow-2xl space-y-6 relative max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 z-50 flex items-center justify-center glass-modal-overlay p-4 animate-fade-in">
+          <div className="w-full max-w-lg rounded-[2rem] glass-panel p-8 shadow-2xl space-y-6 relative max-h-[90vh] overflow-y-auto">
             <button 
               onClick={() => setShowRegModal(false)}
               className="absolute top-6 right-6 text-slate-400 hover:text-slate-655 transition-colors"
@@ -1365,7 +1362,7 @@ support@skillizee.io`;
 
             <form onSubmit={handleSelfRegistration} className="space-y-4">
               {/* Profile Image Upload */}
-              <div className="flex items-center gap-4 bg-slate-50/50 p-4 rounded-2xl border border-slate-200">
+              <div className="flex items-center gap-4 bg-white/30 p-4 rounded-2xl border border-white/60">
                 <div className="h-14 w-14 rounded-full overflow-hidden border border-slate-250 bg-slate-100 flex items-center justify-center shrink-0">
                   {regForm.avatarUrl ? (
                     <img src={regForm.avatarUrl} className="h-full w-full object-cover" alt="avatar" />
@@ -1397,7 +1394,7 @@ support@skillizee.io`;
                     value={regForm.name} 
                     onChange={e => setRegForm({...regForm, name: e.target.value})}
                     placeholder="Enter name"
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-850 focus:outline-none focus:border-violet-500 focus:bg-white transition-all"
+                    className="w-full glass-input rounded-xl px-4 py-2.5 text-xs text-slate-800 focus:outline-none"
                   />
                 </div>
 
@@ -1409,7 +1406,7 @@ support@skillizee.io`;
                     value={regForm.email} 
                     onChange={e => setRegForm({...regForm, email: e.target.value})}
                     placeholder="name@email.com"
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-850 focus:outline-none focus:border-violet-500 focus:bg-white transition-all"
+                    className="w-full glass-input rounded-xl px-4 py-2.5 text-xs text-slate-800 focus:outline-none"
                   />
                 </div>
               </div>
@@ -1420,7 +1417,7 @@ support@skillizee.io`;
                   <select 
                     value={regForm.school} 
                     onChange={e => setRegForm({...regForm, school: e.target.value})}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-xs text-slate-800 focus:outline-none focus:border-violet-500 focus:bg-white transition-all"
+                    className="w-full glass-input rounded-xl px-3 py-2.5 text-xs text-slate-800 focus:outline-none font-semibold"
                   >
                     <option value="CCHS">CCHS Network</option>
                     <option value="CCWS">CCWS Network</option>
@@ -1435,11 +1432,11 @@ support@skillizee.io`;
                     value={regForm.batch} 
                     onChange={e => setRegForm({...regForm, batch: e.target.value})}
                     placeholder="e.g. 2018"
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-800 focus:outline-none focus:border-violet-500 focus:bg-white transition-all"
+                    className="w-full glass-input rounded-xl px-4 py-2.5 text-xs text-slate-800 focus:outline-none"
                   />
                 </div>
 
-                <div className="space-y-1.5">
+                  <div className="space-y-1.5">
                   <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Program / Stream</label>
                   <input 
                     type="text" 
@@ -1447,7 +1444,7 @@ support@skillizee.io`;
                     value={regForm.program} 
                     onChange={e => setRegForm({...regForm, program: e.target.value})}
                     placeholder="e.g. Science"
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-800 focus:outline-none focus:border-violet-500 focus:bg-white transition-all"
+                    className="w-full glass-input rounded-xl px-4 py-2.5 text-xs text-slate-800 focus:outline-none"
                   />
                 </div>
               </div>
@@ -1460,7 +1457,7 @@ support@skillizee.io`;
                     value={regForm.company} 
                     onChange={e => setRegForm({...regForm, company: e.target.value})}
                     placeholder="e.g. Microsoft (Optional)"
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-800 focus:outline-none focus:border-violet-500 focus:bg-white transition-all"
+                    className="w-full glass-input rounded-xl px-4 py-2.5 text-xs text-slate-800 focus:outline-none"
                   />
                 </div>
 
@@ -1471,7 +1468,7 @@ support@skillizee.io`;
                     value={regForm.role} 
                     onChange={e => setRegForm({...regForm, role: e.target.value})}
                     placeholder="e.g. Principal Architect (Optional)"
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-800 focus:outline-none focus:border-violet-500 focus:bg-white transition-all"
+                    className="w-full glass-input rounded-xl px-4 py-2.5 text-xs text-slate-800 focus:outline-none"
                   />
                 </div>
               </div>
@@ -1484,7 +1481,7 @@ support@skillizee.io`;
                   value={regForm.skills} 
                   onChange={e => setRegForm({...regForm, skills: e.target.value})}
                   placeholder="Comma-separated (React, Node, UX Design)"
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-800 focus:outline-none focus:border-violet-500 focus:bg-white transition-all"
+                  className="w-full glass-input rounded-xl px-4 py-2.5 text-xs text-slate-800 focus:outline-none"
                 />
               </div>
 
@@ -1496,7 +1493,7 @@ support@skillizee.io`;
                   value={regForm.city} 
                   onChange={e => setRegForm({...regForm, city: e.target.value})}
                   placeholder="e.g. Mumbai"
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-850 focus:outline-none focus:border-violet-500 focus:bg-white transition-all"
+                  className="w-full glass-input rounded-xl px-4 py-2.5 text-xs text-slate-800 focus:outline-none"
                 />
               </div>
 
@@ -1507,7 +1504,7 @@ support@skillizee.io`;
                   value={regForm.phone} 
                   onChange={e => setRegForm({...regForm, phone: e.target.value})}
                   placeholder="e.g. +91 98765 43210"
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-850 focus:outline-none focus:border-violet-500 focus:bg-white transition-all"
+                  className="w-full glass-input rounded-xl px-4 py-2.5 text-xs text-slate-800 focus:outline-none"
                 />
               </div>
 
@@ -1518,7 +1515,7 @@ support@skillizee.io`;
                   value={regForm.linkedin} 
                   onChange={e => setRegForm({...regForm, linkedin: e.target.value})}
                   placeholder="e.g. https://linkedin.com/in/username"
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-850 focus:outline-none focus:border-violet-500 focus:bg-white transition-all"
+                  className="w-full glass-input rounded-xl px-4 py-2.5 text-xs text-slate-800 focus:outline-none"
                 />
               </div>
 
@@ -1535,8 +1532,8 @@ support@skillizee.io`;
 
       {/* ================= MODAL: EMAIL DRAFT ================= */}
       {draftEmailTarget && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4 backdrop-blur-sm animate-fade-in">
-          <div className="w-full max-w-xl rounded-3xl border border-slate-200 bg-white p-8 shadow-2xl space-y-6 relative">
+        <div className="fixed inset-0 z-50 flex items-center justify-center glass-modal-overlay p-4 animate-fade-in">
+          <div className="w-full max-w-xl rounded-[2rem] glass-panel p-8 shadow-2xl space-y-6 relative">
             <button 
               onClick={() => setDraftEmailTarget(null)}
               className="absolute top-6 right-6 text-slate-400 hover:text-slate-655 transition-colors"
@@ -1554,14 +1551,14 @@ support@skillizee.io`;
             <div className="space-y-4">
               <div className="space-y-1.5">
                 <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Recipient Email</span>
-                <span className="text-xs font-semibold text-slate-800 bg-slate-50 px-3.5 py-2.5 rounded-xl block border border-slate-200">
+                <span className="text-xs font-semibold text-slate-800 glass-card px-3.5 py-2.5 block border border-white/40">
                   {draftEmailTarget.user.name} ({draftEmailTarget.user.email})
                 </span>
               </div>
 
               <div className="space-y-1.5">
                 <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Email Subject</span>
-                <span className="text-xs font-bold text-slate-800 bg-slate-50 px-3.5 py-2.5 rounded-xl block border border-slate-200">
+                <span className="text-xs font-bold text-slate-800 glass-card px-3.5 py-2.5 block border border-white/40">
                   {getEmailSubject(draftEmailTarget)}
                 </span>
               </div>
@@ -1571,7 +1568,7 @@ support@skillizee.io`;
                 <textarea 
                   readOnly
                   value={getEmailBody(draftEmailTarget)}
-                  className="w-full h-40 bg-slate-50 border border-slate-200 rounded-xl p-4 text-xs font-mono text-slate-700 focus:outline-none resize-none leading-relaxed"
+                  className="w-full h-40 glass-input rounded-xl p-4 text-xs font-mono text-slate-700 focus:outline-none resize-none leading-relaxed"
                 />
               </div>
             </div>

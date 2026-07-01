@@ -194,23 +194,24 @@ export default function PublicAlumniPage() {
 
   return (
     <div className="min-h-screen bg-[#f8fafc] text-slate-800 font-sans relative overflow-x-hidden selection:bg-violet-600 selection:text-white grid-bg">
-      {/* Liquid 3D Spheres placed behind everything */}
-      <div className="absolute top-[15%] left-[5%] w-36 h-36 rounded-full sphere-3d pointer-events-none animate-float" />
-      <div className="absolute top-[35%] right-[10%] w-48 h-48 rounded-full sphere-3d pointer-events-none animate-float-slow" />
-      <div className="absolute bottom-[20%] left-[8%] w-44 h-44 rounded-full sphere-3d pointer-events-none animate-float" />
-      <div className="absolute bottom-[5%] right-[25%] w-32 h-32 rounded-full sphere-3d pointer-events-none animate-float-slow" />
-      <div className="absolute top-[75%] left-[45%] w-24 h-24 rounded-full sphere-3d pointer-events-none animate-float" />
+      {/* Liquid Glassmorphic Gradient Orbs placed behind everything */}
+      <div className="gradient-orb gradient-orb-1" />
+      <div className="gradient-orb gradient-orb-2" />
+      <div className="gradient-orb gradient-orb-3" />
+      <div className="gradient-orb gradient-orb-4" />
+      <div className="gradient-orb gradient-orb-5" />
+      <div className="gradient-orb gradient-orb-6" />
 
       {/* Toast alert */}
       {toast && (
-        <div className="fixed top-6 right-6 z-50 flex items-center gap-3 rounded-2xl border border-white/60 p-4 shadow-xl backdrop-blur-xl bg-white/70 animate-fade-in text-slate-800">
+        <div className="fixed top-6 right-6 z-50 flex items-center gap-3 rounded-2xl glass-card p-4 shadow-xl animate-fade-in text-slate-800">
           <Sparkles size={18} className="text-violet-600" />
           <span className="text-sm font-semibold">{toast.message}</span>
         </div>
       )}
 
       {/* Top Header Navigation */}
-      <header className="sticky top-0 z-40 border-b border-white/40 bg-white/40 backdrop-blur-lg px-8 py-5">
+      <header className="sticky top-0 z-40 glass-header px-8 py-5">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="h-10 w-10 rounded-xl bg-gradient-to-tr from-violet-600 to-indigo-600 flex items-center justify-center font-black text-white text-lg tracking-wider shadow-md shadow-indigo-500/10">
@@ -247,17 +248,17 @@ export default function PublicAlumniPage() {
         </p>
 
         <div className="flex items-center justify-center gap-4 pt-4">
-          <div className="px-5 py-2.5 rounded-3xl liquid-glass text-center min-w-[120px]">
+          <div className="px-5 py-2.5 rounded-3xl glass-card text-center min-w-[120px]">
             <span className="block text-xl font-black text-slate-900">{alumni.length}</span>
             <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Verified Alumni</span>
           </div>
-          <div className="px-5 py-2.5 rounded-3xl liquid-glass text-center min-w-[120px]">
+          <div className="px-5 py-2.5 rounded-3xl glass-card text-center min-w-[120px]">
             <span className="block text-xl font-black text-slate-900">
               {alumni.filter(a => a.school === "CCHS").length}
             </span>
             <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">CCHS Graduates</span>
           </div>
-          <div className="px-5 py-2.5 rounded-3xl liquid-glass text-center min-w-[120px]">
+          <div className="px-5 py-2.5 rounded-3xl glass-card text-center min-w-[120px]">
             <span className="block text-xl font-black text-slate-900">
               {alumni.filter(a => a.school === "CCWS").length}
             </span>
@@ -269,8 +270,8 @@ export default function PublicAlumniPage() {
       {/* Directory Content Workspace */}
       <main className="max-w-7xl mx-auto px-8 pb-20 space-y-8 relative z-10">
         
-        {/* Filters and search panel - Refactored to liquid-glass */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 p-5 rounded-[2rem] liquid-glass">
+        {/* Filters and search panel - Refactored to glass-panel */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 p-5 rounded-[2rem] glass-panel">
           {/* Search name, company, skills */}
           <div className="md:col-span-2 relative">
             <span className="absolute inset-y-0 left-3.5 flex items-center text-slate-400">
@@ -281,7 +282,7 @@ export default function PublicAlumniPage() {
               placeholder="Search name, skills, role, company..." 
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-white/50 border border-white/80 rounded-2xl pl-10 pr-4 py-3 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-violet-500/60 focus:bg-white transition-all font-medium"
+              className="w-full glass-input rounded-2xl pl-10 pr-4 py-3 text-xs text-slate-800 placeholder-slate-400 focus:outline-none font-medium"
             />
           </div>
 
@@ -290,7 +291,7 @@ export default function PublicAlumniPage() {
             <select
               value={schoolFilter}
               onChange={(e) => setSchoolFilter(e.target.value)}
-              className="w-full bg-white/50 border border-white/80 rounded-2xl px-4 py-3 text-xs text-slate-700 focus:outline-none focus:border-violet-500/60 focus:bg-white transition-all font-semibold"
+              className="w-full glass-input rounded-2xl px-4 py-3 text-xs text-slate-700 focus:outline-none font-semibold"
             >
               <option value="All">All School Networks</option>
               <option value="CCHS">CCHS Network</option>
@@ -303,7 +304,7 @@ export default function PublicAlumniPage() {
             <select
               value={batchFilter}
               onChange={(e) => setBatchFilter(e.target.value)}
-              className="w-full bg-white/50 border border-white/80 rounded-2xl px-4 py-3 text-xs text-slate-700 focus:outline-none focus:border-violet-500/60 focus:bg-white transition-all font-semibold"
+              className="w-full glass-input rounded-2xl px-4 py-3 text-xs text-slate-700 focus:outline-none font-semibold"
             >
               <option value="All">All Graduation Years</option>
               {batchYears.map(year => (
@@ -324,7 +325,7 @@ export default function PublicAlumniPage() {
         ) : (
           <>
             {filteredAlumni.length === 0 ? (
-              <div className="text-center py-20 rounded-[2rem] liquid-glass">
+              <div className="text-center py-20 rounded-[2rem] glass-panel">
                 <span className="text-slate-400 text-xs font-semibold block uppercase tracking-wider">No Alumni Found</span>
                 <p className="text-[11px] text-slate-500 mt-1">Try adjusting your filters or search keywords.</p>
               </div>
@@ -333,7 +334,7 @@ export default function PublicAlumniPage() {
                 {filteredAlumni.map((alum) => (
                   <div 
                     key={alum.id} 
-                    className="group rounded-[2rem] liquid-glass liquid-glass-hover p-6 space-y-5 hover:scale-[1.01] transition-all duration-300 flex flex-col justify-between"
+                    className="group rounded-[2rem] glass-card glass-card-hover p-6 space-y-5 flex flex-col justify-between"
                   >
                     <div className="space-y-4">
                       {/* Avatar & Header */}
@@ -372,12 +373,12 @@ export default function PublicAlumniPage() {
                       {/* Skills Tags */}
                       <div className="flex flex-wrap gap-1.5">
                         {alum.skills.split(",").slice(0, 3).map((skill, idx) => (
-                          <span key={idx} className="px-2.5 py-0.5 rounded-lg bg-white/40 border border-white/60 text-[9px] font-semibold text-slate-600">
+                          <span key={idx} className="px-2.5 py-0.5 rounded-lg glass-badge text-[9px] font-semibold text-slate-600">
                             {skill.trim()}
                           </span>
                         ))}
                         {alum.skills.split(",").length > 3 && (
-                          <span className="px-2 py-0.5 rounded-lg bg-white/40 border border-white/60 text-[9px] font-semibold text-slate-500">
+                          <span className="px-2 py-0.5 rounded-lg glass-badge text-[9px] font-semibold text-slate-500">
                             +{alum.skills.split(",").length - 3} more
                           </span>
                         )}
@@ -388,7 +389,7 @@ export default function PublicAlumniPage() {
                     <div className="flex items-center justify-between gap-3 pt-4 border-t border-white/40 mt-auto">
                       <button 
                         onClick={() => setSelectedAlumni(alum)}
-                        className="flex-1 py-2 rounded-xl bg-white/60 hover:bg-white/90 text-[10px] font-bold text-slate-750 transition-all border border-white/80 shadow-sm"
+                        className="flex-1 py-2 rounded-xl glass-button text-[10px] font-bold text-slate-750 transition-all shadow-sm"
                       >
                         View Profile Details
                       </button>
@@ -413,10 +414,10 @@ export default function PublicAlumniPage() {
 
       </main>
 
-      {/* ================= DETAIL PROFILE MODAL - Refactored to liquid-glass ================= */}
+      {/* ================= DETAIL PROFILE MODAL - Refactored to glass-panel ================= */}
       {selectedAlumni && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/15 p-4 backdrop-blur-sm animate-fade-in">
-          <div className="w-full max-w-md rounded-[2rem] liquid-glass p-8 shadow-2xl space-y-6 relative animate-fade-in">
+        <div className="fixed inset-0 z-50 flex items-center justify-center glass-modal-overlay p-4 animate-fade-in">
+          <div className="w-full max-w-md rounded-[2rem] glass-panel p-8 shadow-2xl space-y-6 relative animate-fade-in">
             <button 
               onClick={() => setSelectedAlumni(null)}
               className="absolute top-6 right-6 text-slate-400 hover:text-slate-600 transition-colors"
@@ -448,7 +449,7 @@ export default function PublicAlumniPage() {
             {/* Details Fields */}
             <div className="space-y-4 pt-4 border-t border-white/40">
               <div className="space-y-1">
-                <span className="text-[9px] font-bold uppercase tracking-wider text-slate-400 block">Graduation details</span>
+                <span className="text-[9px] font-bold uppercase tracking-wider text-slate-404 block">Graduation details</span>
                 <span className="text-xs font-semibold text-slate-800">
                   {selectedAlumni.program} stream, batch of {selectedAlumni.batch}
                 </span>
@@ -456,7 +457,7 @@ export default function PublicAlumniPage() {
 
               {selectedAlumni.industry && (
                 <div className="space-y-1">
-                  <span className="text-[9px] font-bold uppercase tracking-wider text-slate-400 block">Focus Industry</span>
+                  <span className="text-[9px] font-bold uppercase tracking-wider text-slate-404 block">Focus Industry</span>
                   <span className="text-xs font-semibold text-slate-200">
                     {selectedAlumni.industry}
                   </span>
@@ -464,10 +465,10 @@ export default function PublicAlumniPage() {
               )}
 
               <div className="space-y-2">
-                <span className="text-[9px] font-bold uppercase tracking-wider text-slate-400 block">Expertise Skills</span>
+                <span className="text-[9px] font-bold uppercase tracking-wider text-slate-404 block">Expertise Skills</span>
                 <div className="flex flex-wrap gap-1.5">
                   {selectedAlumni.skills.split(",").map((skill, idx) => (
-                    <span key={idx} className="px-2.5 py-1 rounded-lg bg-white/60 border border-white/80 text-[10px] font-semibold text-slate-700">
+                    <span key={idx} className="px-2.5 py-1 rounded-lg glass-badge text-[10px] font-semibold text-slate-700">
                       {skill.trim()}
                     </span>
                   ))}
@@ -489,7 +490,7 @@ export default function PublicAlumniPage() {
               )}
               <button 
                 onClick={() => setSelectedAlumni(null)}
-                className="px-6 py-3 rounded-xl bg-white/60 border border-white/80 text-xs font-bold text-slate-700 hover:bg-white/80 transition-all shadow-sm"
+                className="px-6 py-3 rounded-xl glass-button text-xs font-bold text-slate-700 shadow-sm"
               >
                 Close Profile
               </button>
@@ -498,10 +499,10 @@ export default function PublicAlumniPage() {
         </div>
       )}
 
-      {/* ================= MODAL: SELF-REGISTRATION - Refactored to liquid-glass ================= */}
+      {/* ================= MODAL: SELF-REGISTRATION - Refactored to glass-panel ================= */}
       {showRegModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/15 p-4 backdrop-blur-sm animate-fade-in">
-          <div className="w-full max-w-lg rounded-[2rem] liquid-glass p-8 shadow-2xl space-y-6 relative max-h-[90vh] overflow-y-auto animate-fade-in">
+        <div className="fixed inset-0 z-50 flex items-center justify-center glass-modal-overlay p-4 animate-fade-in">
+          <div className="w-full max-w-lg rounded-[2rem] glass-panel p-8 shadow-2xl space-y-6 relative max-h-[90vh] overflow-y-auto animate-fade-in">
             <button 
               onClick={() => setShowRegModal(false)}
               className="absolute top-6 right-6 text-slate-400 hover:text-slate-600 transition-colors"
@@ -516,7 +517,7 @@ export default function PublicAlumniPage() {
 
             <form onSubmit={handleSelfRegistration} className="space-y-4">
               {/* Profile Image Upload */}
-              <div className="flex items-center gap-4 bg-slate-50/50 p-4 rounded-2xl border border-white/60">
+              <div className="flex items-center gap-4 bg-white/30 p-4 rounded-2xl border border-white/60">
                 <div className="h-14 w-14 rounded-full overflow-hidden border border-slate-200 bg-slate-100 flex items-center justify-center shrink-0">
                   {regForm.avatarUrl ? (
                     <img src={regForm.avatarUrl} className="h-full w-full object-cover" alt="avatar" />
@@ -548,7 +549,7 @@ export default function PublicAlumniPage() {
                     value={regForm.name} 
                     onChange={e => setRegForm({...regForm, name: e.target.value})}
                     placeholder="Enter name"
-                    className="w-full bg-white/50 border border-white/80 rounded-xl px-4 py-2.5 text-xs text-slate-800 focus:outline-none focus:border-violet-500 focus:bg-white transition-all"
+                    className="w-full glass-input rounded-xl px-4 py-2.5 text-xs text-slate-800 focus:outline-none"
                   />
                 </div>
 
@@ -560,7 +561,7 @@ export default function PublicAlumniPage() {
                     value={regForm.email} 
                     onChange={e => setRegForm({...regForm, email: e.target.value})}
                     placeholder="name@email.com"
-                    className="w-full bg-white/50 border border-white/80 rounded-xl px-4 py-2.5 text-xs text-slate-800 focus:outline-none focus:border-violet-500 focus:bg-white transition-all"
+                    className="w-full glass-input rounded-xl px-4 py-2.5 text-xs text-slate-800 focus:outline-none"
                   />
                 </div>
               </div>
@@ -571,7 +572,7 @@ export default function PublicAlumniPage() {
                   <select 
                     value={regForm.school} 
                     onChange={e => setRegForm({...regForm, school: e.target.value})}
-                    className="w-full bg-white/50 border border-white/80 rounded-xl px-3 py-2.5 text-xs text-slate-800 focus:outline-none focus:border-violet-500 focus:bg-white transition-all font-semibold"
+                    className="w-full glass-input rounded-xl px-3 py-2.5 text-xs text-slate-800 focus:outline-none font-semibold"
                   >
                     <option value="CCHS">CCHS Network</option>
                     <option value="CCWS">CCWS Network</option>
@@ -586,7 +587,7 @@ export default function PublicAlumniPage() {
                     value={regForm.batch} 
                     onChange={e => setRegForm({...regForm, batch: e.target.value})}
                     placeholder="e.g. 2018"
-                    className="w-full bg-white/50 border border-white/80 rounded-xl px-4 py-2.5 text-xs text-slate-800 focus:outline-none focus:border-violet-500 focus:bg-white transition-all"
+                    className="w-full glass-input rounded-xl px-4 py-2.5 text-xs text-slate-800 focus:outline-none"
                   />
                 </div>
 
@@ -598,7 +599,7 @@ export default function PublicAlumniPage() {
                     value={regForm.program} 
                     onChange={e => setRegForm({...regForm, program: e.target.value})}
                     placeholder="e.g. Science"
-                    className="w-full bg-white/50 border border-white/80 rounded-xl px-4 py-2.5 text-xs text-slate-800 focus:outline-none focus:border-violet-500 focus:bg-white transition-all"
+                    className="w-full glass-input rounded-xl px-4 py-2.5 text-xs text-slate-800 focus:outline-none"
                   />
                 </div>
               </div>
@@ -611,7 +612,7 @@ export default function PublicAlumniPage() {
                     value={regForm.company} 
                     onChange={e => setRegForm({...regForm, company: e.target.value})}
                     placeholder="e.g. Microsoft (Optional)"
-                    className="w-full bg-white/50 border border-white/80 rounded-xl px-4 py-2.5 text-xs text-slate-800 focus:outline-none focus:border-violet-500 focus:bg-white transition-all"
+                    className="w-full glass-input rounded-xl px-4 py-2.5 text-xs text-slate-800 focus:outline-none"
                   />
                 </div>
 
@@ -622,7 +623,7 @@ export default function PublicAlumniPage() {
                     value={regForm.role} 
                     onChange={e => setRegForm({...regForm, role: e.target.value})}
                     placeholder="e.g. Principal Architect (Optional)"
-                    className="w-full bg-white/50 border border-white/80 rounded-xl px-4 py-2.5 text-xs text-slate-800 focus:outline-none focus:border-violet-500 focus:bg-white transition-all"
+                    className="w-full glass-input rounded-xl px-4 py-2.5 text-xs text-slate-800 focus:outline-none"
                   />
                 </div>
               </div>
@@ -635,7 +636,7 @@ export default function PublicAlumniPage() {
                   value={regForm.skills} 
                   onChange={e => setRegForm({...regForm, skills: e.target.value})}
                   placeholder="Comma-separated (React, Node, UX Design)"
-                  className="w-full bg-white/50 border border-white/80 rounded-xl px-4 py-2.5 text-xs text-slate-800 focus:outline-none focus:border-violet-500 focus:bg-white transition-all"
+                  className="w-full glass-input rounded-xl px-4 py-2.5 text-xs text-slate-800 focus:outline-none"
                 />
               </div>
 
@@ -647,7 +648,7 @@ export default function PublicAlumniPage() {
                   value={regForm.city} 
                   onChange={e => setRegForm({...regForm, city: e.target.value})}
                   placeholder="e.g. Mumbai"
-                  className="w-full bg-white/50 border border-white/80 rounded-xl px-4 py-2.5 text-xs text-slate-800 focus:outline-none focus:border-violet-500 focus:bg-white transition-all"
+                  className="w-full glass-input rounded-xl px-4 py-2.5 text-xs text-slate-800 focus:outline-none"
                 />
               </div>
 
@@ -658,7 +659,7 @@ export default function PublicAlumniPage() {
                   value={regForm.phone} 
                   onChange={e => setRegForm({...regForm, phone: e.target.value})}
                   placeholder="e.g. +91 98765 43210"
-                  className="w-full bg-white/50 border border-white/80 rounded-xl px-4 py-2.5 text-xs text-slate-800 focus:outline-none focus:border-violet-500 focus:bg-white transition-all"
+                  className="w-full glass-input rounded-xl px-4 py-2.5 text-xs text-slate-800 focus:outline-none"
                 />
               </div>
 
@@ -669,7 +670,7 @@ export default function PublicAlumniPage() {
                   value={regForm.linkedin} 
                   onChange={e => setRegForm({...regForm, linkedin: e.target.value})}
                   placeholder="e.g. https://linkedin.com/in/username"
-                  className="w-full bg-white/50 border border-white/80 rounded-xl px-4 py-2.5 text-xs text-slate-800 focus:outline-none focus:border-violet-500 focus:bg-white transition-all"
+                  className="w-full glass-input rounded-xl px-4 py-2.5 text-xs text-slate-800 focus:outline-none"
                 />
               </div>
 
@@ -684,7 +685,7 @@ export default function PublicAlumniPage() {
         </div>
       )}
 
-      {/* Footer - Refactored to liquid-glass style */}
+      {/* Footer - Refactored to glass-panel style */}
       <footer className="border-t border-slate-200/50 bg-[#eff6ff]/30 py-12 text-center text-xs text-slate-500 mt-20 relative z-10">
         <div className="max-w-7xl mx-auto px-8 flex flex-col md:flex-row items-center justify-between gap-6">
           <p>© 2026 CCGS Educational Group. CCHS & CCWS Joint Alumni Directories.</p>

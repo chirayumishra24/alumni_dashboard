@@ -45,7 +45,7 @@ export default function Sidebar({ currentTab, setCurrentTab, pendingCount, onLog
       </div>
 
       {/* Sidebar Container */}
-      <aside className={`fixed inset-y-0 left-0 z-40 w-64 bg-white lg:bg-white/45 border-r border-slate-200 lg:border-white/60 flex flex-col justify-between transition-transform duration-300 transform lg:translate-x-0 lg:static lg:h-[calc(100vh-3rem)] lg:sticky lg:top-6 lg:rounded-[2rem] lg:liquid-glass lg:shadow-xl ${
+      <aside className={`fixed inset-y-0 left-0 z-40 w-64 bg-white/70 lg:bg-white/35 border-r border-slate-200 lg:border-white/40 flex flex-col justify-between transition-transform duration-300 transform lg:translate-x-0 lg:static lg:h-[calc(100vh-3rem)] lg:sticky lg:top-6 lg:rounded-[2rem] lg:glass-sidebar lg:shadow-xl ${
         isOpen ? "translate-x-0" : "-translate-x-full"
       }`}>
         <div className="p-6 space-y-8 flex-1 flex flex-col">
@@ -59,7 +59,7 @@ export default function Sidebar({ currentTab, setCurrentTab, pendingCount, onLog
               <p className="text-[10px] text-slate-500 tracking-wider font-semibold uppercase">Coordinator Panel</p>
             </div>
           </div>
-
+ 
           {/* Navigation Items */}
           <nav className="space-y-1.5 flex-1">
             {menuItems.map((item) => {
@@ -74,8 +74,8 @@ export default function Sidebar({ currentTab, setCurrentTab, pendingCount, onLog
                   }}
                   className={`w-full flex items-center justify-between px-4 py-3 rounded-xl text-xs font-bold transition-all text-left ${
                     isActive 
-                      ? "bg-violet-50/70 lg:bg-white/60 border-l-2 border-violet-650 text-violet-755 shadow-sm" 
-                      : "text-slate-600 hover:text-slate-900 hover:bg-slate-50/50 border-l-2 border-transparent"
+                      ? "bg-white/50 border-l-2 border-violet-650 text-violet-755 shadow-sm" 
+                      : "text-slate-600 hover:text-slate-900 hover:bg-white/10 border-l-2 border-transparent"
                   }`}
                 >
                   <div className="flex items-center gap-3">
@@ -92,19 +92,19 @@ export default function Sidebar({ currentTab, setCurrentTab, pendingCount, onLog
             })}
           </nav>
         </div>
-
+ 
         {/* Bottom Actions */}
         <div className="p-6 border-t border-slate-200 lg:border-white/40 space-y-3">
           <button 
             onClick={() => window.open('/', '_blank')}
-            className="w-full py-2.5 rounded-xl border border-slate-250 lg:border-white/80 bg-slate-50/50 hover:bg-slate-100/50 text-xs font-bold text-slate-700 flex items-center justify-center gap-2 transition-all shadow-sm"
+            className="w-full py-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-all glass-button shadow-sm"
           >
             <ArrowLeftRight size={14} className="text-slate-500" /> Public Showcase
           </button>
           
           <button 
             onClick={onLogout}
-            className="w-full py-2.5 rounded-xl bg-rose-50/50 hover:bg-rose-100/50 text-xs font-bold text-rose-700 flex items-center justify-center gap-2 transition-all border border-rose-200 lg:border-rose-200/50 shadow-sm"
+            className="w-full py-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-all border border-rose-250 bg-rose-50/30 hover:bg-rose-100/50 text-rose-700 shadow-sm"
           >
             <LogOut size={14} className="text-rose-550" /> Log Out
           </button>
