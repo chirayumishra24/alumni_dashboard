@@ -231,6 +231,36 @@ export default function PublicAlumniPage() {
 
   return (
     <div className="min-h-screen executive-mesh-bg text-slate-800 font-sans relative overflow-x-hidden selection:bg-maroon-600 selection:text-white grid-bg">
+      {/* ================= HERO BACKGROUND IMAGE CAROUSEL (INFINITE MARQUEE) ================= */}
+      <div className="absolute top-0 left-0 right-0 h-[650px] overflow-hidden pointer-events-none z-0 opacity-15">
+        {/* Fading Edge Masks */}
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#f8fafc]/50 to-[#f8fafc] z-10" />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#f8fafc] via-transparent to-[#f8fafc] z-10" />
+        
+        {/* Infinite Image Slider */}
+        <div className="flex w-max gap-8 pt-10 animate-[marquee-left_90s_linear_infinite]">
+          {[
+            "/images/cambridge-court-high-school-mansarovar-jaipur-boarding-schools-ywwbk3adb3.avif",
+            "/images/cambridge-court-international-school-muhana-mandi-road-jaipur-schools-82wy8zpuup.webp",
+            "/images/cambridge-court-world-school-mansarovar-jaipur-schools-858df3yi5y.avif",
+            "/images/cambridge-court-high-school-mansarovar-jaipur-boarding-schools-ywwbk3adb3.avif",
+            "/images/cambridge-court-international-school-muhana-mandi-road-jaipur-schools-82wy8zpuup.webp",
+            "/images/cambridge-court-world-school-mansarovar-jaipur-schools-858df3yi5y.avif"
+          ].map((src, idx) => (
+            <div 
+              key={idx}
+              className="w-[450px] md:w-[680px] h-[350px] md:h-[450px] rounded-[2.5rem] overflow-hidden border border-slate-200/40 shadow-xl shrink-0"
+            >
+              <img 
+                src={src} 
+                className="w-full h-full object-cover filter saturate-[0.8] contrast-[0.95]" 
+                alt="Cambridge Court Campus Background" 
+              />
+            </div>
+          ))}
+        </div>
+      </div>
+
       {/* Dynamic Background Shapes */}
       <div className="absolute top-[-100px] left-[-150px] bg-shape-maroon opacity-90 pointer-events-none" />
       <div className="absolute top-[350px] right-[-250px] bg-shape-navy opacity-80 pointer-events-none" />
