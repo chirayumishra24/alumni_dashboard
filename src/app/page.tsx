@@ -384,23 +384,24 @@ export default function PublicAlumniPage() {
         </div>
       </section>
 
-      {/* ================= NETWORK IMPACT STATS (BLUE CONTAINER) ================= */}
-      <section className="max-w-7xl mx-auto px-8 pb-12 relative z-10">
-        <div className="bg-gradient-to-br from-[#0c1b33] via-[#0f2347] to-[#142d5c] rounded-[2.5rem] p-8 md:p-10 text-white shadow-2xl relative overflow-hidden border border-white/10 space-y-8">
-          {/* Ambient background glows */}
-          <div className="absolute top-0 right-0 w-96 h-96 bg-maroon-500/10 rounded-full blur-3xl pointer-events-none" />
-          <div className="absolute bottom-0 left-0 w-96 h-96 bg-navy-500/20 rounded-full blur-3xl pointer-events-none" />
+      {/* ================= NETWORK IMPACT STATS (BLUE CONTAINER - FULL WIDTH) ================= */}
+      <section className="w-full bg-gradient-to-br from-[#0c2340] via-[#12355e] to-[#0f2c52] text-white shadow-xl relative overflow-hidden border-y border-white/10 py-10 md:py-12 z-10 mb-12">
+        {/* Glow Effects */}
+        <div className="absolute top-0 right-0 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 left-0 w-96 h-96 bg-indigo-500/15 rounded-full blur-3xl pointer-events-none" />
+        
+        <div className="max-w-7xl mx-auto px-8 relative z-10 space-y-8">
           
           <div className="relative z-10 space-y-8">
             {/* Header info */}
             <div className="text-center md:text-left space-y-1.5">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-[9px] font-bold text-amber-300 uppercase tracking-widest">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-[9px] font-bold text-amber-305 uppercase tracking-widest">
                 <Sparkles size={10} fill="currentColor" /> Network Placements &amp; Impact
               </span>
               <h3 className="text-2xl md:text-3xl font-display font-extrabold tracking-tight text-amber-300">
                 Distinguished Academic &amp; Corporate Footprint
               </h3>
-              <p className="text-xs text-slate-350 max-w-xl">
+              <p className="text-xs text-slate-300 max-w-xl">
                 A consolidated summary of our verified alumni&apos;s institutional achievements and top international employer mappings.
               </p>
             </div>
@@ -416,7 +417,7 @@ export default function PublicAlumniPage() {
                 <div>
                   <span className="block text-3xl font-black font-display text-white tracking-tight">{stats.entrepreneurs}+</span>
                   <span className="block text-[10px] font-black uppercase text-amber-300 tracking-wider">Founders &amp; CEOs</span>
-                  <p className="text-[10px] text-slate-350 leading-normal mt-0.5">Pioneering global ventures and tech startups.</p>
+                  <p className="text-[10px] text-slate-300 leading-normal mt-0.5">Pioneering global ventures and tech startups.</p>
                 </div>
               </div>
 
@@ -428,7 +429,7 @@ export default function PublicAlumniPage() {
                 <div>
                   <span className="block text-3xl font-black font-display text-white tracking-tight">{stats.iitAiims}+</span>
                   <span className="block text-[10px] font-black uppercase text-emerald-300 tracking-wider">IIT &amp; AIIMS Scholars</span>
-                  <p className="text-[10px] text-slate-355 leading-normal mt-0.5">Graduates from India&apos;s premier engineering &amp; medical institutes.</p>
+                  <p className="text-[10px] text-slate-300 leading-normal mt-0.5">Graduates from India&apos;s premier engineering &amp; medical institutes.</p>
                 </div>
               </div>
 
@@ -440,7 +441,7 @@ export default function PublicAlumniPage() {
                 <div>
                   <span className="block text-3xl font-black font-display text-white tracking-tight">{stats.government}+</span>
                   <span className="block text-[10px] font-black uppercase text-sky-300 tracking-wider">Govt &amp; Civil Services</span>
-                  <p className="text-[10px] text-slate-355 leading-normal mt-0.5">Serving the nation across IAS, IPS, IFS, and ministries.</p>
+                  <p className="text-[10px] text-slate-300 leading-normal mt-0.5">Serving the nation across IAS, IPS, IFS, and ministries.</p>
                 </div>
               </div>
 
