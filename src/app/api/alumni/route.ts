@@ -65,7 +65,9 @@ export async function GET(request: Request) {
     // Strip phone field from public view and ensure top-level avatar/avatarUrl fields exist for external consumer compatibility
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const publicList = list.map(({ phone, ...rest }) => {
-      const avUrl = rest.user?.avatarUrl || `https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=120`;
+      const avUrl = (rest.user?.avatarUrl && rest.user.avatarUrl.startsWith('http'))
+        ? rest.user.avatarUrl
+        : `https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=120`;
       return {
         ...rest,
         avatar: avUrl,
