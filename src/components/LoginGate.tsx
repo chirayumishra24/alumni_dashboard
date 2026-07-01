@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { ShieldAlert, RefreshCw, KeyRound, Eye, EyeOff } from "lucide-react";
+import Logo from "@/components/Logo";
 
 interface LoginGateProps {
   children: React.ReactNode;
@@ -84,9 +85,7 @@ export default function LoginGate({ children }: LoginGateProps) {
 
       <div className={`w-full max-w-md p-8 rounded-[2rem] glass-panel shadow-2xl relative transition-all duration-300 ${shake ? "animate-shake" : ""}`}>
         <div className="flex flex-col items-center text-center space-y-4 mb-8">
-          <div className="h-14 w-14 rounded-2xl bg-gradient-to-tr from-violet-600 to-indigo-600 flex items-center justify-center font-black text-white text-2xl tracking-wider shadow-md shadow-indigo-500/10">
-            CCGS
-          </div>
+          <Logo size={56} showText={false} className="mb-1" />
           <div>
             <h2 className="text-xl font-bold tracking-tight text-slate-900 flex items-center gap-1.5 justify-center">
               Coordinator Portal

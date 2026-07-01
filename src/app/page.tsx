@@ -5,6 +5,7 @@ import {
   MapPin, Search, X, Sparkles, PlusCircle, RefreshCw, Users, Mail
 } from "lucide-react";
 import { uploadFileToStorage } from "@/lib/firebase";
+import Logo from "@/components/Logo";
 
 // Custom LinkedIn Icon SVG to bypass lucide-react version compatibility issues
 const LinkedinIcon = ({ size = 14, className = "" }: { size?: number; className?: string }) => (
@@ -197,6 +198,13 @@ export default function PublicAlumniPage() {
 
   return (
     <div className="min-h-screen executive-mesh-bg text-slate-800 font-sans relative overflow-x-hidden selection:bg-maroon-600 selection:text-white grid-bg">
+      {/* Dynamic Background Shapes */}
+      <div className="absolute top-[-100px] left-[-150px] bg-shape-maroon opacity-90 pointer-events-none" />
+      <div className="absolute top-[350px] right-[-250px] bg-shape-navy opacity-80 pointer-events-none" />
+      <div className="absolute top-[900px] left-[-200px] bg-shape-navy opacity-60 pointer-events-none" />
+      <div className="absolute bottom-[400px] right-[-150px] bg-shape-maroon opacity-70 pointer-events-none" />
+      <div className="absolute bottom-[-100px] left-[10%] bg-shape-navy opacity-50 pointer-events-none" />
+
       {/* Toast alert */}
       {toast && (
         <div className="fixed top-6 right-6 z-50 flex items-center gap-3 rounded-2xl glass-card p-4 shadow-xl animate-fade-in text-slate-800">
@@ -206,24 +214,18 @@ export default function PublicAlumniPage() {
       )}
 
       {/* Top Header Navigation */}
-      <header className="sticky top-0 z-40 glass-header px-8 py-5">
+      <header className="sticky top-0 z-40 glass-header px-8 py-3.5 border-b border-slate-200/25">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl bg-gradient-to-tr from-violet-600 to-indigo-600 flex items-center justify-center font-black text-white text-lg tracking-wider shadow-md shadow-indigo-500/10">
-              CCGS
-            </div>
-            <div>
-              <h1 className="text-sm font-bold text-slate-900 tracking-wide">CCGS Alumni Directory</h1>
-              <p className="text-[9px] text-slate-500 tracking-wider font-semibold uppercase">Connecting Future Leaders</p>
-            </div>
-          </div>
+          <Logo size={42} />
 
           <div className="flex items-center gap-4">
             <button 
               onClick={() => setShowRegModal(true)}
-              className="flex items-center gap-1.5 px-4.5 py-2.5 rounded-xl bg-maroon-600 hover:bg-maroon-700 text-xs font-bold text-white shadow-sm transition-all hover:scale-[1.01]"
+              className="group relative overflow-hidden flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-maroon-600 to-navy-700 hover:from-maroon-500 hover:to-navy-600 text-xs font-bold text-white shadow-[0_4px_14px_rgba(107,29,47,0.15)] hover:shadow-[0_6px_20px_rgba(107,29,47,0.25)] transition-all duration-300 hover:scale-[1.02] active:scale-95 border border-white/10"
             >
-              <PlusCircle size={14} /> Register Profile
+              <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/15 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-out" />
+              <PlusCircle size={14} className="group-hover:rotate-90 group-hover:scale-110 transition-all duration-300 text-amber-300" />
+              <span>Register Profile</span>
             </button>
           </div>
         </div>

@@ -10,6 +10,9 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: "CCGS Alumni Portal",
   description: "CCHS & CCWS Joint Alumni Directory & Matchmaking Hub",
+  icons: {
+    icon: "/icon.svg",
+  },
 };
 
 export default function RootLayout({
