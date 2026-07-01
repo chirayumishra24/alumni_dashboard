@@ -384,77 +384,73 @@ export default function PublicAlumniPage() {
         </div>
       </section>
 
-      {/* ================= NETWORK IMPACT STATS (THIN HORIZONTAL STRIP) ================= */}
-      <section className="w-full bg-[#0c1b33] border-y border-white/10 text-white shadow-xl relative overflow-hidden py-3.5 z-10 mb-8">
-        {/* Gradient backdrop */}
-        <div className="absolute inset-0 bg-gradient-to-r from-[#0c1b33] via-[#0f2347] to-[#142d5c] opacity-95" />
-        
-        {/* Content container */}
-        <div className="max-w-7xl mx-auto px-8 relative z-10 flex flex-col lg:flex-row items-center justify-between gap-6 lg:gap-4">
-          
-          {/* Badge indicator */}
-          <div className="flex items-center gap-2.5 shrink-0">
-            <span className="p-2 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-400">
-              <Sparkles size={14} fill="currentColor" />
-            </span>
-            <div>
-              <h4 className="text-[10px] font-black uppercase tracking-wider text-amber-300">Network Impact</h4>
-              <p className="text-[8px] text-slate-400 font-bold uppercase tracking-widest leading-none mt-0.5">Academic &amp; Placement stats</p>
-            </div>
+      {/* ================= NETWORK PLACEMENTS HEADER ================= */}
+      <section className="max-w-7xl mx-auto px-8 pt-10 pb-4 relative z-10">
+        <div className="text-center md:text-left">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-900/5 border border-slate-900/10 text-[10px] font-bold text-slate-700 uppercase tracking-wider mb-2">
+            <Sparkles size={12} className="text-amber-600" /> Network Placements &amp; Impact
           </div>
+          <h3 className="text-2xl font-display font-extrabold text-[#1b2a41] tracking-tight">
+            Distinguished Academic &amp; Corporate Footprint
+          </h3>
+          <p className="text-xs text-slate-500 max-w-xl mt-1">
+            A consolidated summary of our verified alumni&apos;s institutional achievements and top international employer mappings.
+          </p>
+        </div>
+      </section>
 
-          {/* Vertical divider */}
-          <div className="hidden lg:block w-px h-8 bg-white/15" />
+      {/* ================= NETWORK IMPACT STATS (THIN STRIP) ================= */}
+      <section className="w-full bg-[#0a1526]/90 backdrop-blur-md border-y border-white/10 text-white shadow-lg py-4 relative z-10 mb-10 overflow-hidden">
+        {/* Glow Effects */}
+        <div className="absolute top-0 left-[10%] w-[300px] h-[80px] bg-amber-500/5 blur-3xl pointer-events-none rounded-full" />
+        <div className="absolute bottom-0 right-[15%] w-[400px] h-[80px] bg-indigo-500/5 blur-3xl pointer-events-none rounded-full" />
 
-          {/* Three core statistics in a row */}
-          <div className="flex flex-wrap items-center justify-around sm:justify-start gap-x-8 gap-y-4 w-full lg:w-auto">
+        <div className="max-w-7xl mx-auto px-8 relative z-10 flex flex-col lg:flex-row items-center justify-between gap-6 lg:gap-4">
+
+          {/* 3 Core Stats (perfect horizontal alignment) */}
+          <div className="flex items-center justify-between sm:justify-start gap-8 md:gap-14 w-full lg:w-auto">
             
             {/* Stat 1: Founders */}
-            <div className="flex items-center gap-2.5">
-              <span className="text-2xl md:text-3xl font-black font-display text-white tracking-tight leading-none">{stats.entrepreneurs}+</span>
+            <div className="flex items-center gap-3">
+              <span className="text-3xl font-black font-display text-amber-400 tracking-tight leading-none">{stats.entrepreneurs}+</span>
               <div>
-                <span className="block text-[9px] font-black uppercase text-amber-400 leading-none">Founders</span>
-                <span className="text-[8px] text-slate-400 font-semibold tracking-tight">CEOs &amp; Entrepreneurs</span>
+                <span className="block text-[10px] font-black uppercase tracking-wider text-slate-200 leading-none">Founders</span>
+                <span className="text-[9px] font-semibold text-slate-400 tracking-tight block mt-0.5">CEOs &amp; Founders</span>
               </div>
             </div>
-
-            {/* Divider dot */}
-            <div className="hidden sm:block w-1 h-1 rounded-full bg-white/20" />
 
             {/* Stat 2: IITs & AIIMS */}
-            <div className="flex items-center gap-2.5">
-              <span className="text-2xl md:text-3xl font-black font-display text-white tracking-tight leading-none">{stats.iitAiims}+</span>
+            <div className="flex items-center gap-3">
+              <span className="text-3xl font-black font-display text-emerald-400 tracking-tight leading-none">{stats.iitAiims}+</span>
               <div>
-                <span className="block text-[9px] font-black uppercase text-emerald-400 leading-none">IIT &amp; AIIMS</span>
-                <span className="text-[8px] text-slate-400 font-semibold tracking-tight">Scholars &amp; Researchers</span>
+                <span className="block text-[10px] font-black uppercase tracking-wider text-slate-200 leading-none">IIT &amp; AIIMS</span>
+                <span className="text-[9px] font-semibold text-slate-400 tracking-tight block mt-0.5">Scholars &amp; Research</span>
               </div>
             </div>
 
-            {/* Divider dot */}
-            <div className="hidden sm:block w-1 h-1 rounded-full bg-white/20" />
-
-            {/* Stat 3: Govt & Civil Services */}
-            <div className="flex items-center gap-2.5">
-              <span className="text-2xl md:text-3xl font-black font-display text-white tracking-tight leading-none">{stats.government}+</span>
+            {/* Stat 3: Civil Services */}
+            <div className="flex items-center gap-3">
+              <span className="text-3xl font-black font-display text-sky-400 tracking-tight leading-none">{stats.government}+</span>
               <div>
-                <span className="block text-[9px] font-black uppercase text-sky-400 leading-none">Govt &amp; Civil</span>
-                <span className="text-[8px] text-slate-400 font-semibold tracking-tight">Services &amp; Diplomatic</span>
+                <span className="block text-[10px] font-black uppercase tracking-wider text-slate-200 leading-none">Govt &amp; Civil</span>
+                <span className="text-[9px] font-semibold text-slate-400 tracking-tight block mt-0.5">Services &amp; Diplomatic</span>
               </div>
             </div>
 
           </div>
 
-          {/* Vertical divider */}
-          <div className="hidden lg:block w-px h-8 bg-white/15" />
+          {/* Divider */}
+          <div className="hidden lg:block w-px h-8 bg-white/10" />
 
           {/* Top employer footprints */}
-          <div className="flex flex-wrap items-center gap-2.5 w-full lg:w-auto overflow-hidden">
+          <div className="flex flex-wrap items-center gap-3 w-full lg:w-auto overflow-hidden">
             <span className="text-[9px] font-black uppercase tracking-wider text-slate-400 shrink-0">Top Placements:</span>
-            <div className="flex flex-wrap items-center gap-1.5 select-none">
-              {stats.topCompanies.slice(0, 6).map((tc, idx) => (
-                <div key={idx} className="flex items-center gap-1 px-2.5 py-1 rounded-xl bg-white/5 border border-white/10 text-[9px] font-bold">
-                  <span className="text-slate-205">{tc.name}</span>
-                  <span className="text-indigo-305 font-black">({tc.count})</span>
+            <div className="flex flex-wrap items-center gap-2 select-none">
+              {stats.topCompanies.slice(0, 5).map((tc, idx) => (
+                <div key={idx} className="flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-white/5 border border-white/10 text-[9px] font-bold text-slate-200 hover:bg-white/10 hover:border-white/20 transition-all duration-200">
+                  <span>{tc.name}</span>
+                  <span className="w-1 h-1 rounded-full bg-indigo-400" />
+                  <span className="text-indigo-300 font-extrabold">{tc.count}</span>
                 </div>
               ))}
             </div>
