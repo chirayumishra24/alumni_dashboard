@@ -292,7 +292,7 @@ export default function PublicAlumniPage() {
   return (
     <div className="min-h-screen executive-mesh-bg text-slate-800 font-sans relative overflow-x-hidden selection:bg-maroon-600 selection:text-white grid-bg">
       {/* ================= HERO BACKGROUND IMAGE CAROUSEL (INFINITE MARQUEE) ================= */}
-      <div className="absolute top-0 left-0 right-0 h-[750px] overflow-hidden pointer-events-none z-0 opacity-100">
+      <div className="absolute top-[73px] left-0 right-0 h-[750px] overflow-hidden pointer-events-none z-0 opacity-100">
         {/* Fading Edge Masks */}
         <div className="absolute inset-0 bg-gradient-to-b from-transparent to-[#FAF8F5]/90 z-10" />
         <div className="absolute inset-0 bg-gradient-to-r from-[#FAF8F5]/25 via-transparent to-[#FAF8F5]/25 z-10" />
@@ -313,7 +313,7 @@ export default function PublicAlumniPage() {
             >
               <img 
                 src={src} 
-                className="w-full h-full object-cover filter saturate-[0.8] contrast-[0.95]" 
+                className="w-full h-full object-cover filter saturate-[0.8] contrast-[0.95] blur-[3px]" 
                 alt="Cambridge Court Campus Background" 
               />
             </div>
@@ -884,25 +884,26 @@ export default function PublicAlumniPage() {
         </div>
       )}
 
-      {/* ================= MODAL: SELF-REGISTRATION - Refactored to glass-panel ================= */}
+      {/* ================= MODAL: SELF-REGISTRATION ================= */}
       {showRegModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center glass-modal-overlay p-4 animate-fade-in">
-          <div className="w-full max-w-lg rounded-[2rem] glass-panel p-8 shadow-2xl space-y-6 relative max-h-[90vh] overflow-y-auto animate-fade-in">
+        <div className="fixed inset-0 z-50 flex items-center justify-center glass-modal-overlay p-4 animate-fade-in" data-lenis-prevent>
+          <div className="w-full max-w-lg rounded-[2.5rem] bg-white border border-slate-100 p-8 shadow-2xl space-y-6 relative max-h-[90vh] overflow-y-auto animate-fade-in no-scrollbar text-left">
             <button 
               onClick={() => setShowRegModal(false)}
-              className="absolute top-6 right-6 text-slate-400 hover:text-slate-600 transition-colors"
+              className="absolute top-6 right-6 p-2 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 transition-all duration-200 cursor-pointer z-20 hover:scale-105"
+              aria-label="Close modal"
             >
-              <X size={20} />
+              <X size={14} />
             </button>
 
             <div>
-              <h2 className="text-xl font-bold tracking-tight text-slate-900">Alumni Self-Registration Form</h2>
-              <p className="text-xs text-slate-505 mt-1">Register to join the school directories. Profiles are reviewed by admins before activation.</p>
+              <h2 className="text-xl font-bold tracking-tight text-slate-900 font-serif">Alumni Self-Registration Form</h2>
+              <p className="text-xs text-slate-500 mt-1 font-semibold">Register to join the school directories. Profiles are reviewed by admins before activation.</p>
             </div>
 
             <form onSubmit={handleSelfRegistration} className="space-y-4">
               {/* Profile Image Upload */}
-              <div className="flex items-center gap-4 bg-white/30 p-4 rounded-2xl border border-white/60">
+              <div className="flex items-center gap-4 bg-slate-50 p-4 rounded-2xl border border-slate-100">
                 <div className="h-14 w-14 rounded-full overflow-hidden border border-slate-200 bg-slate-100 flex items-center justify-center shrink-0">
                   {regForm.avatarUrl ? (
                     <img src={regForm.avatarUrl} className="h-full w-full object-cover" alt="avatar" />
@@ -912,7 +913,7 @@ export default function PublicAlumniPage() {
                 </div>
                 <div>
                   <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">Profile Photo (Optional)</span>
-                  <label className="inline-flex h-8 items-center justify-center rounded-xl bg-violet-650 hover:bg-violet-700 px-3 text-xs font-bold text-white cursor-pointer transition-all">
+                  <label className="inline-flex h-8 items-center justify-center rounded-xl bg-maroon-700 hover:bg-maroon-800 px-3.5 text-xs font-bold text-white cursor-pointer transition-all duration-200">
                     {uploadingAvatar ? "Uploading..." : "Upload Photo"}
                     <input 
                       type="file" 
@@ -927,37 +928,37 @@ export default function PublicAlumniPage() {
 
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold text-slate-405 uppercase tracking-wider block">Full Name</label>
+                  <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Full Name</label>
                   <input 
                     type="text" 
                     required
                     value={regForm.name} 
                     onChange={e => setRegForm({...regForm, name: e.target.value})}
                     placeholder="Enter name"
-                    className="w-full glass-input rounded-xl px-4 py-2.5 text-xs text-slate-800 focus:outline-none"
+                    className="w-full bg-slate-50 border border-slate-200/80 rounded-xl px-4 py-2.5 text-xs text-slate-800 focus:bg-white focus:border-maroon-700/50 focus:ring-1 focus:ring-maroon-700/20 transition-all duration-200 focus:outline-none"
                   />
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold text-slate-405 uppercase tracking-wider block">Email Address</label>
+                  <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Email Address</label>
                   <input 
                     type="email" 
                     required
                     value={regForm.email} 
                     onChange={e => setRegForm({...regForm, email: e.target.value})}
                     placeholder="name@email.com"
-                    className="w-full glass-input rounded-xl px-4 py-2.5 text-xs text-slate-800 focus:outline-none"
+                    className="w-full bg-slate-50 border border-slate-200/80 rounded-xl px-4 py-2.5 text-xs text-slate-800 focus:bg-white focus:border-maroon-700/50 focus:ring-1 focus:ring-maroon-700/20 transition-all duration-200 focus:outline-none"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold text-slate-405 uppercase tracking-wider block">School Network</label>
+                  <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">School Network</label>
                   <select 
                     value={regForm.school} 
                     onChange={e => setRegForm({...regForm, school: e.target.value})}
-                    className="w-full glass-input rounded-xl px-3 py-2.5 text-xs text-slate-800 focus:outline-none font-semibold"
+                    className="w-full bg-slate-50 border border-slate-200/80 rounded-xl px-3 py-2.5 text-xs text-slate-850 focus:bg-white focus:border-maroon-700/50 focus:ring-1 focus:ring-maroon-700/20 transition-all duration-200 focus:outline-none font-semibold"
                   >
                     <option value="CCHS">CCHS Network</option>
                     <option value="CCWS">CCWS Network</option>
@@ -965,114 +966,114 @@ export default function PublicAlumniPage() {
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold text-slate-405 uppercase tracking-wider block">Graduation Batch</label>
+                  <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Graduation Batch</label>
                   <input 
                     type="number" 
                     required
                     value={regForm.batch} 
                     onChange={e => setRegForm({...regForm, batch: e.target.value})}
                     placeholder="e.g. 2018"
-                    className="w-full glass-input rounded-xl px-4 py-2.5 text-xs text-slate-800 focus:outline-none"
+                    className="w-full bg-slate-50 border border-slate-200/80 rounded-xl px-4 py-2.5 text-xs text-slate-800 focus:bg-white focus:border-maroon-700/50 focus:ring-1 focus:ring-maroon-700/20 transition-all duration-200 focus:outline-none"
                   />
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold text-slate-405 uppercase tracking-wider block">Program / Stream</label>
+                  <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Program / Stream</label>
                   <input 
                     type="text" 
                     required
                     value={regForm.program} 
                     onChange={e => setRegForm({...regForm, program: e.target.value})}
                     placeholder="e.g. Science"
-                    className="w-full glass-input rounded-xl px-4 py-2.5 text-xs text-slate-800 focus:outline-none"
+                    className="w-full bg-slate-50 border border-slate-200/80 rounded-xl px-4 py-2.5 text-xs text-slate-800 focus:bg-white focus:border-maroon-700/50 focus:ring-1 focus:ring-maroon-700/20 transition-all duration-200 focus:outline-none"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold text-slate-405 uppercase tracking-wider block">Current Company</label>
+                  <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Current Company</label>
                   <input 
                     type="text" 
                     value={regForm.company} 
                     onChange={e => setRegForm({...regForm, company: e.target.value})}
                     placeholder="e.g. Microsoft (Optional)"
-                    className="w-full glass-input rounded-xl px-4 py-2.5 text-xs text-slate-800 focus:outline-none"
+                    className="w-full bg-slate-50 border border-slate-200/80 rounded-xl px-4 py-2.5 text-xs text-slate-800 focus:bg-white focus:border-maroon-700/50 focus:ring-1 focus:ring-maroon-700/20 transition-all duration-200 focus:outline-none"
                   />
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold text-slate-405 uppercase tracking-wider block">Designation / Role</label>
+                  <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Designation / Role</label>
                   <input 
                     type="text" 
                     value={regForm.role} 
                     onChange={e => setRegForm({...regForm, role: e.target.value})}
                     placeholder="e.g. Principal Architect (Optional)"
-                    className="w-full glass-input rounded-xl px-4 py-2.5 text-xs text-slate-800 focus:outline-none"
+                    className="w-full bg-slate-50 border border-slate-200/80 rounded-xl px-4 py-2.5 text-xs text-slate-800 focus:bg-white focus:border-maroon-700/50 focus:ring-1 focus:ring-maroon-700/20 transition-all duration-200 focus:outline-none"
                   />
                 </div>
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-[10px] font-bold text-slate-405 uppercase tracking-wider block">Expertise Skills Tags</label>
+                <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Expertise Skills Tags</label>
                 <input 
                   type="text" 
                   required
                   value={regForm.skills} 
                   onChange={e => setRegForm({...regForm, skills: e.target.value})}
                   placeholder="Comma-separated (React, Node, UX Design)"
-                  className="w-full glass-input rounded-xl px-4 py-2.5 text-xs text-slate-800 focus:outline-none"
+                  className="w-full bg-slate-50 border border-slate-200/80 rounded-xl px-4 py-2.5 text-xs text-slate-800 focus:bg-white focus:border-maroon-700/50 focus:ring-1 focus:ring-maroon-700/20 transition-all duration-200 focus:outline-none"
                 />
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-[10px] font-bold text-slate-405 uppercase tracking-wider block">Location / City</label>
+                <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Location / City</label>
                 <input 
                   type="text" 
                   required
                   value={regForm.city} 
                   onChange={e => setRegForm({...regForm, city: e.target.value})}
                   placeholder="e.g. Mumbai"
-                  className="w-full glass-input rounded-xl px-4 py-2.5 text-xs text-slate-800 focus:outline-none"
+                  className="w-full bg-slate-50 border border-slate-200/80 rounded-xl px-4 py-2.5 text-xs text-slate-800 focus:bg-white focus:border-maroon-700/50 focus:ring-1 focus:ring-maroon-700/20 transition-all duration-200 focus:outline-none"
                 />
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-[10px] font-bold text-slate-405 uppercase tracking-wider block">Contact Number (Optional)</label>
+                <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Contact Number (Optional)</label>
                 <input 
                   type="text" 
                   value={regForm.phone} 
                   onChange={e => setRegForm({...regForm, phone: e.target.value})}
                   placeholder="e.g. +91 98765 43210"
-                  className="w-full glass-input rounded-xl px-4 py-2.5 text-xs text-slate-800 focus:outline-none"
+                  className="w-full bg-slate-50 border border-slate-200/80 rounded-xl px-4 py-2.5 text-xs text-slate-800 focus:bg-white focus:border-maroon-700/50 focus:ring-1 focus:ring-maroon-700/20 transition-all duration-200 focus:outline-none"
                 />
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-[10px] font-bold text-slate-405 uppercase tracking-wider block">LinkedIn Profile Link (Optional)</label>
+                <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">LinkedIn Profile Link (Optional)</label>
                 <input 
                   type="text" 
                   value={regForm.linkedin} 
                   onChange={e => setRegForm({...regForm, linkedin: e.target.value})}
                   placeholder="e.g. https://linkedin.com/in/username"
-                  className="w-full glass-input rounded-xl px-4 py-2.5 text-xs text-slate-800 focus:outline-none"
+                  className="w-full bg-slate-50 border border-slate-200/80 rounded-xl px-4 py-2.5 text-xs text-slate-800 focus:bg-white focus:border-maroon-700/50 focus:ring-1 focus:ring-maroon-700/20 transition-all duration-200 focus:outline-none"
                 />
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-[10px] font-bold text-slate-405 uppercase tracking-wider block">Professional Biography (Bio)</label>
+                <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Professional Biography (Bio)</label>
                 <textarea 
                   value={regForm.bio} 
                   onChange={e => setRegForm({...regForm, bio: e.target.value})}
                   placeholder="Introduce yourself, your career focus, or guidance you can offer..."
                   rows={3}
-                  className="w-full glass-input rounded-xl px-4 py-2.5 text-xs text-slate-800 focus:outline-none resize-none"
+                  className="w-full bg-slate-50 border border-slate-200/80 rounded-xl px-4 py-2.5 text-xs text-slate-800 focus:bg-white focus:border-maroon-700/50 focus:ring-1 focus:ring-maroon-700/20 transition-all duration-200 focus:outline-none resize-none"
                 />
               </div>
 
               <button 
                 type="submit"
-                className="w-full py-3.5 rounded-xl bg-maroon-600 hover:bg-maroon-700 text-xs font-bold text-white transition-all shadow-sm"
+                className="w-full py-3.5 rounded-xl bg-maroon-700 hover:bg-maroon-800 text-xs font-bold text-white transition-all shadow-md uppercase tracking-wider focus:outline-none focus:ring-2 focus:ring-maroon-700/20 active:scale-[0.99] duration-150"
               >
                 Submit Registration Profile
               </button>
