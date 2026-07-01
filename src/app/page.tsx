@@ -638,87 +638,78 @@ export default function PublicAlumniPage() {
                 {paginatedAlumni.map((alum) => (
                   <div 
                     key={alum.id} 
-                    className="group rounded-3xl bg-white border border-slate-200/50 hover:border-slate-300 shadow-[0_4px_20px_rgba(0,0,0,0.015)] hover:shadow-xl hover:-translate-y-1 transition-all duration-300 p-5 flex flex-col justify-between relative overflow-hidden h-[440px]"
+                    onClick={() => setSelectedAlumni(alum)}
+                    className="group bg-white rounded-3xl border border-slate-100 hover:border-maroon-700/20 hover:-translate-y-1 shadow-[0_4px_20px_rgba(0,0,0,0.015)] hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col justify-between h-[360px] cursor-pointer"
                   >
-                    {/* Top School Accent Strip */}
-                    <div className={`absolute top-0 left-0 right-0 h-1.5 ${
-                      alum.school === "CCHS" ? "bg-maroon-600" : "bg-navy-600"
-                    }`} />
-
-                    <div className="space-y-2.5">
-                      {/* Avatar Header */}
-                      <div className="flex flex-col items-center text-center">
-                        <div className={`h-24 w-24 rounded-full overflow-hidden ring-4 ring-white shadow-md shrink-0 transition-transform duration-300 group-hover:scale-105 ${
-                          alum.school === "CCHS" ? "ring-maroon-50" : "ring-navy-50"
-                        }`}>
-                          <img 
-                            src={alum.user.avatarUrl || `https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=120`} 
-                            className="w-full h-full object-cover" 
-                            alt={alum.user.name} 
-                          />
+                    
+                    <div className="p-6 flex-1 flex flex-col justify-between">
+                      <div>
+                        {/* Header: Class batch & City */}
+                        <div className="flex items-center justify-between text-[8px] md:text-[9px] text-slate-400 font-bold uppercase tracking-wider mb-5">
+                          <span>Class of {alum.batch}</span>
+                          <div className="flex items-center gap-1">
+                            <MapPin size={9} className="text-slate-350" />
+                            <span>{alum.city || 'India'}</span>
+                          </div>
                         </div>
 
-                        <h3 className="text-sm font-display font-extrabold text-slate-900 mt-2.5 group-hover:text-maroon-700 transition-colors line-clamp-1">
-                          {alum.user.name}
-                        </h3>
-
-                        <div className="flex items-center gap-1.5 mt-1">
-                          <span className={`px-1.5 py-0.5 rounded text-[8px] font-black uppercase tracking-wide ${
-                            alum.school === "CCHS" 
-                              ? "bg-maroon-50 text-maroon-700 border border-maroon-100/50" 
-                              : "bg-navy-50 text-navy-700 border border-navy-100/50"
-                          }`}>
-                            {alum.school}
-                          </span>
-                          <span className="text-[10px] text-slate-400 font-extrabold uppercase tracking-wider">
-                            Class of {alum.batch}
-                          </span>
+                        {/* Centered Image with Background Circle */}
+                        <div className="flex justify-center mb-4">
+                          <div className="relative w-24 h-24 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center p-1.5">
+                            <div className="relative w-full h-full rounded-full overflow-hidden bg-slate-100 flex items-center justify-center">
+                              <img 
+                                src={alum.user.avatarUrl || `https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=120`} 
+                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" 
+                                alt={alum.user.name} 
+                              />
+                              {/* Hover "Click to zoom" Overlay */}
+                              <div className="absolute inset-0 bg-[#002147]/85 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col items-center justify-center pointer-events-none">
+                                <span className="text-[8px] text-white font-extrabold uppercase tracking-widest text-center px-2 leading-tight">
+                                  Click To Zoom
+                                </span>
+                              </div>
+                            </div>
+                          </div>
                         </div>
-                      </div>
 
-                      {/* Bio */}
-                      {alum.bio ? (
-                        <p className="text-[11px] text-slate-500 italic text-center line-clamp-2 leading-relaxed max-w-[90%] mx-auto font-medium">
-                          &quot;{alum.bio}&quot;
-                        </p>
-                      ) : (
-                        <div className="h-2" /> /* Reduced height helper */
-                      )}
-
-                      {/* Professional Details */}
-                      <div className="space-y-0.5 text-center pt-1">
-                        <p className="text-[11px] font-extrabold text-slate-800 uppercase tracking-wide truncate max-w-full">
-                          {alum.role || "Graduate"}
-                        </p>
-                        {alum.company && (
-                          <p className="text-[10px] text-slate-500 font-semibold truncate">
-                            at <span className="text-slate-900 font-bold">{alum.company}</span>
+                        {/* Content centered below circle */}
+                        <div className="text-center space-y-1">
+                          <h3 className="font-serif text-sm font-bold text-[#6b1d2f] truncate transition-colors">
+                            {alum.user.name}
+                          </h3>
+                          <p className="text-[9px] text-red-700 font-extrabold uppercase tracking-wide truncate mt-0.5">
+                            {alum.role || "Alumni"}
                           </p>
-                        )}
-                        <p className="text-[9.5px] text-slate-450 flex items-center justify-center gap-0.5 mt-1.5 font-bold uppercase tracking-wider">
-                          <MapPin size={9} className="text-slate-400 shrink-0" /> {alum.city}, {alum.country}
-                        </p>
+                          {alum.company && (
+                            <p className="text-[8px] text-slate-400 font-medium truncate leading-none mt-0.5">
+                              {alum.company}
+                            </p>
+                          )}
+                        </div>
                       </div>
+
+                      {/* Biography / Details */}
+                      <p className="text-slate-500 text-[11px] leading-relaxed line-clamp-2 mt-4 text-center">
+                        {alum.bio || alum.skills}
+                      </p>
                     </div>
 
-                    {/* Footer Actions & Details */}
-                    <div className="space-y-3.5 pt-3 border-t border-slate-100 mt-auto">
-                      {/* Skill tags preview */}
-                      <div className="flex flex-wrap justify-center gap-1">
-                        {alum.skills.split(",").slice(0, 2).map((skill, idx) => (
-                          <span key={idx} className="px-1.5 py-0.5 rounded bg-slate-50 text-[8.5px] font-bold text-slate-500 border border-slate-100">
-                            {skill.trim()}
-                          </span>
-                        ))}
-                      </div>
-
-                      {/* View details */}
-                      <button 
-                        onClick={() => setSelectedAlumni(alum)}
-                        className="w-full py-2.5 rounded-xl border border-slate-200 hover:border-slate-350 hover:bg-slate-50 text-[10px] font-black uppercase tracking-wider text-slate-700 transition-all flex items-center justify-center gap-1.5 active:scale-[0.98]"
-                      >
-                        View Details
-                      </button>
+                    {/* Footer Links (Centered Envelope) */}
+                    <div 
+                      onClick={(e) => e.stopPropagation()}
+                      className="border-t border-slate-100/60 px-6 py-3.5 flex items-center justify-center bg-slate-50/50"
+                    >
+                      {alum.user.email ? (
+                        <a 
+                          href={`mailto:${alum.user.email}`} 
+                          className="text-slate-400 hover:text-maroon-700 transition-colors"
+                          title="Send Email"
+                        >
+                          <Mail size={13} className="stroke-[2.5]" />
+                        </a>
+                      ) : (
+                        <Mail size={13} className="text-slate-200" />
+                      )}
                     </div>
                   </div>
                 ))}
@@ -791,136 +782,103 @@ export default function PublicAlumniPage() {
           onClick={() => setSelectedAlumni(null)}
         >
           <div 
-            className="w-full max-w-md bg-white rounded-3xl shadow-2xl overflow-hidden animate-scale-in relative"
+            className="bg-white rounded-[2.5rem] max-w-sm w-full relative border border-slate-100 shadow-2xl overflow-hidden animate-scale-in text-left flex flex-col"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* School Color Top Bar */}
-            <div className={`h-1.5 w-full ${
-              selectedAlumni.school === "CCHS" 
-                ? "bg-gradient-to-r from-maroon-600 to-maroon-500" 
-                : "bg-gradient-to-r from-navy-600 to-navy-500"
-            }`} />
+            {/* Banner Background */}
+            <div className="relative h-32 w-full bg-gradient-to-r from-[#001f3f] to-[#6b1d2f] overflow-hidden">
+              {/* Subtle mesh background grid inside banner */}
+              <div className="absolute inset-0 opacity-[0.08] bg-[linear-gradient(to_right,#ffffff_1px,transparent_1px),linear-gradient(to_bottom,#ffffff_1px,transparent_1px)] bg-[size:15px_15px]" />
+              
+              <button
+                onClick={() => setSelectedAlumni(null)}
+                className="absolute top-4 right-4 p-2 rounded-full bg-black/20 hover:bg-black/45 text-white backdrop-blur-xs transition-all duration-200 cursor-pointer z-20 hover:scale-105"
+                aria-label="Close details"
+              >
+                <X size={14} />
+              </button>
+            </div>
 
-            {/* Close Button */}
-            <button 
-              onClick={() => setSelectedAlumni(null)}
-              className="absolute top-5 right-5 p-1.5 rounded-full text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-all z-10"
-            >
-              <X size={18} />
-            </button>
-
-            {/* Content */}
-            <div className="px-8 pt-7 pb-8 space-y-6">
-
-              {/* ── Hero Header (Centered) ── */}
-              <div className="flex flex-col items-center text-center space-y-3">
-                <div className={`ring-4 ring-white shadow-lg rounded-2xl overflow-hidden ${
-                  selectedAlumni.school === "CCHS" ? "ring-maroon-100" : "ring-navy-100"
-                }`}>
+            {/* Profile Content Container */}
+            <div className="px-8 pb-8 pt-0 flex flex-col">
+              {/* Avatar overlapping the banner */}
+              <div className="-mt-16 mb-4 flex justify-center z-10">
+                <div className="relative w-28 h-28 rounded-full border-4 border-white bg-white shadow-lg overflow-hidden flex items-center justify-center">
                   <img 
                     src={selectedAlumni.user.avatarUrl || `https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=160`} 
-                    className="h-20 w-20 rounded-2xl object-cover" 
+                    className="h-full w-full object-cover" 
                     alt={selectedAlumni.user.name} 
                   />
                 </div>
-
-                <div className="space-y-1.5">
-                  <div className="flex items-center justify-center gap-2">
-                    <h2 className="text-xl font-black text-slate-900 tracking-tight">{selectedAlumni.user.name}</h2>
-                    <span className={`px-2 py-0.5 rounded-md text-[10px] font-black uppercase tracking-wider ${
-                      selectedAlumni.school === "CCHS" 
-                        ? "bg-maroon-100 text-maroon-700 border border-maroon-200" 
-                        : "bg-navy-100 text-navy-700 border border-navy-200"
-                    }`}>
-                      {selectedAlumni.school}
-                    </span>
-                  </div>
-                  <p className={`text-sm font-semibold ${
-                    selectedAlumni.school === "CCHS" ? "text-maroon-700" : "text-navy-700"
-                  }`}>
-                    {selectedAlumni.role || "Graduate"}
-                    {selectedAlumni.company && <span className="text-slate-500"> at </span>}
-                    {selectedAlumni.company && <span className="font-bold text-slate-900">{selectedAlumni.company}</span>}
-                  </p>
-                  <p className="text-xs text-slate-500 font-medium flex items-center justify-center gap-1">
-                    <MapPin size={12} className="text-slate-400" />
-                    {selectedAlumni.city}, {selectedAlumni.country} · Batch {selectedAlumni.batch}
-                  </p>
-                </div>
               </div>
 
-              {/* ── Bio Block ── */}
-              {selectedAlumni.bio && (
-                <div className={`bg-slate-50 rounded-xl p-4 border-l-4 ${
-                  selectedAlumni.school === "CCHS" ? "border-l-maroon-500" : "border-l-navy-500"
+              {/* Tags: Class & Location & School */}
+              <div className="flex items-center justify-center gap-1.5 mb-4 flex-wrap">
+                <span className={`px-3.5 py-1 rounded-full text-[9px] font-bold uppercase tracking-wider ${
+                  selectedAlumni.school === "CCHS" 
+                    ? "bg-maroon-50 border border-maroon-100 text-[#6b1d2f]" 
+                    : "bg-navy-50 border border-navy-100 text-[#001f3f]"
                 }`}>
-                  <p className="text-sm text-slate-700 leading-relaxed italic">
-                    &quot;{selectedAlumni.bio}&quot;
-                  </p>
-                </div>
-              )}
-
-              {/* ── Info Grid ── */}
-              <div className="grid grid-cols-2 gap-3">
-                <div className="bg-slate-50 rounded-xl p-3.5">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1">Program</span>
-                  <span className="text-sm font-bold text-slate-900">{selectedAlumni.program}</span>
-                </div>
-                <div className="bg-slate-50 rounded-xl p-3.5">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1">
-                    {selectedAlumni.industry ? "Industry" : "Batch"}
-                  </span>
-                  <span className="text-sm font-bold text-slate-900">
-                    {selectedAlumni.industry || `Class of ${selectedAlumni.batch}`}
-                  </span>
-                </div>
+                  {selectedAlumni.school} Network
+                </span>
+                <span className="px-3.5 py-1 rounded-full bg-slate-100 border border-slate-200 text-slate-800 text-[9px] font-bold uppercase tracking-wider">
+                  Class of {selectedAlumni.batch}
+                </span>
+                <span className="px-3.5 py-1 rounded-full bg-amber-50 border border-amber-100 text-amber-700 text-[9px] font-bold uppercase tracking-wider flex items-center gap-1">
+                  <MapPin size={9} className="text-amber-600" />
+                  <span>{selectedAlumni.city || 'India'}</span>
+                </span>
               </div>
 
-              {/* ── Skills ── */}
-              {selectedAlumni.skills && (
-                <div className="space-y-2">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Skills</span>
-                  <div className="flex flex-wrap gap-1.5">
-                    {selectedAlumni.skills.split(",").map((skill, idx) => (
-                      <span key={idx} className="bg-slate-100 text-slate-700 px-3 py-1 rounded-full text-xs font-semibold">
-                        {skill.trim()}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              )}
+              {/* Name and Professional details */}
+              <div className="text-center space-y-1.5">
+                <h3 className="font-serif text-2xl font-bold text-[#001f3f] tracking-tight leading-none">
+                  {selectedAlumni.user.name}
+                </h3>
+                <p className="text-[10px] text-red-700 font-extrabold uppercase tracking-widest">
+                  {selectedAlumni.role || "Alumni"}
+                </p>
+                {selectedAlumni.company && (
+                  <p className="text-xs text-slate-500 font-medium">
+                    {selectedAlumni.company}
+                  </p>
+                )}
+              </div>
 
-              {/* ── Action Buttons ── */}
-              <div className="flex items-center gap-2.5 pt-4 border-t border-slate-100">
-                {/* Email — always visible */}
-                <a 
-                  href={`mailto:${selectedAlumni.user.email}`}
-                  className="flex-1 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-sm font-semibold text-slate-700 flex items-center justify-center gap-2 transition-all active:scale-[0.98]"
-                >
-                  <Mail size={15} className="text-slate-500" /> Email
-                </a>
+              {/* Divider */}
+              <div className="w-16 h-[3px] bg-gradient-to-r from-[#6b1d2f] to-[#d4af37] rounded-full mx-auto my-5 opacity-80" />
 
-                {/* LinkedIn — conditional */}
+              {/* Biography / Details */}
+              <div className="text-slate-600 text-xs md:text-sm leading-relaxed whitespace-pre-wrap text-center max-h-[165px] overflow-y-auto pr-1 no-scrollbar italic px-2 font-medium">
+                {selectedAlumni.bio || selectedAlumni.skills}
+              </div>
+
+              {/* Social Links Footer - Premium email call-to-action button */}
+              <div className="border-t border-slate-100/80 pt-6 mt-6 flex flex-col gap-3 w-full items-center">
+                {selectedAlumni.user.email && (
+                  <a 
+                    href={`mailto:${selectedAlumni.user.email}`} 
+                    className="w-full py-3.5 px-6 rounded-2xl bg-[#fdf5f6] hover:bg-[#fbebee] text-[#6b1d2f] font-extrabold text-[11px] uppercase tracking-widest transition-all duration-300 flex items-center justify-center gap-2 border border-[#6b1d2f]/10 shadow-xs hover:scale-[1.01] cursor-pointer"
+                    title="Send Email"
+                  >
+                    <Mail size={13} className="stroke-[2.5]" />
+                    <span>Email</span>
+                  </a>
+                )}
+                
                 {selectedAlumni.linkedin && (
                   <a 
                     href={selectedAlumni.linkedin} 
                     target="_blank" 
-                    rel="noopener noreferrer"
-                    className="flex-1 py-2.5 rounded-xl bg-[#0a66c2] hover:bg-[#004182] text-sm font-semibold text-white flex items-center justify-center gap-2 transition-all shadow-sm active:scale-[0.98]"
+                    rel="noopener noreferrer" 
+                    className="text-[10px] text-slate-450 hover:text-[#6b1d2f] font-bold uppercase tracking-wider transition-colors mt-1 flex items-center gap-1.5"
+                    title="LinkedIn Profile"
                   >
-                    <LinkedinIcon size={15} /> LinkedIn
+                    <LinkedinIcon size={11} className="stroke-[2.5]" />
+                    <span>View LinkedIn Profile</span>
                   </a>
                 )}
-
-                {/* Close */}
-                <button 
-                  onClick={() => setSelectedAlumni(null)}
-                  className="py-2.5 px-4 rounded-xl text-sm font-semibold text-slate-400 hover:text-slate-700 hover:bg-slate-50 transition-all active:scale-[0.98]"
-                >
-                  Close
-                </button>
               </div>
-
             </div>
           </div>
         </div>
