@@ -55,19 +55,30 @@ interface AlumniProfile {
 }
 
 const ALUMNI_VIDEOS_L2R = [
-  { id: "EngW7tLk6rM", title: "Building Green Energy Solutions", name: "Neha Gupta", role: "CEO at EcoTech Solutions", image: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&q=80&w=360" },
-  { id: "k3vBZs812-Y", title: "AI Research at Google DeepMind", name: "Rahul Sharma", role: "AI Research Scientist", image: "https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&q=80&w=360" },
-  { id: "9h-xV31X3_o", title: "Designing for the Next Billion Users", name: "Sarah Al-Fatah", role: "Lead Product Designer", image: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=360" },
-  { id: "EngW7tLk6rM", title: "Scale-up Strategy at Unicorns", name: "Marcus Chen", role: "VP Growth", image: "https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?auto=format&fit=crop&q=80&w=360" },
-  { id: "k3vBZs812-Y", title: "From Campus to VC Funding", name: "Emily Watson", role: "Managing Partner", image: "https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&q=80&w=360" },
+  { id: "jnQe7v8XwrU", title: "IIT Roorkee Testimony", name: "Divisha Khurana", role: "IIT Roorkee (Electrical)", image: "https://img.youtube.com/vi/jnQe7v8XwrU/0.jpg" },
+  { id: "6gw7mva7OzU", title: "NLSIU Law Graduation Testimony", name: "Yashashvi Bharadwaj", role: "NLSIU Law Graduate", image: "https://img.youtube.com/vi/6gw7mva7OzU/0.jpg" },
+  { id: "VUbI5Y4x0HY", title: "ISB & Innovaccer Director Success Story", name: "Innovaccer Director", role: "ISB Alumnus", image: "https://img.youtube.com/vi/VUbI5Y4x0HY/0.jpg" },
+  { id: "_T5xL8ivQdU", title: "Sub Lieutenant commission from NDA", name: "Sub Lieutenant", role: "NDA Officer", image: "https://img.youtube.com/vi/_T5xL8ivQdU/0.jpg" },
+  { id: "bXBoBQWwWwg", title: "BITS Pilani & Walmart Journey", name: "Walmart Engineer", role: "BITS Pilani Alumnus", image: "https://img.youtube.com/vi/bXBoBQWwWwg/0.jpg" },
+  { id: "qwjOejQpZhA", title: "IIT Bombay & Bain & Co Career Path", name: "Bain Associate", role: "IIT Bombay Alumnus", image: "https://img.youtube.com/vi/qwjOejQpZhA/0.jpg" },
+  { id: "GP-bR8yqemQ", title: "IPS Officer UPSC AIR-178 Journey", name: "IPS Officer", role: "UPSC Civil Services", image: "https://img.youtube.com/vi/GP-bR8yqemQ/0.jpg" },
+  { id: "Y35-UfpD1C0", title: "Supreme Court Advocate Journey", name: "SC Advocate", role: "Supreme Court & High Court", image: "https://img.youtube.com/vi/Y35-UfpD1C0/0.jpg" },
+  { id: "rAMIxtssDzI", title: "Cinematography & Filmmaker Journey", name: "Filmmaker", role: "Cinematography Professional", image: "https://img.youtube.com/vi/rAMIxtssDzI/0.jpg" },
+  { id: "80sosZzVmfU", title: "Pierce Sweden Product Developer Journey", name: "Product Developer", role: "Pierce (Sweden)", image: "https://img.youtube.com/vi/80sosZzVmfU/0.jpg" },
+  { id: "lJXjTNGkL7A", title: "Atlantis The Palm Chef Journey", name: "Atlantis Chef", role: "Nobu (Dubai)", image: "https://img.youtube.com/vi/lJXjTNGkL7A/0.jpg" },
 ];
 
 const ALUMNI_VIDEOS_R2L = [
-  { id: "9h-xV31X3_o", title: "Launching Space Tech Ventures", name: "Elena Rostova", role: "Aerospace Systems Lead", image: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=360" },
-  { id: "EngW7tLk6rM", title: "Fintech Revolution & Web3", name: "Aarav Mehta", role: "Co-Founder @ PaySphere", image: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&q=80&w=360" },
-  { id: "k3vBZs812-Y", title: "Non-Profit Impact in Africa", name: "Zola Dlamini", role: "Executive Director", image: "https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?auto=format&fit=crop&q=80&w=360" },
-  { id: "9h-xV31X3_o", title: "Surgical Robotics Innovation", name: "Kenji Sato", role: "Robotics Architect", image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=360" },
-  { id: "EngW7tLk6rM", title: "E-Commerce Logistics Scaling", name: "Clara Dupont", role: "Global Operations Lead", image: "https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&q=80&w=360" },
+  { id: "LzqOjBV_kjQ", title: "IIT (BHU) Varanasi Testimony", name: "IIT BHU Graduate", role: "IIT Varanasi Alumnus", image: "https://img.youtube.com/vi/LzqOjBV_kjQ/0.jpg" },
+  { id: "aQpthkkFHy0", title: "ESCP London & SRM Institute Journey", name: "ESCP Scholar", role: "ESCP London Alumnus", image: "https://img.youtube.com/vi/aQpthkkFHy0/0.jpg" },
+  { id: "rQs-dBSU5Ak", title: "Social Media Marketing Executive (Dubai)", name: "Marketing Executive", role: "Social Media (Dubai)", image: "https://img.youtube.com/vi/rQs-dBSU5Ak/0.jpg" },
+  { id: "nJK-IDVMXwY", title: "Google Software Engineer Career", name: "Google Engineer", role: "IIIT Hyderabad Alumnus", image: "https://img.youtube.com/vi/nJK-IDVMXwY/0.jpg" },
+  { id: "zIZWYBtdUE4", title: "JP Morgan & ISB Hyd Journey", name: "JP Morgan Analyst", role: "ISB Hyderabad Alumnus", image: "https://img.youtube.com/vi/zIZWYBtdUE4/0.jpg" },
+  { id: "fTsZKzVFaRk", title: "AIR 2 CLAT / AIR 1 AILET NLU Bangalore", name: "CLAT Ranker", role: "NLU Bangalore Alumnus", image: "https://img.youtube.com/vi/fTsZKzVFaRk/0.jpg" },
+  { id: "YA3MSbsQOfA", title: "University of Strathclyde Journey", name: "Strathclyde Scholar", role: "Strathclyde Alumnus", image: "https://img.youtube.com/vi/YA3MSbsQOfA/0.jpg" },
+  { id: "uTBAw0Huxn8", title: "MBA NMIMS Mumbai & Jio Creative Labs", name: "NMIMS Graduate", role: "Jio Creative Labs", image: "https://img.youtube.com/vi/uTBAw0Huxn8/0.jpg" },
+  { id: "46GZ_dSEo4k", title: "IIT Jodhpur Product Management Journey", name: "Product Manager", role: "IIT Jodhpur Alumnus", image: "https://img.youtube.com/vi/46GZ_dSEo4k/0.jpg" },
+  { id: "9aYnr7Nbiyo", title: "Alumni Reunion Highlights Event", name: "Reunion Event", role: "Highlights", image: "https://img.youtube.com/vi/9aYnr7Nbiyo/0.jpg" },
 ];
 
 export default function PublicAlumniPage() {
