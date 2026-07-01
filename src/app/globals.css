@@ -166,7 +166,7 @@ body {
   background: rgba(255, 255, 255, 0.22);
   border-color: rgba(255, 255, 255, 0.65);
   box-shadow: 
-    0 24px 48px -12px rgba(139, 92, 246, 0.16),
+    0 24px 48px -12px rgba(107, 29, 47, 0.12),
     0 16px 32px -5px rgba(15, 23, 42, 0.06),
     inset 0 1px 1px rgba(255, 255, 255, 0.9);
 }
@@ -184,10 +184,10 @@ body {
 
 .glass-input:focus {
   background: rgba(255, 255, 255, 0.25);
-  border-color: rgba(139, 92, 246, 0.55);
+  border-color: rgba(107, 29, 47, 0.55);
   box-shadow: 
-    0 0 0 4px rgba(139, 92, 246, 0.15),
-    0 4px 16px -2px rgba(139, 92, 246, 0.08);
+    0 0 0 4px rgba(107, 29, 47, 0.15),
+    0 4px 16px -2px rgba(107, 29, 47, 0.08);
 }
 
 .glass-button {
@@ -217,7 +217,7 @@ body {
   color: #0f172a;
   transform: translateY(-2px);
   box-shadow: 
-    0 6px 20px -4px rgba(139, 92, 246, 0.12),
+    0 6px 20px -4px rgba(107, 29, 47, 0.1),
     0 4px 12px rgba(0, 0, 0, 0.02);
 }
 
@@ -256,103 +256,16 @@ body {
   -webkit-backdrop-filter: blur(20px);
 }
 
-/* Background floating gradient orbs - Made highly vibrant and layered */
-.gradient-orb {
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(80px);
-  opacity: 0.58;
-  pointer-events: none;
-  will-change: transform;
-  z-index: 0;
-}
-
-.gradient-orb-1 {
-  width: 450px;
-  height: 450px;
-  background: radial-gradient(circle, #f472b6 0%, rgba(167, 139, 250, 0.95) 45%, rgba(255, 255, 255, 0) 70%);
-  top: -5%;
-  left: -8%;
-  animation: orbFloat 22s ease-in-out infinite alternate;
-}
-
-.gradient-orb-2 {
-  width: 550px;
-  height: 550px;
-  background: radial-gradient(circle, #22d3ee 0%, rgba(99, 102, 241, 0.95) 50%, rgba(255, 255, 255, 0) 75%);
-  top: 15%;
-  right: -10%;
-  animation: orbFloat2 28s ease-in-out infinite alternate-reverse;
-}
-
-.gradient-orb-3 {
-  width: 500px;
-  height: 500px;
-  background: radial-gradient(circle, #ec4899 0%, rgba(244, 63, 94, 0.8) 45%, rgba(255, 255, 255, 0) 70%);
-  bottom: 15%;
-  left: -12%;
-  animation: orbFloat 30s ease-in-out infinite alternate;
-}
-
-.gradient-orb-4 {
-  width: 420px;
-  height: 420px;
-  background: radial-gradient(circle, #818cf8 0%, rgba(192, 132, 252, 0.85) 50%, rgba(255, 255, 255, 0) 70%);
-  bottom: -5%;
-  right: 10%;
-  animation: orbFloat2 20s ease-in-out infinite alternate-reverse;
-}
-
-.gradient-orb-5 {
-  width: 350px;
-  height: 350px;
-  background: radial-gradient(circle, #fb7185 0%, rgba(251, 146, 60, 0.85) 45%, rgba(255, 255, 255, 0) 70%);
-  top: 45%;
-  left: 30%;
-  animation: orbFloat 24s ease-in-out infinite alternate;
-}
-
-.gradient-orb-6 {
-  width: 380px;
-  height: 380px;
-  background: radial-gradient(circle, #38bdf8 0%, rgba(99, 102, 241, 0.85) 45%, rgba(255, 255, 255, 0) 70%);
-  top: 65%;
-  right: 35%;
-  animation: orbFloat2 25s ease-in-out infinite alternate-reverse;
-}
-
-@keyframes orbFloat {
-  0% {
-    transform: translate(0px, 0px) scale(1) rotate(0deg);
-  }
-  33% {
-    transform: translate(45px, -60px) scale(1.15) rotate(120deg);
-  }
-  66% {
-    transform: translate(-30px, 30px) scale(0.9) rotate(240deg);
-  }
-  100% {
-    transform: translate(0px, 0px) scale(1) rotate(360deg);
-  }
-}
-
-@keyframes orbFloat2 {
-  0% {
-    transform: translate(0px, 0px) scale(1.05) rotate(360deg);
-  }
-  50% {
-    transform: translate(-50px, 45px) scale(0.9) rotate(180deg);
-  }
-  100% {
-    transform: translate(0px, 0px) scale(1.05) rotate(0deg);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .gradient-orb {
-    animation: none;
-    filter: blur(100px);
-  }
+/* Professional Executive Mesh Gradient Background */
+.executive-mesh-bg {
+  background-color: #fcfdfe;
+  background-image: 
+    radial-gradient(at 0% 0%, rgba(15, 23, 42, 0.08) 0px, transparent 50%),
+    radial-gradient(at 100% 100%, rgba(107, 29, 47, 0.07) 0px, transparent 50%),
+    radial-gradient(at 100% 0%, rgba(15, 23, 42, 0.05) 0px, transparent 40%),
+    radial-gradient(at 0% 100%, rgba(107, 29, 47, 0.05) 0px, transparent 40%),
+    radial-gradient(at 50% 50%, rgba(255, 255, 255, 0.95) 0px, transparent 80%);
+  background-attachment: fixed;
 }
 
 

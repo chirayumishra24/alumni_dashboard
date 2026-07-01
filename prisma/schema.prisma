@@ -30,6 +30,7 @@ model AlumniProfile {
   company         String?
   role            String?
   industry        String?
+  bio             String?
   country         String
   city            String
   latitude        Float?      // For 3D Globe plots

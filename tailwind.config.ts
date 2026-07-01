@@ -11,6 +11,25 @@ const config: Config = {
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",
+        maroon: {
+          50: '#fef2f4',
+          100: '#fce4e8',
+          200: '#f9cbd4',
+          500: '#8b2238',
+          600: '#6b1d2f',
+          700: '#521220',
+          800: '#3a0c16',
+        },
+        navy: {
+          50: '#f4f6fa',
+          100: '#e8ecf4',
+          200: '#d1dbe9',
+          500: '#324a70',
+          600: '#233754',
+          700: '#1b2a41',
+          800: '#0f172a',
+          900: '#0a0f1d',
+        }
       },
     },
   },

@@ -35,6 +35,7 @@ interface AlumniProfile {
   user: User;
   phone?: string;
   linkedin?: string;
+  bio?: string | null;
 }
 
 interface CareerPreference {
@@ -486,15 +487,7 @@ support@skillizee.io`;
   };
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] text-slate-800 font-sans flex flex-col lg:flex-row lg:p-6 lg:gap-6 overflow-x-hidden selection:bg-violet-600 selection:text-white grid-bg relative">
-      
-      {/* Liquid Glassmorphic Gradient Orbs placed behind everything */}
-      <div className="gradient-orb gradient-orb-1" />
-      <div className="gradient-orb gradient-orb-2" />
-      <div className="gradient-orb gradient-orb-3" />
-      <div className="gradient-orb gradient-orb-4" />
-      <div className="gradient-orb gradient-orb-5" />
-      <div className="gradient-orb gradient-orb-6" />
+    <div className="min-h-screen executive-mesh-bg text-slate-800 font-sans flex flex-col lg:flex-row lg:p-6 lg:gap-6 overflow-x-hidden selection:bg-maroon-600 selection:text-white grid-bg relative">
 
       {/* Toast Alert */}
       {toast && (
@@ -781,7 +774,12 @@ support@skillizee.io`;
                               {alum.user.email} {alum.phone && `| Phone: ${alum.phone}`} | Batch {alum.batch} ({alum.program}) | City: {alum.city}
                             </p>
                             {alum.linkedin && (
-                              <p className="text-[10px] text-violet-650 font-semibold mt-1">LinkedIn: {alum.linkedin}</p>
+                              <p className="text-[10px] text-maroon-700 font-semibold mt-1">LinkedIn: {alum.linkedin}</p>
+                            )}
+                            {alum.bio && (
+                              <p className="text-[11px] text-slate-650 font-medium italic mt-2 p-3 bg-black/[0.015] border border-black/5 rounded-xl">
+                                Biography: &quot;{alum.bio}&quot;
+                              </p>
                             )}
                             <p className="text-[10px] text-slate-500 mt-1 italic">&quot;Skills: {alum.skills}&quot;</p>
                           </div>
@@ -797,7 +795,7 @@ support@skillizee.io`;
                           
                           <button
                             onClick={() => handleVerifyAlumni(alum.id)}
-                            className="px-4 py-2 rounded-xl bg-violet-600 hover:bg-violet-700 text-xs font-bold text-white flex items-center gap-1.5 transition-all shadow-sm"
+                            className="px-4 py-2 rounded-xl bg-maroon-600 hover:bg-maroon-700 text-xs font-bold text-white flex items-center gap-1.5 transition-all shadow-sm"
                           >
                             <Check size={12} /> Verify & Activate
                           </button>
@@ -1209,11 +1207,15 @@ support@skillizee.io`;
                     <div>
                       <div className="flex items-center gap-2">
                         <h2 className="text-xl font-bold text-slate-900">{activeAlumni.user.name}</h2>
-                        <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-violet-50 text-violet-650 border border-violet-100">
+                        <span className={`px-2 py-0.5 rounded text-[10px] font-bold border ${
+                          activeAlumni.school === "CCHS" 
+                            ? "bg-maroon-50 text-maroon-700 border-maroon-100" 
+                            : "bg-navy-50 text-navy-700 border-navy-100"
+                        }`}>
                           {activeAlumni.school} Alumni
                         </span>
                       </div>
-                      <p className="text-xs text-violet-650 font-semibold">{activeAlumni.role} @ {activeAlumni.company}</p>
+                      <p className="text-xs text-maroon-700 font-semibold">{activeAlumni.role} @ {activeAlumni.company}</p>
                       <p className="text-[11px] text-slate-500 mt-0.5">{activeAlumni.city}, {activeAlumni.country} | Batch {activeAlumni.batch}</p>
                     </div>
                   </div>
@@ -1308,12 +1310,26 @@ support@skillizee.io`;
                   </div>
                 </div>
 
-                {/* Skills & Testimonial quote submit */}
-                <div className="rounded-3xl glass-panel p-8 space-y-6 shadow-lg">
-                  <div>
-                    <h3 className="text-sm font-bold text-slate-900">Highlight Skills</h3>
-                    <p className="text-xs text-slate-400">Expertise fields currently searchable by students.</p>
-                  </div>
+                {/* Bio & Skills Column */}
+                <div className="space-y-8">
+                  {activeAlumni.bio && (
+                    <div className="rounded-3xl glass-panel p-8 space-y-4 shadow-lg">
+                      <div>
+                        <h3 className="text-sm font-bold text-slate-900">Alumni Biography</h3>
+                        <p className="text-xs text-slate-400">Brief summary displayed to public users.</p>
+                      </div>
+                      <p className="text-xs text-slate-750 leading-relaxed italic bg-white/30 p-4 rounded-2xl border border-white/80">
+                        &quot;{activeAlumni.bio}&quot;
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Skills & Testimonial quote submit */}
+                  <div className="rounded-3xl glass-panel p-8 space-y-6 shadow-lg">
+                    <div>
+                      <h3 className="text-sm font-bold text-slate-900">Highlight Skills</h3>
+                      <p className="text-xs text-slate-400">Expertise fields currently searchable by students.</p>
+                    </div>
 
                   <div className="flex flex-wrap gap-1.5">
                     {activeAlumni.skills.split(",").map((skill, idx) => (
@@ -1331,7 +1347,7 @@ support@skillizee.io`;
                     />
                     <button 
                       onClick={() => showToast("Testimonial submitted for coordinator review!", "success")}
-                      className="mt-3 w-full py-2.5 rounded-xl bg-violet-600 hover:bg-violet-750 text-xs font-bold text-white transition-all shadow-sm"
+                      className="mt-3 w-full py-2.5 rounded-xl bg-maroon-600 hover:bg-maroon-700 text-xs font-bold text-white transition-all shadow-sm"
                     >
                       Submit Testimonial
                     </button>
@@ -1339,7 +1355,8 @@ support@skillizee.io`;
                 </div>
               </div>
             </div>
-          )}
+          </div>
+        )}
 
         </main>
       </div>

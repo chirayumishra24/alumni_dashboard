@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { 
-  MapPin, Search, X, Sparkles, PlusCircle, RefreshCw, Users
+  MapPin, Search, X, Sparkles, PlusCircle, RefreshCw, Users, Mail
 } from "lucide-react";
 import { uploadFileToStorage } from "@/lib/firebase";
 
@@ -50,6 +50,7 @@ interface AlumniProfile {
   isVerified: boolean;
   user: User;
   linkedin?: string;
+  bio?: string | null;
 }
 
 export default function PublicAlumniPage() {
@@ -77,7 +78,8 @@ export default function PublicAlumniPage() {
     linkedin: "",
     phone: "",
     city: "",
-    avatarUrl: ""
+    avatarUrl: "",
+    bio: ""
   });
 
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
@@ -167,7 +169,8 @@ export default function PublicAlumniPage() {
           linkedin: "",
           phone: "",
           city: "",
-          avatarUrl: ""
+          avatarUrl: "",
+          bio: ""
         });
       } else {
         showToast(json.error || "Registration failed", "error");
@@ -193,15 +196,7 @@ export default function PublicAlumniPage() {
   const batchYears = Array.from(new Set(alumni.map(a => a.batch.toString()))).sort((a, b) => b.localeCompare(a));
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] text-slate-800 font-sans relative overflow-x-hidden selection:bg-violet-600 selection:text-white grid-bg">
-      {/* Liquid Glassmorphic Gradient Orbs placed behind everything */}
-      <div className="gradient-orb gradient-orb-1" />
-      <div className="gradient-orb gradient-orb-2" />
-      <div className="gradient-orb gradient-orb-3" />
-      <div className="gradient-orb gradient-orb-4" />
-      <div className="gradient-orb gradient-orb-5" />
-      <div className="gradient-orb gradient-orb-6" />
-
+    <div className="min-h-screen executive-mesh-bg text-slate-800 font-sans relative overflow-x-hidden selection:bg-maroon-600 selection:text-white grid-bg">
       {/* Toast alert */}
       {toast && (
         <div className="fixed top-6 right-6 z-50 flex items-center gap-3 rounded-2xl glass-card p-4 shadow-xl animate-fade-in text-slate-800">
@@ -226,7 +221,7 @@ export default function PublicAlumniPage() {
           <div className="flex items-center gap-4">
             <button 
               onClick={() => setShowRegModal(true)}
-              className="flex items-center gap-1.5 px-4.5 py-2.5 rounded-xl bg-violet-600 hover:bg-violet-700 text-xs font-bold text-white shadow-sm transition-all hover:scale-[1.01]"
+              className="flex items-center gap-1.5 px-4.5 py-2.5 rounded-xl bg-maroon-600 hover:bg-maroon-700 text-xs font-bold text-white shadow-sm transition-all hover:scale-[1.01]"
             >
               <PlusCircle size={14} /> Register Profile
             </button>
@@ -236,12 +231,12 @@ export default function PublicAlumniPage() {
 
       {/* Hero Showcase Section */}
       <section className="max-w-7xl mx-auto px-8 pt-16 pb-12 text-center space-y-6 relative z-10">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-violet-500/10 border border-violet-500/15 text-[10px] font-bold text-violet-600 uppercase tracking-wider">
-          <Sparkles size={12} className="text-violet-600" /> CCHS & CCWS Combined Directories
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-maroon-500/10 border border-maroon-500/15 text-[10px] font-bold text-maroon-700 uppercase tracking-wider">
+          <Sparkles size={12} className="text-maroon-600" /> CCHS & CCWS Combined Directories
         </div>
         <h2 className="text-4xl md:text-5xl font-black tracking-tight text-slate-900 leading-tight">
           Discover Our Professional <br />
-          <span className="bg-clip-text text-transparent bg-gradient-to-r from-violet-600 to-indigo-600">Graduate Alumni Network</span>
+          <span className="bg-clip-text text-transparent bg-gradient-to-r from-maroon-600 to-navy-700">Graduate Alumni Network</span>
         </h2>
         <p className="text-xs md:text-sm text-slate-600 max-w-xl mx-auto leading-relaxed">
           Explore and connect with verified graduates from the CCHS and CCWS school networks building modern careers across top global industries.
@@ -339,25 +334,42 @@ export default function PublicAlumniPage() {
                     <div className="space-y-4">
                       {/* Avatar & Header */}
                       <div className="flex items-center gap-3">
-                        <img 
-                          src={alum.user.avatarUrl || `https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=120`} 
-                          className="h-12 w-12 rounded-xl border border-slate-200 shadow-sm" 
-                          alt="avatar" 
-                        />
-                        <div>
+                        <div className={`relative p-0.5 rounded-2xl border-2 ${
+                          alum.school === "CCHS" ? "border-maroon-600/30 bg-maroon-50/20" : "border-navy-600/30 bg-navy-50/20"
+                        } shrink-0`}>
+                          <img 
+                            src={alum.user.avatarUrl || `https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=120`} 
+                            className="h-11 w-11 rounded-xl object-cover shadow-sm" 
+                            alt="avatar" 
+                          />
+                        </div>
+                        <div className="min-w-0 flex-1">
                           <div className="flex items-center gap-1.5 flex-wrap">
-                            <h3 className="text-sm font-bold text-slate-900">{alum.user.name}</h3>
+                            <h3 className="text-sm font-bold text-slate-900 truncate">{alum.user.name}</h3>
                             <span className={`px-1.5 py-0.5 rounded text-[8px] font-bold uppercase ${
-                              alum.school === "CCHS" ? "bg-violet-50 text-violet-650 border border-violet-100/50" : "bg-emerald-50 text-emerald-650 border border-emerald-100/50"
+                              alum.school === "CCHS" 
+                                ? "bg-maroon-50 text-maroon-700 border border-maroon-100/50" 
+                                : "bg-navy-50/80 text-navy-700 border border-navy-100/50"
                             }`}>
                               {alum.school}
                             </span>
                           </div>
-                          <span className="text-[10px] text-slate-550 font-semibold uppercase block mt-0.5">Class of {alum.batch}</span>
+                          <span className="text-[10px] text-slate-500 font-semibold uppercase block mt-0.5">Class of {alum.batch}</span>
                         </div>
                       </div>
 
-                      {/* Professional details */}
+                      {/* Biography Block - Left Maroon/Navy Accent Line */}
+                      {alum.bio && (
+                        <div className={`pl-3 border-l-2 py-0.5 my-2.5 ${
+                          alum.school === "CCHS" ? "border-maroon-600/60" : "border-navy-600/60"
+                        }`}>
+                          <p className="text-[11px] text-slate-600 leading-relaxed line-clamp-3 italic">
+                            &quot;{alum.bio}&quot;
+                          </p>
+                        </div>
+                      )}
+
+                      {/* Professional Details */}
                       <div className="space-y-1.5">
                         <p className="text-xs text-slate-700 font-semibold truncate">
                           {alum.role || "Graduate"} 
@@ -370,8 +382,33 @@ export default function PublicAlumniPage() {
                         </p>
                       </div>
 
+                      {/* Direct Contacts Badges */}
+                      <div className="flex flex-wrap items-center gap-2 pt-3 border-t border-black/[0.04] mt-1.5">
+                        <a 
+                          href={`mailto:${alum.user.email}`}
+                          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/40 hover:bg-white/80 border border-white/60 text-[10px] font-bold text-slate-700 hover:text-maroon-700 transition-all shadow-sm max-w-[130px]"
+                          title={`Email ${alum.user.name}`}
+                        >
+                          <Mail size={12} className="text-maroon-600 shrink-0" />
+                          <span className="truncate">{alum.user.email}</span>
+                        </a>
+                        
+                        {alum.linkedin && (
+                          <a 
+                            href={alum.linkedin} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/40 hover:bg-white/80 border border-white/60 text-[10px] font-bold text-slate-700 hover:text-navy-700 transition-all shadow-sm"
+                            title="LinkedIn Profile"
+                          >
+                            <LinkedinIcon size={12} className="text-navy-600 shrink-0" />
+                            <span>LinkedIn</span>
+                          </a>
+                        )}
+                      </div>
+
                       {/* Skills Tags */}
-                      <div className="flex flex-wrap gap-1.5">
+                      <div className="flex flex-wrap gap-1.5 pt-1">
                         {alum.skills.split(",").slice(0, 3).map((skill, idx) => (
                           <span key={idx} className="px-2.5 py-0.5 rounded-lg glass-badge text-[9px] font-semibold text-slate-600">
                             {skill.trim()}
@@ -386,24 +423,13 @@ export default function PublicAlumniPage() {
                     </div>
 
                     {/* Actions bar */}
-                    <div className="flex items-center justify-between gap-3 pt-4 border-t border-white/40 mt-auto">
+                    <div className="pt-4 border-t border-white/40 mt-auto">
                       <button 
                         onClick={() => setSelectedAlumni(alum)}
-                        className="flex-1 py-2 rounded-xl glass-button text-[10px] font-bold text-slate-750 transition-all shadow-sm"
+                        className="w-full py-2.5 rounded-xl glass-button text-[10px] font-bold text-slate-700 hover:bg-maroon-600 hover:text-white hover:border-maroon-600 transition-all shadow-sm flex items-center justify-center gap-1.5"
                       >
                         View Profile Details
                       </button>
-
-                      {alum.linkedin && (
-                        <a 
-                          href={alum.linkedin} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          className="h-8 w-8 rounded-xl bg-[#0a66c2]/10 hover:bg-[#0a66c2]/15 text-[#0a66c2] border border-[#0a66c2]/20 flex items-center justify-center transition-all"
-                        >
-                          <LinkedinIcon size={14} />
-                        </a>
-                      )}
                     </div>
                   </div>
                 ))}
@@ -448,8 +474,17 @@ export default function PublicAlumniPage() {
 
             {/* Details Fields */}
             <div className="space-y-4 pt-4 border-t border-white/40">
+              {selectedAlumni.bio && (
+                <div className="space-y-1">
+                  <span className="text-[9px] font-bold uppercase tracking-wider text-slate-400 block">Biography</span>
+                  <p className="text-xs text-slate-700 leading-relaxed italic bg-white/30 p-3 rounded-xl border border-white/85">
+                    &quot;{selectedAlumni.bio}&quot;
+                  </p>
+                </div>
+              )}
+
               <div className="space-y-1">
-                <span className="text-[9px] font-bold uppercase tracking-wider text-slate-404 block">Graduation details</span>
+                <span className="text-[9px] font-bold uppercase tracking-wider text-slate-400 block">Graduation details</span>
                 <span className="text-xs font-semibold text-slate-800">
                   {selectedAlumni.program} stream, batch of {selectedAlumni.batch}
                 </span>
@@ -457,15 +492,15 @@ export default function PublicAlumniPage() {
 
               {selectedAlumni.industry && (
                 <div className="space-y-1">
-                  <span className="text-[9px] font-bold uppercase tracking-wider text-slate-404 block">Focus Industry</span>
-                  <span className="text-xs font-semibold text-slate-200">
+                  <span className="text-[9px] font-bold uppercase tracking-wider text-slate-400 block">Focus Industry</span>
+                  <span className="text-xs font-semibold text-slate-800">
                     {selectedAlumni.industry}
                   </span>
                 </div>
               )}
 
               <div className="space-y-2">
-                <span className="text-[9px] font-bold uppercase tracking-wider text-slate-404 block">Expertise Skills</span>
+                <span className="text-[9px] font-bold uppercase tracking-wider text-slate-400 block">Expertise Skills</span>
                 <div className="flex flex-wrap gap-1.5">
                   {selectedAlumni.skills.split(",").map((skill, idx) => (
                     <span key={idx} className="px-2.5 py-1 rounded-lg glass-badge text-[10px] font-semibold text-slate-700">
@@ -483,7 +518,7 @@ export default function PublicAlumniPage() {
                   href={selectedAlumni.linkedin} 
                   target="_blank" 
                   rel="noopener noreferrer"
-                  className="flex-1 py-3 rounded-xl bg-violet-600 hover:bg-violet-755 text-xs font-bold text-white flex items-center justify-center gap-2 transition-all shadow-sm"
+                  className="flex-1 py-3 rounded-xl bg-maroon-600 hover:bg-maroon-700 text-xs font-bold text-white flex items-center justify-center gap-2 transition-all shadow-sm"
                 >
                   <LinkedinIcon size={14} /> Connect on LinkedIn
                 </a>
@@ -674,9 +709,20 @@ export default function PublicAlumniPage() {
                 />
               </div>
 
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold text-slate-405 uppercase tracking-wider block">Professional Biography (Bio)</label>
+                <textarea 
+                  value={regForm.bio} 
+                  onChange={e => setRegForm({...regForm, bio: e.target.value})}
+                  placeholder="Introduce yourself, your career focus, or guidance you can offer..."
+                  rows={3}
+                  className="w-full glass-input rounded-xl px-4 py-2.5 text-xs text-slate-800 focus:outline-none resize-none"
+                />
+              </div>
+
               <button 
                 type="submit"
-                className="w-full py-3.5 rounded-xl bg-violet-600 hover:bg-violet-750 text-xs font-bold text-white transition-all shadow-sm"
+                className="w-full py-3.5 rounded-xl bg-maroon-600 hover:bg-maroon-700 text-xs font-bold text-white transition-all shadow-sm"
               >
                 Submit Registration Profile
               </button>
@@ -692,7 +738,7 @@ export default function PublicAlumniPage() {
           <div className="flex items-center gap-4">
             <span 
               onClick={() => window.open("/admin", "_blank")}
-              className="hover:text-slate-700 cursor-pointer font-bold text-violet-650 transition-colors"
+              className="hover:text-maroon-700 cursor-pointer font-bold text-maroon-600 transition-colors"
             >
               Coordinator Portal Access
             </span>
