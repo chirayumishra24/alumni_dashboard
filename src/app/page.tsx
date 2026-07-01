@@ -260,8 +260,8 @@ export default function PublicAlumniPage() {
       {/* ================= HERO BACKGROUND IMAGE CAROUSEL (INFINITE MARQUEE) ================= */}
       <div className="absolute top-0 left-0 right-0 h-[650px] overflow-hidden pointer-events-none z-0 opacity-30">
         {/* Fading Edge Masks */}
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#f8fafc]/50 to-[#f8fafc] z-10" />
-        <div className="absolute inset-0 bg-gradient-to-r from-[#f8fafc] via-transparent to-[#f8fafc] z-10" />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#FAF8F5]/50 to-[#FAF8F5] z-10" />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#FAF8F5] via-transparent to-[#FAF8F5] z-10" />
         
         {/* Infinite Image Slider */}
         <div className="flex w-max gap-8 pt-10 animate-[marquee-left_90s_linear_infinite]">

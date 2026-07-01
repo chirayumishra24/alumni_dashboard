@@ -32,7 +32,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${inter.variable} ${plusJakarta.variable} ${playfair.variable} font-sans bg-[#f8fafc] text-slate-900 antialiased`}>
+      <body className={`${inter.variable} ${plusJakarta.variable} ${playfair.variable} font-sans bg-[#FAF8F5] text-slate-900 antialiased`}>
         {children}
       </body>
     </html>

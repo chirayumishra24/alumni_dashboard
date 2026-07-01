@@ -60,7 +60,7 @@ export default function LoginGate({ children }: LoginGateProps) {
 
   if (checkingSession) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#f8fafc] text-slate-800">
+      <div className="flex min-h-screen items-center justify-center bg-[#FAF8F5] text-slate-800">
         <div className="flex flex-col items-center gap-3">
           <RefreshCw size={24} className="animate-spin text-violet-650" />
           <span className="text-xs font-semibold tracking-wider text-slate-405">AUTHENTICATING SESSION...</span>
@@ -74,7 +74,7 @@ export default function LoginGate({ children }: LoginGateProps) {
   }
 
   return (
-    <div className="min-h-screen w-full flex items-center justify-center bg-[#f8fafc] text-slate-800 relative overflow-hidden font-sans select-none">
+    <div className="min-h-screen w-full flex items-center justify-center bg-[#FAF8F5] text-slate-800 relative overflow-hidden font-sans select-none">
       {/* Liquid Glassmorphic Gradient Orbs placed behind everything */}
       <div className="gradient-orb gradient-orb-1" />
       <div className="gradient-orb gradient-orb-2" />

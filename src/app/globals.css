@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 :root {
-  --background: #f8fafc;
+  --background: #FAF8F5;
   --foreground: #0f172a;
 }
 
@@ -256,7 +256,7 @@ body {
 
 /* Professional Executive Mesh Gradient Background */
 .executive-mesh-bg {
-  background-color: #f8fafc;
+  background-color: #FAF8F5;
 }
 
 /* Animated blurred background gradient shapes */

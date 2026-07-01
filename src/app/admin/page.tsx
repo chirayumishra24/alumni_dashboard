@@ -405,7 +405,7 @@ function AdminDashboardContent() {
 
   if (loading && !data) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#f8fafc] text-slate-800">
+      <div className="flex min-h-screen items-center justify-center bg-[#FAF8F5] text-slate-800">
         <div className="flex flex-col items-center gap-3">
           <RefreshCw size={28} className="animate-spin text-violet-600" />
           <span className="text-xs font-bold tracking-wider text-slate-500">LOADING DATABASE RELATIONSHIPS...</span>
