@@ -252,9 +252,11 @@ export default function PublicAlumniPage() {
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-maroon-500/10 border border-maroon-500/15 text-[10px] font-bold text-maroon-700 uppercase tracking-wider">
           <Sparkles size={12} className="text-maroon-600" /> CCHS & CCWS Combined Directories
         </div>
-        <h2 className="text-4xl md:text-5xl font-black tracking-tight text-slate-900 leading-tight">
+        <h2 className="text-4xl md:text-[3.25rem] font-display font-extrabold tracking-tight text-slate-900 leading-[1.1]">
           Discover Our Professional <br />
-          <span className="bg-clip-text text-transparent bg-gradient-to-r from-maroon-600 to-navy-700">Graduate Alumni Network</span>
+          <span className="font-black bg-clip-text text-transparent bg-gradient-to-r from-maroon-650 via-maroon-500 to-navy-700">
+            Graduate Alumni Network
+          </span>
         </h2>
         <p className="text-xs md:text-sm text-slate-600 max-w-xl mx-auto leading-relaxed">
           Explore and connect with verified graduates from the CCHS and CCWS school networks building modern careers across top global industries.

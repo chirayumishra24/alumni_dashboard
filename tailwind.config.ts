@@ -40,10 +40,24 @@ const config: Config = {
           '0%': { opacity: '0', transform: 'scale(0.95)' },
           '100%': { opacity: '1', transform: 'scale(1)' },
         },
+        'marquee-left': {
+          '0%': { transform: 'translateX(0%)' },
+          '100%': { transform: 'translateX(-50%)' },
+        },
+        'marquee-right': {
+          '0%': { transform: 'translateX(-50%)' },
+          '100%': { transform: 'translateX(0%)' },
+        },
       },
       animation: {
         'fade-in': 'fade-in 0.2s ease-out',
         'scale-in': 'scale-in 0.25s ease-out',
+        'marquee-left': 'marquee-left 45s linear infinite',
+        'marquee-right': 'marquee-right 45s linear infinite',
+      },
+      fontFamily: {
+        sans: ["var(--font-inter)", "sans-serif"],
+        display: ["var(--font-plus-jakarta)", "sans-serif"],
       },
     },
   },
