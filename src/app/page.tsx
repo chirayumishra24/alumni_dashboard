@@ -292,10 +292,10 @@ export default function PublicAlumniPage() {
   return (
     <div className="min-h-screen executive-mesh-bg text-slate-800 font-sans relative overflow-x-hidden selection:bg-maroon-600 selection:text-white grid-bg">
       {/* ================= HERO BACKGROUND IMAGE CAROUSEL (INFINITE MARQUEE) ================= */}
-      <div className="absolute top-0 left-0 right-0 h-[650px] overflow-hidden pointer-events-none z-0 opacity-30">
+      <div className="absolute top-0 left-0 right-0 h-[750px] overflow-hidden pointer-events-none z-0 opacity-100">
         {/* Fading Edge Masks */}
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#FAF8F5]/50 to-[#FAF8F5] z-10" />
-        <div className="absolute inset-0 bg-gradient-to-r from-[#FAF8F5] via-transparent to-[#FAF8F5] z-10" />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-[#FAF8F5]/90 z-10" />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#FAF8F5]/25 via-transparent to-[#FAF8F5]/25 z-10" />
         
         {/* Infinite Image Slider */}
         <div className="flex w-max gap-8 pt-10 animate-[marquee-left_90s_linear_infinite]">
@@ -355,7 +355,7 @@ export default function PublicAlumniPage() {
       </header>
 
       {/* Hero Showcase Section */}
-      <section className="max-w-7xl mx-auto px-8 pt-20 pb-12 text-center space-y-6 relative z-10">
+      <section className="max-w-7xl mx-auto px-8 pt-32 pb-24 text-center space-y-6 relative z-10">
         
         <h2 className="text-4xl md:text-[4.5rem] font-serif font-bold text-[#1b2a41] tracking-tight leading-[1.1] max-w-5xl mx-auto">
           Connecting Past <span className="font-serif italic font-extrabold text-maroon-600">Achievers</span>, <br className="hidden md:inline" />
