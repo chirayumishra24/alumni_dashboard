@@ -384,6 +384,108 @@ export default function PublicAlumniPage() {
         </div>
       </section>
 
+      {/* ================= NETWORK IMPACT STATS (BLUE CONTAINER) ================= */}
+      <section className="max-w-7xl mx-auto px-8 pb-12 relative z-10">
+        <div className="bg-gradient-to-br from-[#0c1b33] via-[#0f2347] to-[#142d5c] rounded-[2.5rem] p-8 md:p-10 text-white shadow-2xl relative overflow-hidden border border-white/10">
+          {/* Ambient background glows */}
+          <div className="absolute top-0 right-0 w-96 h-96 bg-maroon-500/10 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute bottom-0 left-0 w-96 h-96 bg-navy-500/20 rounded-full blur-3xl pointer-events-none" />
+          
+          <div className="relative z-10 space-y-8">
+            {/* Header info */}
+            <div className="text-center md:text-left space-y-1.5">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-[9px] font-bold text-amber-305 uppercase tracking-widest">
+                <Sparkles size={10} fill="currentColor" className="text-amber-350" /> Network Impact &amp; Placements
+              </span>
+              <h3 className="text-2xl md:text-3xl font-display font-extrabold tracking-tight">
+                Distinguished Academic &amp; Corporate Footprint
+              </h3>
+              <p className="text-xs text-slate-350 max-w-xl">
+                A consolidated summary of our verified alumni&apos;s institutional achievements and top international employer mappings.
+              </p>
+            </div>
+
+            {/* Content grid */}
+            <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 items-stretch">
+              
+              {/* Left Column: 3 Core streams (IITs, Founders, Govt) - Span 3 */}
+              <div className="lg:col-span-3 grid grid-cols-1 sm:grid-cols-3 gap-4">
+                
+                {/* Stat 1: Entrepreneurs */}
+                <div className="bg-white/5 border border-white/10 rounded-3xl p-5 flex flex-col justify-between hover:bg-white/10 transition-all duration-300 shadow-sm relative group">
+                  <div className="p-3 w-fit rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-400 group-hover:scale-110 transition-transform duration-300">
+                    <Briefcase size={18} />
+                  </div>
+                  <div className="mt-8 space-y-1">
+                    <span className="block text-3xl font-black font-display text-white tracking-tight">{stats.entrepreneurs}+</span>
+                    <span className="block text-[11px] font-black uppercase text-amber-300 tracking-wider">Founders &amp; CEOs</span>
+                    <p className="text-[10px] text-slate-300 leading-relaxed pt-1">
+                      Pioneering ventures, tech startups, and global consultancies worldwide.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Stat 2: IITs & AIIMS */}
+                <div className="bg-white/5 border border-white/10 rounded-3xl p-5 flex flex-col justify-between hover:bg-white/10 transition-all duration-300 shadow-sm relative group">
+                  <div className="p-3 w-fit rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 group-hover:scale-110 transition-transform duration-300">
+                    <GraduationCap size={18} />
+                  </div>
+                  <div className="mt-8 space-y-1">
+                    <span className="block text-3xl font-black font-display text-white tracking-tight">{stats.iitAiims}+</span>
+                    <span className="block text-[11px] font-black uppercase text-emerald-300 tracking-wider">IIT &amp; AIIMS Scholars</span>
+                    <p className="text-[10px] text-slate-300 leading-relaxed pt-1">
+                      Graduates from India&apos;s premier engineering &amp; medical research institutes.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Stat 3: Civil Services */}
+                <div className="bg-white/5 border border-white/10 rounded-3xl p-5 flex flex-col justify-between hover:bg-white/10 transition-all duration-300 shadow-sm relative group">
+                  <div className="p-3 w-fit rounded-2xl bg-sky-500/10 border border-sky-500/20 text-sky-400 group-hover:scale-110 transition-transform duration-300">
+                    <Landmark size={18} />
+                  </div>
+                  <div className="mt-8 space-y-1">
+                    <span className="block text-3xl font-black font-display text-white tracking-tight">{stats.government}+</span>
+                    <span className="block text-[11px] font-black uppercase text-sky-300 tracking-wider">Civil &amp; Govt Services</span>
+                    <p className="text-[10px] text-slate-300 leading-relaxed pt-1">
+                      Serving the nation across IAS, IPS, IFS, Defense, and ministries.
+                    </p>
+                  </div>
+                </div>
+
+              </div>
+
+              {/* Right Column: Top employer placements count - Span 2 */}
+              <div className="lg:col-span-2 bg-white/[0.03] border border-white/10 rounded-3xl p-5 flex flex-col justify-between">
+                <div>
+                  <h4 className="text-[11px] font-black uppercase tracking-widest text-slate-350 mb-4 border-b border-white/10 pb-2">
+                    Top Corporate Placements
+                  </h4>
+                  <div className="grid grid-cols-2 gap-x-6 gap-y-3">
+                    {stats.topCompanies.map((tc, idx) => (
+                      <div key={idx} className="flex items-center justify-between py-1 border-b border-white/5 last:border-0">
+                        <span className="text-xs font-semibold text-slate-100 flex items-center gap-1.5">
+                          <span className="w-1.5 h-1.5 rounded-full bg-indigo-400" /> {tc.name}
+                        </span>
+                        <span className="px-1.5 py-0.5 rounded-lg bg-white/10 text-[9px] font-bold text-indigo-200">
+                          {tc.count} Alum{tc.count > 1 ? 'ni' : ''}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                <div className="pt-4 text-center lg:text-left">
+                  <p className="text-[9px] text-slate-400 font-medium">
+                    *Counts reflect verified registrations in the CCHS &amp; CCWS network directory.
+                  </p>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* ================= ALUMNI SPOTLIGHT VIDEO RIBBONS ================= */}
       <section className="py-6 space-y-6 relative z-10 max-w-[100vw] overflow-hidden">
         <div className="max-w-7xl mx-auto px-8 text-center md:text-left">
@@ -487,106 +589,6 @@ export default function PublicAlumniPage() {
       {/* Directory Content Workspace */}
       <main className="max-w-7xl mx-auto px-8 pb-20 space-y-8 relative z-10">
         
-        {/* ================= NETWORK IMPACT STATS (BLUE CONTAINER) ================= */}
-        <section className="bg-gradient-to-br from-[#0c1b33] via-[#0f2347] to-[#142d5c] rounded-[2.5rem] p-8 md:p-10 text-white shadow-2xl relative overflow-hidden border border-white/10">
-          {/* Ambient background glows */}
-          <div className="absolute top-0 right-0 w-96 h-96 bg-maroon-500/10 rounded-full blur-3xl pointer-events-none" />
-          <div className="absolute bottom-0 left-0 w-96 h-96 bg-navy-500/20 rounded-full blur-3xl pointer-events-none" />
-          
-          <div className="relative z-10 space-y-8">
-            {/* Header info */}
-            <div className="text-center md:text-left space-y-1.5">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-[9px] font-bold text-amber-305 uppercase tracking-widest">
-                <Sparkles size={10} fill="currentColor" className="text-amber-350" /> Network Impact &amp; Placements
-              </span>
-              <h3 className="text-2xl md:text-3xl font-display font-extrabold tracking-tight">
-                Distinguished Academic &amp; Corporate Footprint
-              </h3>
-              <p className="text-xs text-slate-300 max-w-xl">
-                A consolidated summary of our verified alumni&apos;s institutional achievements and top international employer mappings.
-              </p>
-            </div>
-
-            {/* Content grid */}
-            <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 items-stretch">
-              
-              {/* Left Column: 3 Core streams (IITs, Founders, Govt) - Span 3 */}
-              <div className="lg:col-span-3 grid grid-cols-1 sm:grid-cols-3 gap-4">
-                
-                {/* Stat 1: Entrepreneurs */}
-                <div className="bg-white/5 border border-white/10 rounded-3xl p-5 flex flex-col justify-between hover:bg-white/10 transition-all duration-300 shadow-sm relative group">
-                  <div className="p-3 w-fit rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-400 group-hover:scale-110 transition-transform duration-300">
-                    <Briefcase size={18} />
-                  </div>
-                  <div className="mt-8 space-y-1">
-                    <span className="block text-3xl font-black font-display text-white tracking-tight">{stats.entrepreneurs}+</span>
-                    <span className="block text-[11px] font-black uppercase text-amber-300 tracking-wider">Founders &amp; CEOs</span>
-                    <p className="text-[10px] text-slate-300 leading-relaxed pt-1">
-                      Pioneering ventures, tech startups, and global consultancies worldwide.
-                    </p>
-                  </div>
-                </div>
-
-                {/* Stat 2: IITs & AIIMS */}
-                <div className="bg-white/5 border border-white/10 rounded-3xl p-5 flex flex-col justify-between hover:bg-white/10 transition-all duration-300 shadow-sm relative group">
-                  <div className="p-3 w-fit rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 group-hover:scale-110 transition-transform duration-300">
-                    <GraduationCap size={18} />
-                  </div>
-                  <div className="mt-8 space-y-1">
-                    <span className="block text-3xl font-black font-display text-white tracking-tight">{stats.iitAiims}+</span>
-                    <span className="block text-[11px] font-black uppercase text-emerald-300 tracking-wider">IIT &amp; AIIMS Scholars</span>
-                    <p className="text-[10px] text-slate-300 leading-relaxed pt-1">
-                      Graduates from India&apos;s premier engineering &amp; medical research institutes.
-                    </p>
-                  </div>
-                </div>
-
-                {/* Stat 3: Civil Services */}
-                <div className="bg-white/5 border border-white/10 rounded-3xl p-5 flex flex-col justify-between hover:bg-white/10 transition-all duration-300 shadow-sm relative group">
-                  <div className="p-3 w-fit rounded-2xl bg-sky-500/10 border border-sky-500/20 text-sky-400 group-hover:scale-110 transition-transform duration-300">
-                    <Landmark size={18} />
-                  </div>
-                  <div className="mt-8 space-y-1">
-                    <span className="block text-3xl font-black font-display text-white tracking-tight">{stats.government}+</span>
-                    <span className="block text-[11px] font-black uppercase text-sky-300 tracking-wider">Civil &amp; Govt Services</span>
-                    <p className="text-[10px] text-slate-300 leading-relaxed pt-1">
-                      Serving the nation across IAS, IPS, IFS, Defense, and ministries.
-                    </p>
-                  </div>
-                </div>
-
-              </div>
-
-              {/* Right Column: Top employer placements count - Span 2 */}
-              <div className="lg:col-span-2 bg-white/[0.03] border border-white/10 rounded-3xl p-5 flex flex-col justify-between">
-                <div>
-                  <h4 className="text-[11px] font-black uppercase tracking-widest text-slate-350 mb-4 border-b border-white/10 pb-2">
-                    Top Corporate Placements
-                  </h4>
-                  <div className="grid grid-cols-2 gap-x-6 gap-y-3">
-                    {stats.topCompanies.map((tc, idx) => (
-                      <div key={idx} className="flex items-center justify-between py-1 border-b border-white/5 last:border-0">
-                        <span className="text-xs font-semibold text-slate-100 flex items-center gap-1.5">
-                          <span className="w-1.5 h-1.5 rounded-full bg-indigo-400" /> {tc.name}
-                        </span>
-                        <span className="px-1.5 py-0.5 rounded-lg bg-white/10 text-[9px] font-bold text-indigo-200">
-                          {tc.count} Alum{tc.count > 1 ? 'ni' : ''}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-                <div className="pt-4 text-center lg:text-left">
-                  <p className="text-[9px] text-slate-400 font-medium">
-                    *Counts reflect verified registrations in the CCHS &amp; CCWS network directory.
-                  </p>
-                </div>
-              </div>
-
-            </div>
-          </div>
-        </section>
-
         {/* Filters and search panel - Refactored to glass-panel */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 p-5 rounded-[2rem] glass-panel">
           {/* Search name, company, skills */}
