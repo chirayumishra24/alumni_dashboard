@@ -516,67 +516,93 @@ export default function PublicAlumniPage() {
       {/* ================= DETAIL PROFILE MODAL - Refactored to glass-panel ================= */}
       {selectedAlumni && (
         <div className="fixed inset-0 z-50 flex items-center justify-center glass-modal-overlay p-4 animate-fade-in">
-          <div className="w-full max-w-md rounded-[2rem] glass-panel p-8 shadow-2xl space-y-6 relative animate-fade-in">
+          <div className="w-full max-w-md rounded-[2rem] glass-panel p-8 shadow-[0_20px_50px_rgba(15,23,42,0.18)] border border-white/60 space-y-6 relative animate-fade-in">
+            {/* Elegant Top-Right Close Button */}
             <button 
               onClick={() => setSelectedAlumni(null)}
-              className="absolute top-6 right-6 text-slate-400 hover:text-slate-600 transition-colors"
+              className="absolute top-6 right-6 text-slate-400 hover:text-slate-700 transition-colors p-1 hover:bg-black/5 rounded-full"
             >
-              <X size={20} />
+              <X size={18} />
             </button>
 
             {/* Profile Header */}
-            <div className="flex items-center gap-4">
-              <img 
-                src={selectedAlumni.user.avatarUrl || `https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=120`} 
-                className="h-16 w-16 rounded-2xl border border-slate-200" 
-                alt="avatar" 
-              />
-              <div>
-                <div className="flex items-center gap-2">
-                  <h2 className="text-lg font-bold text-slate-900">{selectedAlumni.user.name}</h2>
-                  <span className={`px-2 py-0.5 rounded text-[9px] font-bold uppercase ${
-                    selectedAlumni.school === "CCHS" ? "bg-violet-50 text-violet-600 border border-violet-100" : "bg-emerald-50 text-emerald-600 border border-emerald-100"
+            <div className="flex items-center gap-4.5">
+              <div className={`relative p-0.5 rounded-2xl border-2 ${
+                selectedAlumni.school === "CCHS" ? "border-maroon-600/30 bg-maroon-50/20" : "border-navy-600/30 bg-navy-50/20"
+              } shrink-0 shadow-md`}>
+                <img 
+                  src={selectedAlumni.user.avatarUrl || `https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=120`} 
+                  className="h-16 w-16 rounded-xl object-cover" 
+                  alt="avatar" 
+                />
+              </div>
+              <div className="space-y-1">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <h2 className="text-base font-extrabold text-slate-900 tracking-tight">{selectedAlumni.user.name}</h2>
+                  <span className={`px-2 py-0.5 rounded text-[8px] font-extrabold uppercase tracking-wider ${
+                    selectedAlumni.school === "CCHS" 
+                      ? "bg-maroon-50 text-maroon-700 border border-maroon-100/50" 
+                      : "bg-navy-50/80 text-navy-700 border border-navy-100/50"
                   }`}>
                     {selectedAlumni.school}
                   </span>
                 </div>
-                <p className="text-xs text-violet-650 font-semibold">{selectedAlumni.role} @ {selectedAlumni.company}</p>
-                <p className="text-[11px] text-slate-500 mt-0.5">{selectedAlumni.city}, {selectedAlumni.country} | Batch {selectedAlumni.batch}</p>
+                <p className={`text-xs font-bold ${
+                  selectedAlumni.school === "CCHS" ? "text-maroon-700" : "text-navy-600"
+                }`}>
+                  {selectedAlumni.role || "Graduate"}
+                  {selectedAlumni.company && <span> @ <span className="font-extrabold text-slate-900">{selectedAlumni.company}</span></span>}
+                </p>
+                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider flex items-center gap-0.5">
+                  <MapPin size={11} className="text-slate-350" /> {selectedAlumni.city}, {selectedAlumni.country} | Batch {selectedAlumni.batch}
+                </p>
               </div>
             </div>
 
             {/* Details Fields */}
-            <div className="space-y-4 pt-4 border-t border-white/40">
+            <div className="space-y-4 pt-5 border-t border-black/[0.04]">
               {selectedAlumni.bio && (
-                <div className="space-y-1">
-                  <span className="text-[9px] font-bold uppercase tracking-wider text-slate-400 block">Biography</span>
-                  <p className="text-xs text-slate-700 leading-relaxed italic bg-white/30 p-3 rounded-xl border border-white/85">
+                <div className="space-y-1.5">
+                  <div className="flex items-center gap-1.5">
+                    <div className={`w-1 h-3 rounded-full ${selectedAlumni.school === "CCHS" ? "bg-maroon-600" : "bg-navy-600"}`} />
+                    <span className="text-[9px] font-bold uppercase tracking-widest text-slate-400">Biography</span>
+                  </div>
+                  <p className="text-xs text-slate-750 leading-relaxed italic bg-white/45 p-4 rounded-2xl border border-white/80 shadow-sm">
                     &quot;{selectedAlumni.bio}&quot;
                   </p>
                 </div>
               )}
 
-              <div className="space-y-1">
-                <span className="text-[9px] font-bold uppercase tracking-wider text-slate-400 block">Graduation details</span>
-                <span className="text-xs font-semibold text-slate-800">
-                  {selectedAlumni.program} stream, batch of {selectedAlumni.batch}
-                </span>
+              <div className="space-y-1.5">
+                <div className="flex items-center gap-1.5">
+                  <div className={`w-1 h-3 rounded-full ${selectedAlumni.school === "CCHS" ? "bg-maroon-600" : "bg-navy-600"}`} />
+                  <span className="text-[9px] font-bold uppercase tracking-widest text-slate-400">Graduation details</span>
+                </div>
+                <div className="text-xs font-bold text-slate-800 bg-white/30 px-3.5 py-2.5 rounded-xl border border-white/70">
+                  {selectedAlumni.program} stream, Class of {selectedAlumni.batch}
+                </div>
               </div>
 
               {selectedAlumni.industry && (
-                <div className="space-y-1">
-                  <span className="text-[9px] font-bold uppercase tracking-wider text-slate-400 block">Focus Industry</span>
-                  <span className="text-xs font-semibold text-slate-800">
+                <div className="space-y-1.5">
+                  <div className="flex items-center gap-1.5">
+                    <div className={`w-1 h-3 rounded-full ${selectedAlumni.school === "CCHS" ? "bg-maroon-600" : "bg-navy-600"}`} />
+                    <span className="text-[9px] font-bold uppercase tracking-widest text-slate-400">Focus Industry</span>
+                  </div>
+                  <div className="text-xs font-bold text-slate-800 bg-white/30 px-3.5 py-2.5 rounded-xl border border-white/70">
                     {selectedAlumni.industry}
-                  </span>
+                  </div>
                 </div>
               )}
 
               <div className="space-y-2">
-                <span className="text-[9px] font-bold uppercase tracking-wider text-slate-400 block">Expertise Skills</span>
+                <div className="flex items-center gap-1.5">
+                  <div className={`w-1 h-3 rounded-full ${selectedAlumni.school === "CCHS" ? "bg-maroon-600" : "bg-navy-600"}`} />
+                  <span className="text-[9px] font-bold uppercase tracking-widest text-slate-400">Expertise Skills</span>
+                </div>
                 <div className="flex flex-wrap gap-1.5">
                   {selectedAlumni.skills.split(",").map((skill, idx) => (
-                    <span key={idx} className="px-2.5 py-1 rounded-lg glass-badge text-[10px] font-semibold text-slate-700">
+                    <span key={idx} className="px-2.5 py-1 rounded-lg bg-white/35 border border-white/60 text-[9.5px] font-bold text-slate-650 shadow-sm">
                       {skill.trim()}
                     </span>
                   ))}
@@ -585,20 +611,20 @@ export default function PublicAlumniPage() {
             </div>
 
             {/* Actions */}
-            <div className="flex items-center gap-3 pt-4 border-t border-white/40">
+            <div className="flex items-center gap-3 pt-5 border-t border-black/[0.04]">
               {selectedAlumni.linkedin && (
                 <a 
                   href={selectedAlumni.linkedin} 
                   target="_blank" 
                   rel="noopener noreferrer"
-                  className="flex-1 py-3 rounded-xl bg-maroon-600 hover:bg-maroon-700 text-xs font-bold text-white flex items-center justify-center gap-2 transition-all shadow-sm"
+                  className="flex-1 py-3 rounded-xl bg-gradient-to-r from-[#0a66c2] to-[#004182] hover:from-[#0077b5] hover:to-[#005582] text-xs font-bold text-white flex items-center justify-center gap-2 transition-all shadow-[0_4px_12px_rgba(10,102,194,0.18)] hover:scale-[1.01] active:scale-95"
                 >
-                  <LinkedinIcon size={14} /> Connect on LinkedIn
+                  <LinkedinIcon size={13} /> Connect on LinkedIn
                 </a>
               )}
               <button 
                 onClick={() => setSelectedAlumni(null)}
-                className="px-6 py-3 rounded-xl glass-button text-xs font-bold text-slate-700 shadow-sm"
+                className="px-5 py-3 rounded-xl bg-white/40 hover:bg-white/70 border border-white/60 hover:border-slate-350 text-xs font-bold text-slate-700 shadow-sm transition-all active:scale-95"
               >
                 Close Profile
               </button>
