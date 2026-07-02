@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { firestore } from '@/lib/firebaseAdmin';
 import { QueryDocumentSnapshot } from 'firebase-admin/firestore';
 import { sendVerificationEmail } from '@/lib/email';
+import { revalidateTag } from 'next/cache';
 
 export const dynamic = 'force-dynamic';
 
@@ -180,7 +181,43 @@ export async function PATCH(request: Request) {
         }
       }
 
+      // Invalidate alumni cache
+      revalidateTag('alumni');
+
       return NextResponse.json({ success: true, profile: updated });
+    }
+
+    if (action === 'deleteAlumni') {
+      const profileRef = firestore.collection('alumni_profiles').doc(id);
+      const profileDoc = await profileRef.get();
+
+      if (!profileDoc.exists) {
+        return NextResponse.json({ error: 'Alumni profile not found' }, { status: 404 });
+      }
+
+      const profileData = profileDoc.data();
+      const userId = profileData?.userId;
+
+      // Delete the alumni profile
+      await profileRef.delete();
+
+      // Delete the associated user if exists
+      if (userId) {
+        await firestore.collection('users').doc(userId).delete();
+      }
+
+      // Delete widget testimonials associated with this profile
+      const widgetsQuery = await firestore.collection('widget_testimonials')
+        .where('alumniProfileId', '==', id)
+        .get();
+      const batch = firestore.batch();
+      widgetsQuery.docs.forEach((doc: QueryDocumentSnapshot) => batch.delete(doc.ref));
+      await batch.commit();
+
+      // Invalidate alumni cache
+      revalidateTag('alumni');
+
+      return NextResponse.json({ success: true });
     }
 
     return NextResponse.json({ error: 'Invalid action' }, { status: 400 });

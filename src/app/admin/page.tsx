@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { 
   Users, Calendar, Star, MapPin, Check, X, Sparkles, Send, 
-  RefreshCw, UserCheck, Filter, Mail, Copy, PlusCircle, ShieldCheck, Search
+  RefreshCw, UserCheck, Filter, Mail, Copy, PlusCircle, ShieldCheck, Search, Trash2
 } from "lucide-react";
 import { uploadFileToStorage } from "@/lib/firebase";
 import LoginGate from "@/components/LoginGate";
@@ -274,6 +274,29 @@ function AdminDashboardContent() {
       }
     } catch {
       showToast("Verification action error", "error");
+    }
+  };
+
+  // Delete an alumnus profile permanently
+  const handleDeleteAlumni = async (id: string) => {
+    if (!window.confirm("Are you sure you want to permanently delete this alumni profile? This action cannot be undone.")) {
+      return;
+    }
+    try {
+      const res = await fetch("/api/data", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "deleteAlumni", id }),
+      });
+      if (res.ok) {
+        showToast("Alumni profile permanently deleted", "success");
+        fetchData();
+      } else {
+        const json = await res.json();
+        showToast(json.error || "Failed to delete alumni profile", "error");
+      }
+    } catch {
+      showToast("Delete action error", "error");
     }
   };
 
@@ -799,6 +822,14 @@ support@skillizee.io`;
                           >
                             <Check size={12} /> Verify & Activate
                           </button>
+
+                          <button
+                            onClick={() => handleDeleteAlumni(alum.id)}
+                            className="p-2 rounded-xl border border-slate-200 hover:border-rose-250 hover:bg-rose-50 text-slate-400 hover:text-rose-600 transition-all active:scale-95 shadow-sm"
+                            title="Delete Registration Request"
+                          >
+                            <Trash2 size={12} />
+                          </button>
                         </div>
                       </div>
                     ))
@@ -843,12 +874,13 @@ support@skillizee.io`;
                         <th className="pb-3">Company & Role</th>
                         <th className="pb-3">Location</th>
                         <th className="pb-3 text-center">Mentor Status</th>
+                        <th className="pb-3 text-right">Actions</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-100">
                       {filteredAlumniForAdmin.length === 0 ? (
                         <tr>
-                          <td colSpan={6} className="py-8 text-center text-slate-500">
+                          <td colSpan={7} className="py-8 text-center text-slate-500">
                             No matching alumni profiles found in the database.
                           </td>
                         </tr>
@@ -889,6 +921,15 @@ support@skillizee.io`;
                               }`}>
                                 {alum.isMentor ? "Mentor" : "Alumnus"}
                               </span>
+                            </td>
+                            <td className="py-4 text-right">
+                              <button
+                                onClick={() => handleDeleteAlumni(alum.id)}
+                                className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-all active:scale-90"
+                                title="Delete Profile"
+                              >
+                                <Trash2 size={13} />
+                              </button>
                             </td>
                           </tr>
                         ))

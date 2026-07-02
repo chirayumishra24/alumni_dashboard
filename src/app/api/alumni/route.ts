@@ -2,14 +2,12 @@ import { NextResponse } from 'next/server';
 import { firestore } from '@/lib/firebaseAdmin';
 import { QueryDocumentSnapshot } from 'firebase-admin/firestore';
 import { sendRegistrationEmail } from '@/lib/email';
+import { unstable_cache, revalidateTag } from 'next/cache';
 
 export const dynamic = 'force-dynamic';
 
-export async function GET(request: Request) {
-  try {
-    const { searchParams } = new URL(request.url);
-    const school = searchParams.get('school'); // e.g. "CCHS", "CCWS", "CCIS"
-
+const getCachedAlumni = unstable_cache(
+  async (school: string | null) => {
     const alumniRef = firestore.collection('alumni_profiles');
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let list: any[] = [];
@@ -20,16 +18,14 @@ export async function GET(request: Request) {
         .where('isVerified', '==', true)
         .get();
       list = snapshot.docs
-        .map((doc: QueryDocumentSnapshot) => doc.data())
-        .sort((a: { batch?: number }, b: { batch?: number }) => (b.batch || 0) - (a.batch || 0));
+        .map((doc: QueryDocumentSnapshot) => doc.data());
     } else if (school === 'CCWS') {
       const snapshot = await alumniRef
         .where('school', '==', 'CCWS')
         .where('isVerified', '==', true)
         .get();
       list = snapshot.docs
-        .map((doc: QueryDocumentSnapshot) => doc.data())
-        .sort((a: { batch?: number }, b: { batch?: number }) => (b.batch || 0) - (a.batch || 0));
+        .map((doc: QueryDocumentSnapshot) => doc.data());
     } else if (school === 'CCIS') {
       // CCIS displays data for both CCHS and CCWS, top 25 profiles each on page 1
       const [cchsSnapshot, ccwsSnapshot] = await Promise.all([
@@ -58,9 +54,25 @@ export async function GET(request: Request) {
         .where('isVerified', '==', true)
         .get();
       list = snapshot.docs
-        .map((doc: QueryDocumentSnapshot) => doc.data())
-        .sort((a: { batch?: number }, b: { batch?: number }) => (b.batch || 0) - (a.batch || 0));
+        .map((doc: QueryDocumentSnapshot) => doc.data());
     }
+
+    if (school !== 'CCIS') {
+      list.sort((a: { batch?: number }, b: { batch?: number }) => (b.batch || 0) - (a.batch || 0));
+    }
+
+    return list;
+  },
+  ['alumni-list-cache'],
+  { revalidate: 300, tags: ['alumni'] }
+);
+
+export async function GET(request: Request) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const school = searchParams.get('school'); // e.g. "CCHS", "CCWS", "CCIS"
+
+    const list = await getCachedAlumni(school);
 
     // Strip phone field from public view and ensure top-level avatar/avatarUrl fields exist for external consumer compatibility
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -161,6 +173,9 @@ export async function POST(request: Request) {
     } catch (err) {
       console.error('Failed to send registration email:', err);
     }
+
+    // Revalidate cache on new registration
+    revalidateTag('alumni');
 
     const response = NextResponse.json({ success: true, profile: profileData });
     response.headers.set('Access-Control-Allow-Origin', '*');
