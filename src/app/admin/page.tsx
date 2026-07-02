@@ -134,6 +134,7 @@ function AdminDashboardContent() {
 
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [sendingEmail, setSendingEmail] = useState(false);
 
   const handleAvatarUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -308,12 +309,17 @@ function AdminDashboardContent() {
     if (submitting) return;
 
     if (regForm.linkedin) {
-      const trimmed = regForm.linkedin.trim();
+      let trimmed = regForm.linkedin.trim();
+      if (trimmed && !trimmed.startsWith("http://") && !trimmed.startsWith("https://")) {
+        trimmed = "https://" + trimmed;
+      }
       const pattern = /^https?:\/\/(www\.)?linkedin\.com\/.*$/i;
       if (!pattern.test(trimmed)) {
-        showToast("Please enter a valid LinkedIn URL", "error");
+        showToast("Please enter a valid LinkedIn URL (e.g. linkedin.com/in/username)", "error");
         return;
       }
+      // Save the normalized URL back to regForm
+      regForm.linkedin = trimmed;
     }
 
     setSubmitting(true);
@@ -471,23 +477,65 @@ function AdminDashboardContent() {
 
   // Email Draft content helpers
   const getEmailSubject = (profile: AlumniProfile) => `Verify your CCGS Alumni Hub Account - ${profile.user.name}`;
-  const getEmailBody = (profile: AlumniProfile) => 
-`Dear ${profile.user.name},
+  const getEmailBody = (profile: AlumniProfile) => {
+    const origin = typeof window !== 'undefined' ? window.location.origin : '';
+    const verificationLink = `${origin}/verify?id=${profile.id}`;
+    return `Dear ${profile.user.name},
 
 Thank you for registering on the CCGS Alumni Hub portal for ${profile.school}!
 
 In order to complete your profile verification and publish your details to the school website directory, we need to quickly verify your email and credentials.
 
-Please reply directly to this email or contact our support team at support@skillizee.io to confirm your graduation details. Once verified, your profile and company/role information will go live immediately on the school platform.
+Please click the link below to verify your email address:
+${verificationLink}
 
-Warm regards,
+If the link does not work, please reply directly to this email or contact our support team at support@skillizee.io. Once verified, your profile will go live immediately on the school platform directory.
+
+Thank you,
 CCGS Alumni Coordinator Team
 support@skillizee.io`;
+  };
 
   const handleCopyEmail = (profile: AlumniProfile) => {
     const text = `Subject: ${getEmailSubject(profile)}\n\n${getEmailBody(profile)}`;
     navigator.clipboard.writeText(text);
     showToast("Email draft copied to clipboard!", "success");
+  };
+
+  const handleShareMailClient = (profile: AlumniProfile) => {
+    const subject = encodeURIComponent(getEmailSubject(profile));
+    const body = encodeURIComponent(getEmailBody(profile));
+    window.location.href = `mailto:${profile.user.email}?subject=${subject}&body=${body}`;
+  };
+
+  const handleSendDraftEmail = async (profile: AlumniProfile) => {
+    if (sendingEmail) return;
+    setSendingEmail(true);
+    try {
+      const subject = getEmailSubject(profile);
+      const body = getEmailBody(profile);
+      const res = await fetch("/api/data", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "sendDraftEmail",
+          id: profile.id,
+          subject,
+          body
+        })
+      });
+      const json = await res.json();
+      if (res.ok) {
+        showToast("Verification email sent successfully!", "success");
+        setDraftEmailTarget(null);
+      } else {
+        showToast(json.error || "Failed to send email", "error");
+      }
+    } catch {
+      showToast("Request error sending email", "error");
+    } finally {
+      setSendingEmail(false);
+    }
   };
 
   const getMatchingScore = (alumni: AlumniProfile, student: StudentProfile) => {
@@ -520,7 +568,7 @@ support@skillizee.io`;
 
       {/* Toast Alert */}
       {toast && (
-        <div className={`fixed top-6 right-6 z-50 flex items-center gap-3 rounded-2xl border p-4 shadow-xl glass-card animate-fade-in ${
+        <div className={`fixed top-6 right-6 z-[9999] flex items-center gap-3 rounded-2xl border p-4 shadow-xl glass-card animate-fade-in ${
           toast.type === "success" 
             ? "border-emerald-200/50 bg-emerald-50/70 text-emerald-805" 
             : "border-rose-200/50 bg-rose-50/70 text-rose-805"
@@ -1667,16 +1715,48 @@ support@skillizee.io`;
               </div>
             </div>
 
-            <div className="flex items-center gap-3 pt-2">
+            <div className="flex flex-wrap items-center gap-3 pt-2">
+              <button 
+                onClick={() => handleSendDraftEmail(draftEmailTarget)}
+                disabled={sendingEmail}
+                className={`flex-1 min-w-[140px] py-3 rounded-xl text-xs font-bold text-white flex items-center justify-center gap-2 transition-all shadow-md ${
+                  sendingEmail
+                    ? "bg-slate-400 cursor-not-allowed opacity-75"
+                    : "bg-emerald-600 hover:bg-emerald-700 shadow-emerald-500/10"
+                }`}
+              >
+                {sendingEmail ? (
+                  <>
+                    <svg className="animate-spin -ml-1 mr-1 h-3.5 w-3.5 text-white" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                    </svg>
+                    Sending...
+                  </>
+                ) : (
+                  <>
+                    <Mail size={14} /> Send Email Direct
+                  </>
+                )}
+              </button>
+              
+              <button 
+                onClick={() => handleShareMailClient(draftEmailTarget)}
+                className="flex-1 min-w-[140px] py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-xs font-bold text-white flex items-center justify-center gap-2 transition-all shadow-md shadow-blue-500/10"
+              >
+                <Send size={14} /> Open in Mail App
+              </button>
+
               <button 
                 onClick={() => handleCopyEmail(draftEmailTarget)}
-                className="flex-1 py-3.5 rounded-xl bg-violet-600 hover:bg-violet-750 text-xs font-bold text-white flex items-center justify-center gap-2 transition-all shadow-md shadow-violet-550/10"
+                className="flex-1 min-w-[140px] py-3 rounded-xl bg-violet-600 hover:bg-violet-750 text-xs font-bold text-white flex items-center justify-center gap-2 transition-all shadow-md shadow-violet-550/10"
               >
-                <Copy size={14} /> Copy Subject & Body
+                <Copy size={14} /> Copy to Clipboard
               </button>
+              
               <button 
                 onClick={() => setDraftEmailTarget(null)}
-                className="px-6 py-3.5 rounded-xl bg-slate-100 border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-200 transition-all"
+                className="px-5 py-3 rounded-xl bg-slate-100 border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-200 transition-all"
               >
                 Close
               </button>

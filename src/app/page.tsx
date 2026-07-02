@@ -239,12 +239,17 @@ export default function PublicAlumniPage() {
     if (submitting) return;
 
     if (regForm.linkedin) {
-      const trimmed = regForm.linkedin.trim();
+      let trimmed = regForm.linkedin.trim();
+      if (trimmed && !trimmed.startsWith("http://") && !trimmed.startsWith("https://")) {
+        trimmed = "https://" + trimmed;
+      }
       const pattern = /^https?:\/\/(www\.)?linkedin\.com\/.*$/i;
       if (!pattern.test(trimmed)) {
-        showToast("Please enter a valid LinkedIn URL", "error");
+        showToast("Please enter a valid LinkedIn URL (e.g. linkedin.com/in/username)", "error");
         return;
       }
+      // Save the normalized URL back to regForm
+      regForm.linkedin = trimmed;
     }
 
     setSubmitting(true);
@@ -346,7 +351,7 @@ export default function PublicAlumniPage() {
 
       {/* Toast alert */}
       {toast && (
-        <div className="fixed top-6 right-6 z-50 flex items-center gap-3 rounded-2xl glass-card p-4 shadow-xl animate-fade-in text-slate-800">
+        <div className="fixed top-6 right-6 z-[9999] flex items-center gap-3 rounded-2xl glass-card p-4 shadow-xl animate-fade-in text-slate-800">
           <Sparkles size={18} className="text-violet-600" />
           <span className="text-sm font-semibold">{toast.message}</span>
         </div>

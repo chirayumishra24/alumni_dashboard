@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { firestore } from '@/lib/firebaseAdmin';
 import { QueryDocumentSnapshot } from 'firebase-admin/firestore';
-import { sendVerificationEmail } from '@/lib/email';
+import { sendVerificationEmail, sendEmail } from '@/lib/email';
 import { invalidateAlumniCache } from '@/lib/cache';
 
 export const dynamic = 'force-dynamic';
@@ -210,12 +210,53 @@ export async function PATCH(request: Request) {
       const widgetsQuery = await firestore.collection('widget_testimonials')
         .where('alumniProfileId', '==', id)
         .get();
-      const batch = firestore.batch();
-      widgetsQuery.docs.forEach((doc: QueryDocumentSnapshot) => batch.delete(doc.ref));
-      await batch.commit();
+      if (!widgetsQuery.empty) {
+        const batch = firestore.batch();
+        widgetsQuery.docs.forEach((doc: QueryDocumentSnapshot) => batch.delete(doc.ref));
+        await batch.commit();
+      }
 
       // Invalidate custom in-memory cache
       invalidateAlumniCache();
+
+      return NextResponse.json({ success: true });
+    }
+
+    if (action === 'sendDraftEmail') {
+      const { subject, body: emailBody } = body;
+      const profileRef = firestore.collection('alumni_profiles').doc(id);
+      const profileDoc = await profileRef.get();
+
+      if (!profileDoc.exists) {
+        return NextResponse.json({ error: 'Alumni profile not found' }, { status: 404 });
+      }
+
+      const profileData = profileDoc.data();
+      if (!profileData?.user?.email) {
+        return NextResponse.json({ error: 'Recipient email not found' }, { status: 400 });
+      }
+
+      const recipientEmail = profileData.user.email;
+      const recipientName = profileData.user.name;
+
+      // Wrap the text body into a nice HTML layout
+      const formattedHtml = `<div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
+        <h2 style="color: #6b1d2f; margin-bottom: 20px; font-family: serif;">CCGS Alumni Verification</h2>
+        <p style="white-space: pre-wrap; line-height: 1.6; color: #334155; font-size: 0.95em;">${emailBody}</p>
+        <br/>
+        <p style="margin-top: 20px; font-size: 0.9em; color: #64748b; border-top: 1px solid #f1f5f9; padding-top: 15px;">
+          Warm regards,<br/>
+          <strong>CCGS Alumni Coordinator Team</strong><br/>
+          <a href="mailto:support@skillizee.io" style="color: #64748b; text-decoration: none;">support@skillizee.io</a>
+        </p>
+      </div>`;
+
+      await sendEmail({
+        to: recipientEmail,
+        subject: subject || `Verify your CCGS Alumni Hub Account - ${recipientName}`,
+        text: emailBody,
+        html: formattedHtml
+      });
 
       return NextResponse.json({ success: true });
     }
