@@ -119,7 +119,19 @@ export async function POST(request: Request) {
       .get();
 
     if (!userQuery.empty) {
-      return NextResponse.json({ error: 'An account with this email already exists' }, { status: 409 });
+      const existingUser = userQuery.docs[0];
+      // Check if there is an associated alumni profile for this user
+      const profileQuery = await firestore.collection('alumni_profiles')
+        .where('userId', '==', existingUser.id)
+        .limit(1)
+        .get();
+
+      if (!profileQuery.empty) {
+        return NextResponse.json({ error: 'An account with this email already exists' }, { status: 409 });
+      } else {
+        // If there's no alumni profile, delete the orphaned user doc to allow fresh registration
+        await existingUser.ref.delete();
+      }
     }
 
     // Create the User first in Firestore
