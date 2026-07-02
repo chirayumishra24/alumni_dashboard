@@ -209,9 +209,10 @@ export default function PublicAlumniPage() {
     }
   };
 
-  const fetchStats = async () => {
+  const fetchStats = async (school: string = "All") => {
     try {
-      const res = await fetch("/api/stats");
+      const url = school && school !== "All" ? `/api/stats?school=${school}` : "/api/stats";
+      const res = await fetch(url);
       if (res.ok) {
         const json = await res.json();
         setStats(json);
@@ -223,7 +224,6 @@ export default function PublicAlumniPage() {
 
   useEffect(() => {
     fetchAlumni();
-    fetchStats();
     // Auto-open registration if URL contains ?register=true
     if (typeof window !== "undefined") {
       const params = new URLSearchParams(window.location.search);
@@ -233,6 +233,11 @@ export default function PublicAlumniPage() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    fetchStats(schoolFilter);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [schoolFilter]);
 
   const handleSelfRegistration = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -313,7 +318,7 @@ export default function PublicAlumniPage() {
   return (
     <div className="min-h-screen executive-mesh-bg text-slate-800 font-sans relative overflow-x-hidden selection:bg-maroon-600 selection:text-white grid-bg">
       {/* ================= HERO BACKGROUND IMAGE CAROUSEL (INFINITE MARQUEE) ================= */}
-      <div className="absolute top-[73px] left-0 right-0 h-[750px] overflow-hidden pointer-events-none z-0 opacity-100">
+      <div className="absolute top-[73px] left-0 right-0 h-[480px] overflow-hidden pointer-events-none z-0 opacity-100">
         {/* Fading Edge Masks */}
         <div className="absolute inset-0 bg-gradient-to-b from-transparent to-[#FAF8F5]/90 z-10" />
         <div className="absolute inset-0 bg-gradient-to-r from-[#FAF8F5]/25 via-transparent to-[#FAF8F5]/25 z-10" />
@@ -481,7 +486,7 @@ export default function PublicAlumniPage() {
                     <div key={idx} className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white/5 border border-white/10 text-xs font-bold text-white hover:bg-white/10 hover:border-white/20 transition-all duration-200 shrink-0">
                       <span>{tc.name}</span>
                       <span className="w-1 h-1 rounded-full bg-white/30" />
-                      <span className="text-white font-extrabold">{tc.count}</span>
+                      <span className="text-white font-extrabold">{tc.count} {tc.count === 1 ? 'alumn' : 'alumns'}</span>
                     </div>
                   ))}
                 </div>
