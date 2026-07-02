@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { firestore } from '@/lib/firebaseAdmin';
 import { QueryDocumentSnapshot } from 'firebase-admin/firestore';
 import { sendVerificationEmail } from '@/lib/email';
-import { revalidateTag } from 'next/cache';
+import { invalidateAlumniCache } from '@/lib/cache';
 
 export const dynamic = 'force-dynamic';
 
@@ -181,8 +181,8 @@ export async function PATCH(request: Request) {
         }
       }
 
-      // Invalidate alumni cache
-      revalidateTag('alumni');
+      // Invalidate custom in-memory cache
+      invalidateAlumniCache();
 
       return NextResponse.json({ success: true, profile: updated });
     }
@@ -214,8 +214,8 @@ export async function PATCH(request: Request) {
       widgetsQuery.docs.forEach((doc: QueryDocumentSnapshot) => batch.delete(doc.ref));
       await batch.commit();
 
-      // Invalidate alumni cache
-      revalidateTag('alumni');
+      // Invalidate custom in-memory cache
+      invalidateAlumniCache();
 
       return NextResponse.json({ success: true });
     }

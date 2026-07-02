@@ -2,82 +2,84 @@ import { NextResponse } from 'next/server';
 import { firestore } from '@/lib/firebaseAdmin';
 import { QueryDocumentSnapshot } from 'firebase-admin/firestore';
 import { sendRegistrationEmail } from '@/lib/email';
-import { unstable_cache, revalidateTag } from 'next/cache';
+import { getAlumniCache, setAlumniCache, invalidateAlumniCache } from '@/lib/cache';
 
 export const dynamic = 'force-dynamic';
-
-const getCachedAlumni = unstable_cache(
-  async (school: string | null) => {
-    const alumniRef = firestore.collection('alumni_profiles');
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let list: any[] = [];
-
-    if (school === 'CCHS') {
-      const snapshot = await alumniRef
-        .where('school', '==', 'CCHS')
-        .where('isVerified', '==', true)
-        .get();
-      list = snapshot.docs
-        .map((doc: QueryDocumentSnapshot) => doc.data());
-    } else if (school === 'CCWS') {
-      const snapshot = await alumniRef
-        .where('school', '==', 'CCWS')
-        .where('isVerified', '==', true)
-        .get();
-      list = snapshot.docs
-        .map((doc: QueryDocumentSnapshot) => doc.data());
-    } else if (school === 'CCIS') {
-      // CCIS displays data for both CCHS and CCWS, top 25 profiles each on page 1
-      const [cchsSnapshot, ccwsSnapshot] = await Promise.all([
-        alumniRef
-          .where('school', '==', 'CCHS')
-          .where('isVerified', '==', true)
-          .get(),
-        alumniRef
-          .where('school', '==', 'CCWS')
-          .where('isVerified', '==', true)
-          .get()
-      ]);
-
-      const cchsTop = cchsSnapshot.docs
-        .map((doc: QueryDocumentSnapshot) => doc.data())
-        .sort((a: { batch?: number }, b: { batch?: number }) => (b.batch || 0) - (a.batch || 0))
-        .slice(0, 25);
-      const ccwsTop = ccwsSnapshot.docs
-        .map((doc: QueryDocumentSnapshot) => doc.data())
-        .sort((a: { batch?: number }, b: { batch?: number }) => (b.batch || 0) - (a.batch || 0))
-        .slice(0, 25);
-      list = [...cchsTop, ...ccwsTop];
-    } else {
-      // Return all verified if no school parameter specified
-      const snapshot = await alumniRef
-        .where('isVerified', '==', true)
-        .get();
-      list = snapshot.docs
-        .map((doc: QueryDocumentSnapshot) => doc.data());
-    }
-
-    if (school !== 'CCIS') {
-      list.sort((a: { batch?: number }, b: { batch?: number }) => (b.batch || 0) - (a.batch || 0));
-    }
-
-    return list;
-  },
-  ['alumni-list-cache'],
-  { revalidate: 300, tags: ['alumni'] }
-);
 
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
     const school = searchParams.get('school'); // e.g. "CCHS", "CCWS", "CCIS"
 
-    const list = await getCachedAlumni(school);
+    // Check custom server-side in-memory cache first
+    const cachedList = getAlumniCache(school);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let list: any[] = [];
+
+    if (cachedList) {
+      list = cachedList;
+    } else {
+      const alumniRef = firestore.collection('alumni_profiles');
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      let fetchedList: any[] = [];
+
+      if (school === 'CCHS') {
+        const snapshot = await alumniRef
+          .where('school', '==', 'CCHS')
+          .where('isVerified', '==', true)
+          .get();
+        fetchedList = snapshot.docs
+          .map((doc: QueryDocumentSnapshot) => doc.data());
+      } else if (school === 'CCWS') {
+        const snapshot = await alumniRef
+          .where('school', '==', 'CCWS')
+          .where('isVerified', '==', true)
+          .get();
+        fetchedList = snapshot.docs
+          .map((doc: QueryDocumentSnapshot) => doc.data());
+      } else if (school === 'CCIS') {
+        // CCIS displays data for both CCHS and CCWS, top 25 profiles each on page 1
+        const [cchsSnapshot, ccwsSnapshot] = await Promise.all([
+          alumniRef
+            .where('school', '==', 'CCHS')
+            .where('isVerified', '==', true)
+            .get(),
+          alumniRef
+            .where('school', '==', 'CCWS')
+            .where('isVerified', '==', true)
+            .get()
+        ]);
+
+        const cchsTop = cchsSnapshot.docs
+          .map((doc: QueryDocumentSnapshot) => doc.data())
+          .sort((a: { batch?: number }, b: { batch?: number }) => (b.batch || 0) - (a.batch || 0))
+          .slice(0, 25);
+        const ccwsTop = ccwsSnapshot.docs
+          .map((doc: QueryDocumentSnapshot) => doc.data())
+          .sort((a: { batch?: number }, b: { batch?: number }) => (b.batch || 0) - (a.batch || 0))
+          .slice(0, 25);
+        fetchedList = [...cchsTop, ...ccwsTop];
+      } else {
+        // Return all verified if no school parameter specified
+        const snapshot = await alumniRef
+          .where('isVerified', '==', true)
+          .get();
+        fetchedList = snapshot.docs
+          .map((doc: QueryDocumentSnapshot) => doc.data());
+      }
+
+      if (school !== 'CCIS') {
+        fetchedList.sort((a: { batch?: number }, b: { batch?: number }) => (b.batch || 0) - (a.batch || 0));
+      }
+
+      setAlumniCache(school, fetchedList);
+      list = fetchedList;
+    }
 
     // Strip phone field from public view and ensure top-level avatar/avatarUrl fields exist for external consumer compatibility
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const publicList = list.map(({ phone, ...rest }) => {
-      const avUrl = (rest.user?.avatarUrl && rest.user.avatarUrl.startsWith('http'))
+      const avUrl = (rest.user?.avatarUrl && (rest.user.avatarUrl.startsWith('http') || rest.user.avatarUrl.startsWith('data:image/')))
         ? rest.user.avatarUrl
         : `https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=120`;
       return {
@@ -174,8 +176,8 @@ export async function POST(request: Request) {
       console.error('Failed to send registration email:', err);
     }
 
-    // Revalidate cache on new registration
-    revalidateTag('alumni');
+    // Invalidate custom in-memory cache
+    invalidateAlumniCache();
 
     const response = NextResponse.json({ success: true, profile: profileData });
     response.headers.set('Access-Control-Allow-Origin', '*');

@@ -27,14 +27,47 @@ const storage = getStorage(app);
  * @returns Promise resolving to the download URL
  */
 export async function uploadFileToStorage(file: File, path: string): Promise<string> {
-  // If the apiKey is the placeholder, simulate upload locally
+  // If the apiKey is the placeholder, simulate upload locally by converting to compressed Base64
   if (firebaseConfig.apiKey === "mock-api-key-placeholder") {
-    console.warn("Using mock Firebase configuration. Simulating file upload...");
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        const mockUrl = URL.createObjectURL(file);
-        resolve(mockUrl);
-      }, 1000);
+    console.warn("Using mock Firebase configuration. Converting to Base64...");
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          const maxDim = 256;
+          let width = img.width;
+          let height = img.height;
+
+          if (width > maxDim || height > maxDim) {
+            if (width > height) {
+              height = Math.round((height * maxDim) / width);
+              width = maxDim;
+            } else {
+              width = Math.round((width * maxDim) / height);
+              height = maxDim;
+            }
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          if (ctx) {
+            ctx.drawImage(img, 0, 0, width, height);
+            const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
+            resolve(dataUrl);
+          } else {
+            resolve(event.target?.result as string);
+          }
+        };
+        img.onerror = () => {
+          resolve(event.target?.result as string);
+        };
+        img.src = event.target?.result as string;
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
     });
   }
 
