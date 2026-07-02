@@ -142,6 +142,7 @@ export default function PublicAlumniPage() {
   });
 
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
   const handleAvatarUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -235,6 +236,7 @@ export default function PublicAlumniPage() {
 
   const handleSelfRegistration = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (submitting) return;
 
     if (regForm.linkedin) {
       const trimmed = regForm.linkedin.trim();
@@ -245,6 +247,7 @@ export default function PublicAlumniPage() {
       }
     }
 
+    setSubmitting(true);
     try {
       const res = await fetch("/api/alumni", {
         method: "POST",
@@ -253,7 +256,7 @@ export default function PublicAlumniPage() {
       });
       const json = await res.json();
       if (res.ok) {
-        showToast("Registration request received! Profiles are reviewed by admins.", "success");
+        showToast("Registration request received! Check your email to verify your address.", "success");
         setShowRegModal(false);
         setRegForm({
           name: "",
@@ -275,6 +278,8 @@ export default function PublicAlumniPage() {
       }
     } catch {
       showToast("Registration request error", "error");
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -1084,9 +1089,26 @@ export default function PublicAlumniPage() {
 
               <button 
                 type="submit"
-                className="w-full py-3.5 rounded-xl bg-maroon-700 hover:bg-maroon-800 text-xs font-bold text-white transition-all shadow-md uppercase tracking-wider focus:outline-none focus:ring-2 focus:ring-maroon-700/20 active:scale-[0.99] duration-150"
+                disabled={submitting || uploadingAvatar}
+                className={`w-full py-3.5 rounded-xl text-xs font-bold text-white transition-all shadow-md uppercase tracking-wider focus:outline-none focus:ring-2 focus:ring-maroon-700/20 active:scale-[0.99] duration-150 flex items-center justify-center gap-2 ${
+                  submitting || uploadingAvatar
+                    ? "bg-slate-400 cursor-not-allowed opacity-75"
+                    : "bg-maroon-700 hover:bg-maroon-800"
+                }`}
               >
-                Submit Registration Profile
+                {submitting ? (
+                  <>
+                    <svg className="animate-spin -ml-1 mr-3 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                    </svg>
+                    Submitting Profile...
+                  </>
+                ) : uploadingAvatar ? (
+                  "Uploading Photo..."
+                ) : (
+                  "Submit Registration Profile"
+                )}
               </button>
             </form>
           </div>
