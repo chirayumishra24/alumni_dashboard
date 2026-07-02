@@ -58,13 +58,13 @@ export async function sendEmail({ to, subject, text, html }: MailOptions) {
   }
 }
 
-export async function sendRegistrationEmail(toEmail: string, name: string, school: string) {
-  const subject = `Welcome to the CCGS Alumni Hub - Registration Received`;
+export async function sendRegistrationEmail(toEmail: string, name: string, school: string, verificationLink?: string) {
+  const subject = `Welcome to the CCGS Alumni Hub - Verify Your Email`;
   const text = `Dear ${name},
 
 Thank you for registering on the CCGS Alumni Hub portal for ${school}!
 
-We have received your registration details. A mentor or coordinator will review your profile shortly. Once your email and credentials are verified, we will activate your profile and publish it live on the school website directory.
+${verificationLink ? `To complete your registration, please verify your email address by clicking the link below:\n\n${verificationLink}\n\n` : ''}We have received your registration details. A mentor or coordinator will review your profile shortly after your email is verified. Once your email and credentials are verified, we will activate your profile and publish it live on the school website directory.
 
 If you have any questions, please reply to this email or reach out to us at support@skillizee.io.
 
@@ -72,17 +72,29 @@ Warm regards,
 CCGS Alumni Coordinator Team
 support@skillizee.io`;
 
-  const html = `<div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; rounded-lg">
-    <h2 style="color: #4f46e5; margin-bottom: 20px;">Registration Received!</h2>
+  const html = `<div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
+    <h2 style="color: #6b1d2f; margin-bottom: 20px; font-family: serif;">Verify Your Email Address</h2>
     <p>Dear <strong>${name}</strong>,</p>
     <p>Thank you for registering on the <strong>CCGS Alumni Hub</strong> portal for <strong>${school}</strong>!</p>
-    <p>We have received your registration details. A mentor or coordinator will review your profile shortly. Once your email and credentials are verified, we will activate your profile and publish it live on the school website directory.</p>
-    <p>If you have any questions, please reply directly to this email or contact us at <a href="mailto:support@skillizee.io" style="color: #4f46e5;">support@skillizee.io</a>.</p>
+    
+    ${verificationLink ? `
+    <p>Please click the button below to verify your email address and submit your profile for admin review:</p>
+    <div style="text-align: center; margin: 30px 0;">
+      <a href="${verificationLink}" style="background-color: #6b1d2f; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block; font-size: 0.9em; box-shadow: 0 4px 6px rgba(107, 29, 47, 0.15);">Verify Email Address</a>
+    </div>
+    <p style="font-size: 0.85em; color: #64748b; margin-bottom: 25px;">
+      If the button does not work, copy and paste this link into your browser: <br/>
+      <a href="${verificationLink}" style="color: #6b1d2f; word-break: break-all;">${verificationLink}</a>
+    </p>
+    ` : ''}
+    
+    <p>After verification, a school coordinator will review your profile. Once approved, your details will go live on the school platform directory.</p>
+    <p>If you have any questions, please reply directly to this email or contact us at <a href="mailto:support@skillizee.io" style="color: #6b1d2f;">support@skillizee.io</a>.</p>
     <br/>
-    <p style="margin-top: 20px; font-size: 0.9em; color: #64748b;">
+    <p style="margin-top: 20px; font-size: 0.9em; color: #64748b; border-t: 1px solid #f1f5f9; padding-top: 15px;">
       Warm regards,<br/>
       <strong>CCGS Alumni Coordinator Team</strong><br/>
-      <a href="mailto:support@skillizee.io" style="color: #64748b;">support@skillizee.io</a>
+      <a href="mailto:support@skillizee.io" style="color: #64748b; text-decoration: none;">support@skillizee.io</a>
     </p>
   </div>`;
 

@@ -150,6 +150,7 @@ export async function POST(request: Request) {
       city: city || 'Mumbai',
       skills,
       isVerified: false,
+      isEmailVerified: false, // Default isEmailVerified to false
       isMentor: false,
       profileComplete: bio ? 55 : 40,
       user: userData,
@@ -169,9 +170,13 @@ export async function POST(request: Request) {
       alumni: profileData
     });
 
+    // Construct dynamic verification link using request origin
+    const origin = new URL(request.url).origin;
+    const verificationLink = `${origin}/verify?id=${profileId}`;
+
     // Trigger automatic registration received email in background
     try {
-      await sendRegistrationEmail(email, name, school);
+      await sendRegistrationEmail(email, name, school, verificationLink);
     } catch (err) {
       console.error('Failed to send registration email:', err);
     }

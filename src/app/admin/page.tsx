@@ -32,6 +32,7 @@ interface AlumniProfile {
   profileComplete: number;
   school: string;
   isVerified: boolean;
+  isEmailVerified?: boolean;
   user: User;
   phone?: string;
   linkedin?: string;
@@ -791,6 +792,13 @@ support@skillizee.io`;
                               }`}>
                                 {alum.school}
                               </span>
+                              <span className={`px-1.5 py-0.5 rounded text-[8px] font-bold uppercase border ${
+                                alum.isEmailVerified
+                                  ? "bg-emerald-50 text-emerald-700 border-emerald-250"
+                                  : "bg-amber-50 text-amber-700 border-amber-250"
+                              }`}>
+                                {alum.isEmailVerified ? "Email Verified" : "Pending Verification"}
+                              </span>
                             </div>
                             <p className="text-xs text-slate-600 font-semibold">{alum.role || "Graduate"} @ {alum.company || "No Company"}</p>
                             <p className="text-[11px] text-slate-500 mt-0.5">
@@ -818,9 +826,15 @@ support@skillizee.io`;
                           
                           <button
                             onClick={() => handleVerifyAlumni(alum.id)}
-                            className="px-4 py-2 rounded-xl bg-maroon-600 hover:bg-maroon-700 text-xs font-bold text-white flex items-center gap-1.5 transition-all shadow-sm"
+                            disabled={!alum.isEmailVerified}
+                            className={`px-4 py-2 rounded-xl text-xs font-bold text-white flex items-center gap-1.5 transition-all shadow-sm ${
+                              alum.isEmailVerified
+                                ? "bg-maroon-600 hover:bg-maroon-700 active:scale-95 cursor-pointer"
+                                : "bg-slate-300 text-slate-500 cursor-not-allowed"
+                            }`}
+                            title={alum.isEmailVerified ? "Verify and publish profile" : "Awaiting student email verification"}
                           >
-                            <Check size={12} /> Verify & Activate
+                            <Check size={12} /> {alum.isEmailVerified ? "Verify & Activate" : "Awaiting Verification"}
                           </button>
 
                           <button
