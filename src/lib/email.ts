@@ -64,7 +64,9 @@ export async function sendRegistrationEmail(toEmail: string, name: string, schoo
 
 Thank you for registering on the CCGS Alumni Hub portal for ${school}!
 
-${verificationLink ? `To complete your registration, please verify your email address by clicking the link below:\n\n${verificationLink}\n\n` : ''}We have received your registration details. A mentor or coordinator will review your profile shortly after your email is verified. Once your email and credentials are verified, we will activate your profile and publish it live on the school website directory.
+We have received your registration details. We will reach out to you for email verification shortly.
+
+${verificationLink ? `You can also verify your email address directly by clicking the link below:\n\n${verificationLink}\n\n` : ''}Once your email and credentials are verified, we will activate your profile and publish it live on the school website directory.
 
 If you have any questions, please reply to this email or reach out to us at support@skillizee.io.
 
@@ -76,9 +78,10 @@ support@skillizee.io`;
     <h2 style="color: #6b1d2f; margin-bottom: 20px; font-family: serif;">Verify Your Email Address</h2>
     <p>Dear <strong>${name}</strong>,</p>
     <p>Thank you for registering on the <strong>CCGS Alumni Hub</strong> portal for <strong>${school}</strong>!</p>
+    <p>We have received your registration details. We will reach out to you for email verification shortly.</p>
     
     ${verificationLink ? `
-    <p>Please click the button below to verify your email address and submit your profile for admin review:</p>
+    <p>You can also verify your email address directly by clicking the button below:</p>
     <div style="text-align: center; margin: 30px 0;">
       <a href="${verificationLink}" style="background-color: #6b1d2f; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block; font-size: 0.9em; box-shadow: 0 4px 6px rgba(107, 29, 47, 0.15);">Verify Email Address</a>
     </div>
@@ -88,7 +91,7 @@ support@skillizee.io`;
     </p>
     ` : ''}
     
-    <p>After verification, a school coordinator will review your profile. Once approved, your details will go live on the school platform directory.</p>
+    <p>Once approved, your details will go live on the school platform directory.</p>
     <p>If you have any questions, please reply directly to this email or contact us at <a href="mailto:support@skillizee.io" style="color: #6b1d2f;">support@skillizee.io</a>.</p>
     <br/>
     <p style="margin-top: 20px; font-size: 0.9em; color: #64748b; border-t: 1px solid #f1f5f9; padding-top: 15px;">
