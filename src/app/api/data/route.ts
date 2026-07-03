@@ -8,12 +8,13 @@ export const dynamic = 'force-dynamic';
 
 export async function GET() {
   try {
-    const [alumniSnap, studentsSnap, mentorshipSnap, eventsSnap, widgetsSnap] = await Promise.all([
+    const [alumniSnap, studentsSnap, mentorshipSnap, eventsSnap, widgetsSnap, rsvpsSnap] = await Promise.all([
       firestore.collection('alumni_profiles').get(),
       firestore.collection('student_profiles').get(),
       firestore.collection('mentorship_connections').get(),
       firestore.collection('events').get(),
-      firestore.collection('widget_testimonials').get()
+      firestore.collection('widget_testimonials').get(),
+      firestore.collection('event_rsvps').get()
     ]);
 
     const alumni = alumniSnap.docs.map((doc: QueryDocumentSnapshot) => doc.data());
@@ -26,13 +27,15 @@ export async function GET() {
       .sort((a: { eventDate: string }, b: { eventDate: string }) => new Date(a.eventDate).getTime() - new Date(b.eventDate).getTime());
 
     const widgets = widgetsSnap.docs.map((doc: QueryDocumentSnapshot) => doc.data());
+    const eventRsvps = rsvpsSnap.docs.map((doc: QueryDocumentSnapshot) => doc.data());
 
     return NextResponse.json({
       alumni,
       students,
       mentorships,
       events,
-      widgets
+      widgets,
+      eventRsvps
     });
   } catch (error) {
     console.error('Firestore API GET error: ', error);
@@ -72,6 +75,10 @@ export async function POST(request: Request) {
       const studentData = studentDoc.data();
       const alumniData = alumniDoc.data();
 
+      if (!alumniData?.isVerified || !alumniData?.isMentor) {
+        return NextResponse.json({ error: 'Selected alumni profile is not available for mentorship' }, { status: 400 });
+      }
+
       const connectionRef = firestore.collection('mentorship_connections').doc();
       const connectionData = {
         id: connectionRef.id,
@@ -80,6 +87,10 @@ export async function POST(request: Request) {
         notes,
         status: 'PENDING',
         createdAt: new Date().toISOString(),
+        scheduledAt: null,
+        meetingUrl: null,
+        meetingPlatform: null,
+        scheduledBy: null,
         student: studentData,
         alumni: alumniData
       };
@@ -133,13 +144,21 @@ export async function PATCH(request: Request) {
         return NextResponse.json({ success: true });
       }
 
+      if (!['PENDING', 'SCHEDULED', 'DECLINED', 'COMPLETED', 'ACCEPTED'].includes(status)) {
+        return NextResponse.json({ error: 'Invalid mentorship status' }, { status: 400 });
+      }
+
       const connectionDoc = await connectionRef.get();
       if (!connectionDoc.exists) {
         return NextResponse.json({ error: 'Connection not found' }, { status: 404 });
       }
 
-      await connectionRef.update({ status });
+      await connectionRef.update({
+        status,
+        updatedAt: new Date().toISOString()
+      });
       const updated = (await connectionRef.get()).data();
+      invalidateAlumniCache();
       return NextResponse.json({ success: true, connection: updated });
     }
 

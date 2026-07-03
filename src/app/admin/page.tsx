@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { 
   Users, Calendar, Star, MapPin, Check, X, Sparkles, Send, 
-  RefreshCw, UserCheck, Filter, Mail, Copy, PlusCircle, ShieldCheck, Search, Trash2
+  RefreshCw, UserCheck, Filter, Mail, Copy, PlusCircle, ShieldCheck, Search, Trash2, Video
 } from "lucide-react";
 import { uploadFileToStorage } from "@/lib/firebase";
 import LoginGate from "@/components/LoginGate";
@@ -62,6 +62,10 @@ interface Mentorship {
   status: string;
   notes: string | null;
   createdAt: string;
+  scheduledAt?: string | null;
+  meetingUrl?: string | null;
+  meetingPlatform?: string | null;
+  scheduledBy?: string | null;
   student: StudentProfile;
   alumni: AlumniProfile;
 }
@@ -74,7 +78,21 @@ interface Event {
   location: string;
   meetingUrl: string | null;
   bannerUrl: string | null;
+  invitationsSentAt?: string | null;
 }
+
+interface EventRsvp {
+  id: string;
+  eventId: string;
+  alumniProfileId: string;
+  alumniName: string;
+  alumniEmail: string;
+  alumniSchool: string;
+  response: "PENDING" | "ACCEPTED" | "DECLINED";
+  respondedAt: string | null;
+  sentAt: string;
+}
+
 
 interface WidgetSpeak {
   id: string;
@@ -82,6 +100,38 @@ interface WidgetSpeak {
   quote: string;
   isApproved: boolean;
   alumni: AlumniProfile;
+}
+
+const mentorshipStatusStyles: Record<string, string> = {
+  PENDING: "bg-amber-50 text-amber-705 border-amber-200",
+  ACCEPTED: "bg-amber-50 text-amber-705 border-amber-200",
+  SCHEDULED: "bg-emerald-50 text-emerald-700 border-emerald-200",
+  DECLINED: "bg-rose-50 text-rose-700 border-rose-200",
+  COMPLETED: "bg-slate-100 text-slate-600 border-slate-200",
+};
+
+function getMentorshipStatusClass(status: string) {
+  return mentorshipStatusStyles[status] || "bg-slate-100 text-slate-600 border-slate-200";
+}
+
+function getMentorshipStatusLabel(status: string) {
+  return status === "ACCEPTED" ? "PENDING SCHEDULE" : status;
+}
+
+function isSchedulableMentorship(status: string) {
+  return status === "PENDING" || status === "ACCEPTED";
+}
+
+function formatMentorshipDate(value?: string | null) {
+  if (!value) return "Not scheduled";
+  return new Date(value).toLocaleString("en-IN", {
+    timeZone: "Asia/Kolkata",
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
 }
 
 export default function AdminPage() {
@@ -99,6 +149,7 @@ function AdminDashboardContent() {
     mentorships: Mentorship[];
     events: Event[];
     widgets: WidgetSpeak[];
+    eventRsvps: EventRsvp[];
   } | null>(null);
 
   const [loading, setLoading] = useState(true);
@@ -111,6 +162,21 @@ function AdminDashboardContent() {
   const [adminSchoolFilter, setAdminSchoolFilter] = useState<string>("All");
   const [studentSchoolFilter, setStudentSchoolFilter] = useState<string>("All");
   const [searchQuery, setSearchQuery] = useState("");
+  const [mentorSearchQuery, setMentorSearchQuery] = useState("");
+  const [mentorCompanyFilter, setMentorCompanyFilter] = useState("All");
+  const [mentorshipPanel, setMentorshipPanel] = useState<"PENDING" | "SCHEDULED" | "CLOSED">("PENDING");
+
+  // Create Event Form State
+  const [eventForm, setEventForm] = useState({
+    title: "",
+    description: "",
+    eventDate: "",
+    location: "",
+    meetingUrl: "",
+    bannerUrl: ""
+  });
+  const [creatingEvent, setCreatingEvent] = useState(false);
+  const [sendingInvitesMap, setSendingInvitesMap] = useState<{[eventId: string]: boolean}>({});
 
   // Email Draft Modal State
   const [draftEmailTarget, setDraftEmailTarget] = useState<AlumniProfile | null>(null);
@@ -161,6 +227,14 @@ function AdminDashboardContent() {
   const [pref2Country, setPref2Country] = useState("India");
   const [mentorshipNote, setMentorshipNote] = useState("");
   const [requestingMentorId, setRequestingMentorId] = useState<string | null>(null);
+  const [scheduleTarget, setScheduleTarget] = useState<Mentorship | null>(null);
+  const [scheduleForm, setScheduleForm] = useState({
+    scheduledAt: "",
+    meetingPlatform: "Zoom",
+    meetingUrl: ""
+  });
+  const [schedulingMentorship, setSchedulingMentorship] = useState(false);
+  const [updatingMentorshipId, setUpdatingMentorshipId] = useState<string | null>(null);
 
   // File upload state for Firebase Storage
   const [uploadingFile, setUploadingFile] = useState(false);
@@ -198,8 +272,13 @@ function AdminDashboardContent() {
     setTimeout(() => setToast(null), 4000);
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     sessionStorage.removeItem("admin_authenticated");
+    try {
+      await fetch("/api/auth", { method: "DELETE" });
+    } catch {
+      // The local session is cleared even if the server logout request fails.
+    }
     window.location.reload();
   };
 
@@ -225,8 +304,10 @@ function AdminDashboardContent() {
     }
   };
 
-  // Perform mentorship response action (Accept / Decline)
-  const handleMentorshipAction = async (id: string, status: "ACCEPTED" | "DECLINED") => {
+  // Perform coordinator mentorship status actions
+  const handleMentorshipAction = async (id: string, status: "DECLINED" | "COMPLETED" | "PENDING") => {
+    if (updatingMentorshipId) return;
+    setUpdatingMentorshipId(id);
     try {
       const res = await fetch("/api/data", {
         method: "PATCH",
@@ -234,13 +315,75 @@ function AdminDashboardContent() {
         body: JSON.stringify({ action: "updateMentorshipStatus", id, status }),
       });
       if (res.ok) {
-        showToast(`Request ${status.toLowerCase()} successfully`, "success");
+        showToast(`Mentorship marked ${status.toLowerCase()}`, "success");
         fetchData();
       } else {
         showToast("Failed to update status", "error");
       }
     } catch {
       showToast("Action error", "error");
+    } finally {
+      setUpdatingMentorshipId(null);
+    }
+  };
+
+  const openScheduleDialog = (request: Mentorship) => {
+    setScheduleTarget(request);
+    setScheduleForm({
+      scheduledAt: "",
+      meetingPlatform: "Zoom",
+      meetingUrl: ""
+    });
+  };
+
+  const handleScheduleMentorship = async (event: React.FormEvent) => {
+    event.preventDefault();
+    if (!scheduleTarget || schedulingMentorship) return;
+
+    const scheduledDate = new Date(scheduleForm.scheduledAt);
+    if (!scheduleForm.scheduledAt || Number.isNaN(scheduledDate.getTime()) || scheduledDate.getTime() <= Date.now()) {
+      showToast("Choose a future date and time", "error");
+      return;
+    }
+
+    try {
+      const meetingUrl = new URL(scheduleForm.meetingUrl.trim());
+      if (meetingUrl.protocol !== "https:") {
+        showToast("Meeting URL must start with https://", "error");
+        return;
+      }
+    } catch {
+      showToast("Enter a valid meeting URL", "error");
+      return;
+    }
+
+    setSchedulingMentorship(true);
+    try {
+      const res = await fetch("/api/mentorships/schedule", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          connectionId: scheduleTarget.id,
+          scheduledAt: scheduledDate.toISOString(),
+          meetingUrl: scheduleForm.meetingUrl.trim(),
+          meetingPlatform: scheduleForm.meetingPlatform
+        })
+      });
+      const json = await res.json();
+
+      if (res.ok) {
+        const emailResults = json.emails;
+        const allEmailsSent = emailResults?.mentor?.success && emailResults?.student?.success;
+        showToast(allEmailsSent ? "Call scheduled and emails sent" : "Call scheduled, but one email failed", allEmailsSent ? "success" : "error");
+        setScheduleTarget(null);
+        fetchData();
+      } else {
+        showToast(json.error || "Failed to schedule call", "error");
+      }
+    } catch {
+      showToast("Scheduling request error", "error");
+    } finally {
+      setSchedulingMentorship(false);
     }
   };
 
@@ -563,6 +706,40 @@ support@skillizee.io`;
     return score;
   };
 
+  const mentorshipRequests = data?.mentorships || [];
+  const pendingMentorships = mentorshipRequests.filter(m => isSchedulableMentorship(m.status));
+  const scheduledMentorships = mentorshipRequests.filter(m => m.status === "SCHEDULED");
+  const closedMentorships = mentorshipRequests.filter(m => m.status === "DECLINED" || m.status === "COMPLETED");
+  const mentorshipPanelItems = mentorshipPanel === "PENDING"
+    ? pendingMentorships
+    : mentorshipPanel === "SCHEDULED"
+    ? scheduledMentorships
+    : closedMentorships;
+  const mentorCompanyOptions = Array.from(new Set(
+    verifiedAlumniList
+      .filter(a => a.isMentor && a.company?.trim())
+      .map(a => a.company!.trim())
+  )).sort((a, b) => a.localeCompare(b));
+  const normalizedMentorSearch = mentorSearchQuery.trim().toLowerCase();
+  const studentMentorMatches = (activeStudent ? verifiedAlumniList : [])
+    .filter(a => a.isMentor)
+    .filter(a => studentSchoolFilter === "All" || a.school === studentSchoolFilter)
+    .filter(a => mentorCompanyFilter === "All" || (a.company || "").trim() === mentorCompanyFilter)
+    .filter(a => {
+      if (!normalizedMentorSearch) return true;
+      return [
+        a.user.name,
+        a.role,
+        a.company,
+        a.skills
+      ].some(value => (value || "").toLowerCase().includes(normalizedMentorSearch));
+    })
+    .map((alum) => ({
+      alum,
+      score: activeStudent ? getMatchingScore(alum, activeStudent) : 0
+    }))
+    .sort((a, b) => b.score - a.score);
+
   return (
     <div className="min-h-screen executive-mesh-bg text-slate-800 font-sans flex flex-col lg:flex-row lg:p-6 lg:gap-6 overflow-x-hidden selection:bg-maroon-600 selection:text-white grid-bg relative">
 
@@ -575,6 +752,83 @@ support@skillizee.io`;
         }`}>
           <Sparkles size={18} className={toast.type === "success" ? "text-emerald-600" : "text-rose-600"} />
           <span className="text-sm font-semibold">{toast.message}</span>
+        </div>
+      )}
+
+      {scheduleTarget && (
+        <div className="fixed inset-0 z-[9998] flex items-center justify-center bg-slate-900/30 backdrop-blur-sm p-4">
+          <div className="w-full max-w-lg rounded-3xl glass-panel p-6 shadow-2xl animate-fade-in">
+            <div className="mb-5 flex items-start justify-between gap-4">
+              <div>
+                <h2 className="text-base font-extrabold text-slate-900">Schedule Mentorship Call</h2>
+                <p className="mt-1 text-xs text-slate-500">
+                  {scheduleTarget.student.user.name} with {scheduleTarget.alumni.user.name}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setScheduleTarget(null)}
+                className="h-8 w-8 rounded-xl border border-slate-200 bg-white/40 text-slate-500 hover:text-slate-800 flex items-center justify-center"
+                disabled={schedulingMentorship}
+              >
+                <X size={16} />
+              </button>
+            </div>
+
+            <form onSubmit={handleScheduleMentorship} className="space-y-4">
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Date & Time</label>
+                <input
+                  type="datetime-local"
+                  required
+                  value={scheduleForm.scheduledAt}
+                  onChange={(e) => setScheduleForm(prev => ({ ...prev, scheduledAt: e.target.value }))}
+                  className="w-full glass-input rounded-xl px-4 py-3 text-xs text-slate-800 focus:outline-none"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Platform</label>
+                  <select
+                    value={scheduleForm.meetingPlatform}
+                    onChange={(e) => setScheduleForm(prev => ({ ...prev, meetingPlatform: e.target.value }))}
+                    className="w-full glass-input rounded-xl px-4 py-3 text-xs text-slate-800 focus:outline-none"
+                  >
+                    <option>Zoom</option>
+                    <option>Google Meet</option>
+                    <option>Microsoft Teams</option>
+                    <option>Other</option>
+                  </select>
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Meeting URL</label>
+                  <input
+                    type="url"
+                    required
+                    value={scheduleForm.meetingUrl}
+                    onChange={(e) => setScheduleForm(prev => ({ ...prev, meetingUrl: e.target.value }))}
+                    placeholder="https://meet.google.com/..."
+                    className="w-full glass-input rounded-xl px-4 py-3 text-xs text-slate-800 focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              <div className="rounded-2xl border border-white/50 bg-white/25 p-4 text-xs text-slate-600">
+                <span className="font-bold text-slate-800">Student note:</span> &quot;{scheduleTarget.notes || "No note provided"}&quot;
+              </div>
+
+              <button
+                type="submit"
+                disabled={schedulingMentorship}
+                className="w-full h-11 rounded-xl bg-violet-600 hover:bg-violet-700 text-xs font-bold text-white transition-all flex items-center justify-center gap-2 disabled:opacity-70"
+              >
+                {schedulingMentorship ? <RefreshCw size={14} className="animate-spin" /> : <Calendar size={14} />}
+                {schedulingMentorship ? "Scheduling..." : "Schedule & Send Emails"}
+              </button>
+            </form>
+          </div>
         </div>
       )}
 
@@ -717,9 +971,9 @@ support@skillizee.io`;
                     <Star size={20} />
                   </div>
                   <h3 className="mt-4 text-3xl font-extrabold text-slate-900">
-                    {data?.mentorships.filter(m => m.status === "ACCEPTED" && (adminSchoolFilter === "All" || m.alumni.school === adminSchoolFilter)).length || 0}
+                    {data?.mentorships.filter(m => ["SCHEDULED", "COMPLETED"].includes(m.status) && (adminSchoolFilter === "All" || m.alumni.school === adminSchoolFilter)).length || 0}
                   </h3>
-                  <p className="text-xs text-slate-500 font-semibold mt-1">Active Mentorship Matches</p>
+                  <p className="text-xs text-slate-500 font-semibold mt-1">Scheduled Mentorship Calls</p>
                 </div>
 
                 <div className="glass-card p-6 relative overflow-hidden group shadow-lg">
@@ -1055,54 +1309,423 @@ support@skillizee.io`;
           {currentTab === "MENTORSHIPS" && (
             <div className="space-y-6 animate-fade-in">
               <div className="rounded-3xl glass-panel p-8 shadow-lg">
-                <h2 className="text-sm font-bold text-slate-900 mb-2">Mentorship Connections & Inquiries</h2>
-                <p className="text-xs text-slate-500 mb-6">Overview of student-to-alumni mentor matchmaking and request status.</p>
+                <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+                  <div>
+                    <h2 className="text-sm font-bold text-slate-900 mb-2">Mentorship Workflow Manager</h2>
+                    <p className="text-xs text-slate-500">Schedule calls after offline coordination and close records after completion.</p>
+                  </div>
 
-                <div className="overflow-x-auto">
-                  <table className="w-full text-left text-xs">
-                    <thead>
-                      <tr className="border-b border-slate-200 text-slate-400 font-bold uppercase tracking-wider">
-                        <th className="pb-3">Student Mentee</th>
-                        <th className="pb-3">Target Mentor</th>
-                        <th className="pb-3">Initial Inquiry Note</th>
-                        <th className="pb-3">Date Requested</th>
-                        <th className="pb-3 text-center">Status</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-100">
-                      {data?.mentorships.length === 0 ? (
-                        <tr>
-                          <td colSpan={5} className="py-8 text-center text-slate-500">No mentorship connections initiated yet.</td>
-                        </tr>
-                      ) : (
-                        data?.mentorships.map((req) => (
-                          <tr key={req.id} className="text-slate-700 hover:bg-slate-50/50">
-                            <td className="py-4 font-bold text-slate-900">
-                              <div>{req.student.user.name}</div>
-                              <div className="text-[10px] font-normal text-slate-400 mt-0.5">{req.student.program} (Expected {req.student.batch})</div>
-                            </td>
-                            <td className="py-4 font-bold text-slate-900">
-                              <div>{req.alumni.user.name}</div>
-                              <div className="text-[10px] font-normal text-slate-400 mt-0.5">{req.alumni.school} ({req.alumni.role})</div>
-                            </td>
-                            <td className="py-4 max-w-xs truncate italic text-slate-500">&quot;{req.notes}&quot;</td>
-                            <td className="py-4 text-slate-500">{new Date(req.createdAt).toLocaleDateString()}</td>
-                            <td className="py-4 text-center">
-                              <span className={`px-2.5 py-1 rounded-full text-[9px] font-bold border ${
-                                req.status === "ACCEPTED" 
-                                  ? "bg-emerald-50 text-emerald-700 border-emerald-200" 
-                                  : req.status === "DECLINED" 
-                                  ? "bg-rose-50 text-rose-700 border-rose-200"
-                                  : "bg-amber-50 text-amber-705 border-amber-200"
-                              }`}>
-                                {req.status}
-                              </span>
-                            </td>
-                          </tr>
-                        ))
-                      )}
-                    </tbody>
-                  </table>
+                  <div className="flex flex-wrap gap-2">
+                    {[
+                      { id: "PENDING" as const, label: "Pending Calls", count: pendingMentorships.length },
+                      { id: "SCHEDULED" as const, label: "Scheduled Calls", count: scheduledMentorships.length },
+                      { id: "CLOSED" as const, label: "Closed", count: closedMentorships.length },
+                    ].map(item => (
+                      <button
+                        key={item.id}
+                        onClick={() => setMentorshipPanel(item.id)}
+                        className={`px-3.5 py-2 rounded-xl text-[10px] font-bold border transition-all ${
+                          mentorshipPanel === item.id
+                            ? "bg-white text-slate-900 border-slate-200 shadow-sm"
+                            : "bg-white/20 text-slate-500 border-white/60 hover:text-slate-800"
+                        }`}
+                      >
+                        {item.label} ({item.count})
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  {mentorshipPanelItems.length === 0 ? (
+                    <div className="rounded-2xl border border-dashed border-slate-200 bg-slate-50/50 py-12 text-center text-xs font-semibold text-slate-400">
+                      No mentorship requests in this panel.
+                    </div>
+                  ) : (
+                    mentorshipPanelItems.map((req) => {
+                      const isUpdating = updatingMentorshipId === req.id;
+                      return (
+                        <div key={req.id} className="glass-card p-5 shadow-sm space-y-4">
+                          <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 flex-1">
+                              <div className="flex items-center gap-3">
+                                <img src={req.student.user.avatarUrl || ""} className="h-11 w-11 rounded-xl border border-slate-200" alt="student avatar" />
+                                <div>
+                                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Student</span>
+                                  <h3 className="text-sm font-extrabold text-slate-900">{req.student.user.name}</h3>
+                                  <p className="text-[11px] text-slate-500">{req.student.program} | Expected {req.student.batch}</p>
+                                </div>
+                              </div>
+
+                              <div className="flex items-center gap-3">
+                                <img src={req.alumni.user.avatarUrl || ""} className="h-11 w-11 rounded-xl border border-slate-200" alt="mentor avatar" />
+                                <div>
+                                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Mentor</span>
+                                  <h3 className="text-sm font-extrabold text-slate-900">{req.alumni.user.name}</h3>
+                                  <p className="text-[11px] text-slate-500">{req.alumni.role || "Alumnus"} @ {req.alumni.company || "N/A"}</p>
+                                </div>
+                              </div>
+                            </div>
+
+                            <span className={`self-start px-2.5 py-1 rounded-full text-[9px] font-bold border ${getMentorshipStatusClass(req.status)}`}>
+                              {getMentorshipStatusLabel(req.status)}
+                            </span>
+                          </div>
+
+                          <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 text-xs">
+                            <div className="rounded-xl bg-white/25 border border-white/50 p-3">
+                              <span className="block text-[10px] font-bold uppercase tracking-wider text-slate-400">Request Note</span>
+                              <p className="mt-1 text-slate-600 italic line-clamp-2">&quot;{req.notes || "No note provided"}&quot;</p>
+                            </div>
+                            <div className="rounded-xl bg-white/25 border border-white/50 p-3">
+                              <span className="block text-[10px] font-bold uppercase tracking-wider text-slate-400">Requested</span>
+                              <p className="mt-1 font-bold text-slate-700">{new Date(req.createdAt).toLocaleDateString()}</p>
+                            </div>
+                            <div className="rounded-xl bg-white/25 border border-white/50 p-3">
+                              <span className="block text-[10px] font-bold uppercase tracking-wider text-slate-400">Scheduled</span>
+                              <p className="mt-1 font-bold text-slate-700">{formatMentorshipDate(req.scheduledAt)}</p>
+                            </div>
+                          </div>
+
+                          <div className="flex flex-wrap items-center gap-2">
+                            {isSchedulableMentorship(req.status) && (
+                              <>
+                                <button
+                                  onClick={() => openScheduleDialog(req)}
+                                  disabled={isUpdating}
+                                  className="h-9 px-3.5 rounded-xl bg-violet-600 hover:bg-violet-700 text-xs font-bold text-white flex items-center gap-1.5 transition-all disabled:opacity-60"
+                                >
+                                  <Calendar size={13} /> Schedule Call
+                                </button>
+                                <button
+                                  onClick={() => handleMentorshipAction(req.id, "DECLINED")}
+                                  disabled={isUpdating}
+                                  className="h-9 px-3.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-xs font-bold text-rose-700 border border-rose-100 flex items-center gap-1.5 transition-all disabled:opacity-60"
+                                >
+                                  {isUpdating ? <RefreshCw size={13} className="animate-spin" /> : <X size={13} />} Decline
+                                </button>
+                              </>
+                            )}
+
+                            {req.status === "SCHEDULED" && (
+                              <>
+                                {req.meetingUrl && (
+                                  <a
+                                    href={req.meetingUrl}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="h-9 px-3.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-xs font-bold text-emerald-700 border border-emerald-100 flex items-center gap-1.5 transition-all"
+                                  >
+                                    <Video size={13} /> Join Link
+                                  </a>
+                                )}
+                                <button
+                                  onClick={() => handleMentorshipAction(req.id, "COMPLETED")}
+                                  disabled={isUpdating}
+                                  className="h-9 px-3.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-xs font-bold text-white flex items-center gap-1.5 transition-all disabled:opacity-60"
+                                >
+                                  {isUpdating ? <RefreshCw size={13} className="animate-spin" /> : <Check size={13} />} Mark Completed
+                                </button>
+                              </>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* ================= TAB: EVENTS ================= */}
+          {currentTab === "EVENTS" && (
+            <div className="space-y-6 animate-fade-in">
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+                {/* Form to Create Event */}
+                <div className="lg:col-span-1 rounded-3xl glass-panel p-6 shadow-lg h-fit space-y-4">
+                  <div>
+                    <h2 className="text-sm font-bold text-slate-900">Host New Event</h2>
+                    <p className="text-xs text-slate-500 mt-1">Add details below to publish and invite verified alumni.</p>
+                  </div>
+
+                  <form onSubmit={async (e) => {
+                    e.preventDefault();
+                    if (creatingEvent) return;
+                    setCreatingEvent(true);
+                    try {
+                      const res = await fetch("/api/events", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify(eventForm)
+                      });
+                      if (res.ok) {
+                        showToast("Event created successfully!", "success");
+                        setEventForm({
+                          title: "",
+                          description: "",
+                          eventDate: "",
+                          location: "",
+                          meetingUrl: "",
+                          bannerUrl: ""
+                        });
+                        fetchData();
+                      } else {
+                        showToast("Failed to create event", "error");
+                      }
+                    } catch {
+                      showToast("Error creating event", "error");
+                    } finally {
+                      setCreatingEvent(false);
+                    }
+                  }} className="space-y-3">
+                    <div className="space-y-1">
+                      <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Event Title</label>
+                      <input
+                        type="text"
+                        required
+                        value={eventForm.title}
+                        onChange={(e) => setEventForm(prev => ({ ...prev, title: e.target.value }))}
+                        placeholder="e.g. Navigating Careers in Tech"
+                        className="w-full glass-input rounded-xl px-3.5 py-2 text-xs text-slate-800 placeholder-slate-400 focus:outline-none font-medium"
+                      />
+                    </div>
+
+                    <div className="space-y-1">
+                      <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Description</label>
+                      <textarea
+                        required
+                        rows={3}
+                        value={eventForm.description}
+                        onChange={(e) => setEventForm(prev => ({ ...prev, description: e.target.value }))}
+                        placeholder="Detail the agenda, speakers, and goals..."
+                        className="w-full glass-input rounded-xl px-3.5 py-2 text-xs text-slate-800 placeholder-slate-400 focus:outline-none font-medium"
+                      />
+                    </div>
+
+                    <div className="space-y-1">
+                      <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Date & Time</label>
+                      <input
+                        type="datetime-local"
+                        required
+                        value={eventForm.eventDate}
+                        onChange={(e) => setEventForm(prev => ({ ...prev, eventDate: e.target.value }))}
+                        className="w-full glass-input rounded-xl px-3.5 py-2 text-xs text-slate-800 focus:outline-none font-medium"
+                      />
+                    </div>
+
+                    <div className="space-y-1">
+                      <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Location / Platform</label>
+                      <input
+                        type="text"
+                        required
+                        value={eventForm.location}
+                        onChange={(e) => setEventForm(prev => ({ ...prev, location: e.target.value }))}
+                        placeholder="e.g. Online Zoom or Seminar Hall 1"
+                        className="w-full glass-input rounded-xl px-3.5 py-2 text-xs text-slate-800 placeholder-slate-400 focus:outline-none font-medium"
+                      />
+                    </div>
+
+                    <div className="space-y-1">
+                      <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Meeting URL (Optional)</label>
+                      <input
+                        type="url"
+                        value={eventForm.meetingUrl}
+                        onChange={(e) => setEventForm(prev => ({ ...prev, meetingUrl: e.target.value }))}
+                        placeholder="https://zoom.us/j/..."
+                        className="w-full glass-input rounded-xl px-3.5 py-2 text-xs text-slate-800 placeholder-slate-400 focus:outline-none font-medium"
+                      />
+                    </div>
+
+                    <div className="space-y-1">
+                      <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Banner Image URL (Optional)</label>
+                      <input
+                        type="url"
+                        value={eventForm.bannerUrl}
+                        onChange={(e) => setEventForm(prev => ({ ...prev, bannerUrl: e.target.value }))}
+                        placeholder="https://images.unsplash.com/..."
+                        className="w-full glass-input rounded-xl px-3.5 py-2 text-xs text-slate-800 placeholder-slate-400 focus:outline-none font-medium"
+                      />
+                    </div>
+
+                    <button
+                      type="submit"
+                      disabled={creatingEvent}
+                      className="w-full py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-xs font-bold text-white transition-all flex items-center justify-center gap-2"
+                    >
+                      {creatingEvent ? <RefreshCw size={12} className="animate-spin" /> : <PlusCircle size={14} />}
+                      Create Event
+                    </button>
+                  </form>
+                </div>
+
+                {/* Events list and analytics */}
+                <div className="lg:col-span-2 space-y-6">
+                  {data?.events.length === 0 ? (
+                    <div className="rounded-3xl glass-panel p-12 text-center text-slate-500 shadow-lg">
+                      <Calendar size={48} className="mx-auto text-slate-300 mb-3" />
+                      <h3 className="font-bold text-sm text-slate-850">No Events Scheduled</h3>
+                      <p className="text-xs text-slate-400 mt-1">Host a new event on the left panel to begin.</p>
+                    </div>
+                  ) : (
+                    data?.events.map((event) => {
+                      const rsvpsForEvent = data?.eventRsvps?.filter(r => r.eventId === event.id) || [];
+                      const accepted = rsvpsForEvent.filter(r => r.response === 'ACCEPTED');
+                      const declined = rsvpsForEvent.filter(r => r.response === 'DECLINED');
+                      const pending = rsvpsForEvent.filter(r => r.response === 'PENDING');
+
+                      const totalResponded = accepted.length + declined.length;
+                      const acceptanceRate = totalResponded > 0
+                        ? Math.round((accepted.length / totalResponded) * 100)
+                        : 0;
+
+                      const isSending = sendingInvitesMap[event.id] || false;
+
+                      return (
+                        <div key={event.id} className="rounded-3xl glass-panel p-6 shadow-md relative overflow-hidden flex flex-col md:flex-row gap-6">
+                          {event.bannerUrl && (
+                            <div className="w-full md:w-32 h-32 rounded-2xl overflow-hidden shrink-0 border border-slate-200 shadow-inner">
+                              <img src={event.bannerUrl} alt="Banner" className="w-full h-full object-cover" />
+                            </div>
+                          )}
+
+                          <div className="flex-1 space-y-4">
+                            <div>
+                              <div className="flex items-center gap-2 flex-wrap">
+                                <span className="px-2 py-0.5 rounded-full text-[9px] font-bold bg-violet-50 text-violet-605 border border-violet-100">
+                                  {new Date(event.eventDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
+                                </span>
+                                {event.meetingUrl && (
+                                  <a href={event.meetingUrl} target="_blank" rel="noopener noreferrer" className="px-2 py-0.5 rounded-full text-[9px] font-bold bg-emerald-50 text-emerald-605 border border-emerald-100 flex items-center gap-1">
+                                    <Video size={10} /> Launch Link
+                                  </a>
+                                )}
+                              </div>
+                              <h3 className="text-base font-extrabold text-slate-900 mt-1">{event.title}</h3>
+                              <p className="text-xs text-slate-500 font-medium mt-1 leading-relaxed">{event.description}</p>
+                              <p className="text-[10px] text-slate-400 mt-2 font-bold flex items-center gap-1">
+                                <MapPin size={12} /> {event.location}
+                              </p>
+                            </div>
+
+                            <div className="flex flex-wrap gap-2.5 items-center">
+                              {!event.invitationsSentAt ? (
+                                <button
+                                  onClick={async () => {
+                                    setSendingInvitesMap(prev => ({ ...prev, [event.id]: true }));
+                                    try {
+                                      const res = await fetch("/api/events", {
+                                        method: "PATCH",
+                                        headers: { "Content-Type": "application/json" },
+                                        body: JSON.stringify({
+                                          action: "sendInvitations",
+                                          eventId: event.id,
+                                          schoolFilter: adminSchoolFilter
+                                        })
+                                      });
+                                      if (res.ok) {
+                                        const json = await res.json();
+                                        showToast(`Invitations sent to ${json.sentCount} alumni!`, "success");
+                                        fetchData();
+                                      } else {
+                                        showToast("Failed to send invitations", "error");
+                                      }
+                                    } catch {
+                                      showToast("Error dispatching invitations", "error");
+                                    } finally {
+                                      setSendingInvitesMap(prev => ({ ...prev, [event.id]: false }));
+                                    }
+                                  }}
+                                  disabled={isSending}
+                                  className="px-3.5 py-1.5 rounded-xl bg-violet-600 hover:bg-violet-700 text-[10px] font-bold text-white transition-all flex items-center gap-1.5"
+                                >
+                                  {isSending ? <RefreshCw size={10} className="animate-spin" /> : <Send size={10} />}
+                                  {isSending ? "Sending..." : "Send Invitations"}
+                                </button>
+                              ) : (
+                                <span className="px-2.5 py-1 rounded-xl bg-slate-100 text-slate-500 text-[10px] font-bold flex items-center gap-1">
+                                  ✓ Invites Sent ({new Date(event.invitationsSentAt).toLocaleDateString()})
+                                </span>
+                              )}
+
+                              <button
+                                onClick={async () => {
+                                  if (!window.confirm("Are you sure you want to delete this event? This will delete all associated RSVP records.")) return;
+                                  try {
+                                    const res = await fetch(`/api/events?eventId=${event.id}`, { method: "DELETE" });
+                                    if (res.ok) {
+                                      showToast("Event deleted successfully", "success");
+                                      fetchData();
+                                    } else {
+                                      showToast("Failed to delete event", "error");
+                                    }
+                                  } catch {
+                                    showToast("Error deleting event", "error");
+                                  }
+                                }}
+                                className="p-1.5 rounded-xl border border-rose-250 hover:bg-rose-50/50 text-rose-700 transition-all ml-auto"
+                              >
+                                <Trash2 size={12} />
+                              </button>
+                            </div>
+
+                            {/* RSVP Analytics */}
+                            {event.invitationsSentAt && (
+                              <div className="border-t border-slate-100 pt-4 mt-2 space-y-4">
+                                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                                  <div className="bg-emerald-50/50 border border-emerald-100 rounded-2xl p-2.5 text-center">
+                                    <span className="text-[10px] font-bold text-emerald-700 block">Accepted</span>
+                                    <span className="text-base font-extrabold text-emerald-850">{accepted.length}</span>
+                                  </div>
+                                  <div className="bg-rose-50/50 border border-rose-100 rounded-2xl p-2.5 text-center">
+                                    <span className="text-[10px] font-bold text-rose-705 block">Declined</span>
+                                    <span className="text-base font-extrabold text-rose-850">{declined.length}</span>
+                                  </div>
+                                  <div className="bg-amber-50/50 border border-amber-100 rounded-2xl p-2.5 text-center">
+                                    <span className="text-[10px] font-bold text-amber-705 block">Pending</span>
+                                    <span className="text-base font-extrabold text-amber-850">{pending.length}</span>
+                                  </div>
+                                  <div className="bg-violet-50/50 border border-violet-100 rounded-2xl p-2.5 text-center flex flex-col justify-center items-center">
+                                    <span className="text-[10px] font-bold text-violet-700 block">Acceptance</span>
+                                    <span className="text-base font-extrabold text-violet-850">{acceptanceRate}%</span>
+                                  </div>
+                                </div>
+
+                                {/* RSVP Name List */}
+                                <div className="space-y-2">
+                                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Attendee Status</span>
+                                  <div className="max-h-32 overflow-y-auto space-y-1.5 pr-1.5 text-[11px] font-semibold text-slate-650">
+                                    {accepted.length > 0 && (
+                                      <div className="flex gap-1.5 items-start flex-wrap">
+                                        <span className="text-emerald-600 font-bold shrink-0">✓ Accepted:</span>
+                                        <span className="text-slate-600 font-medium">{accepted.map(r => r.alumniName).join(", ")}</span>
+                                      </div>
+                                    )}
+                                    {declined.length > 0 && (
+                                      <div className="flex gap-1.5 items-start flex-wrap">
+                                        <span className="text-rose-600 font-bold shrink-0">✗ Declined:</span>
+                                        <span className="text-slate-600 font-medium">{declined.map(r => r.alumniName).join(", ")}</span>
+                                      </div>
+                                    )}
+                                    {pending.length > 0 && (
+                                      <div className="flex gap-1.5 items-start flex-wrap">
+                                        <span className="text-amber-505 font-bold shrink-0">⏳ Pending:</span>
+                                        <span className="text-slate-600 font-medium">{pending.map(r => r.alumniName).join(", ")}</span>
+                                      </div>
+                                    )}
+                                    {rsvpsForEvent.length === 0 && (
+                                      <span className="text-slate-400 italic">No invitees found.</span>
+                                    )}
+                                  </div>
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })
+                  )}
                 </div>
               </div>
             </div>
@@ -1224,83 +1847,115 @@ support@skillizee.io`;
                     </div>
                   </div>
 
+                  <div className="grid grid-cols-1 md:grid-cols-[1fr_220px] gap-3 mb-6">
+                    <div className="relative">
+                      <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                      <input
+                        type="text"
+                        value={mentorSearchQuery}
+                        onChange={(e) => setMentorSearchQuery(e.target.value)}
+                        placeholder="Search role, company, skills, or name..."
+                        className="w-full glass-input rounded-xl pl-10 pr-4 py-3 text-xs text-slate-800 focus:outline-none"
+                      />
+                    </div>
+                    <select
+                      value={mentorCompanyFilter}
+                      onChange={(e) => setMentorCompanyFilter(e.target.value)}
+                      className="w-full glass-input rounded-xl px-4 py-3 text-xs text-slate-800 focus:outline-none"
+                    >
+                      <option value="All">All Companies</option>
+                      {mentorCompanyOptions.map(company => (
+                        <option key={company} value={company}>{company}</option>
+                      ))}
+                    </select>
+                  </div>
+
                   <div className="space-y-4">
-                    {data?.alumni
-                      .filter(a => a.isVerified)
-                      .filter(a => studentSchoolFilter === "All" || a.school === studentSchoolFilter)
-                      .map((alum) => ({
-                        alum,
-                        score: getMatchingScore(alum, activeStudent)
-                      }))
-                      .sort((a, b) => b.score - a.score)
-                      .map(({ alum, score }) => (
-                        <div key={alum.id} className="glass-card p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 hover:scale-[1.005] transition-all">
-                          <div className="flex gap-4">
-                            <img src={alum.user.avatarUrl || ""} className="h-11 w-11 rounded-xl border border-slate-200" alt="avatar" />
-                            <div className="space-y-0.5">
-                              <div className="flex items-center gap-2 flex-wrap">
-                                <h4 className="text-sm font-bold text-slate-900">{alum.user.name}</h4>
-                                <span className={`px-2 py-0.5 rounded text-[9px] font-bold ${
-                                  alum.school === "CCHS" ? "bg-violet-50 text-violet-600 border border-violet-100" : "bg-emerald-50 text-emerald-600 border border-emerald-100"
-                                } border`}>
-                                  {alum.school} Network
-                                </span>
-                                <span className={`px-2 py-0.5 rounded-full text-[9px] font-bold border ${
-                                  score >= 75 
-                                    ? "bg-emerald-55 text-emerald-700 border-emerald-200" 
-                                    : score >= 40 
-                                    ? "bg-violet-50 text-violet-600 border-violet-100" 
-                                    : "bg-slate-100 text-slate-550 border-slate-200"
-                                }`}>
-                                  Match index: {score}%
-                                </span>
+                    {studentMentorMatches.length === 0 ? (
+                      <div className="rounded-2xl border border-dashed border-slate-200 bg-slate-50/50 py-12 text-center text-xs font-semibold text-slate-400">
+                        No verified mentors match these filters.
+                      </div>
+                    ) : (
+                      studentMentorMatches.map(({ alum, score }) => {
+                        const existingRequest = mentorshipRequests.find(m => m.studentId === activeStudent.id && m.alumniId === alum.id);
+                        return (
+                          <div key={alum.id} className="glass-card p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 hover:scale-[1.005] transition-all">
+                            <div className="flex gap-4">
+                              <img src={alum.user.avatarUrl || ""} className="h-11 w-11 rounded-xl border border-slate-200" alt="avatar" />
+                              <div className="space-y-0.5">
+                                <div className="flex items-center gap-2 flex-wrap">
+                                  <h4 className="text-sm font-bold text-slate-900">{alum.user.name}</h4>
+                                  <span className={`px-2 py-0.5 rounded text-[9px] font-bold ${
+                                    alum.school === "CCHS" ? "bg-violet-50 text-violet-600 border border-violet-100" : "bg-emerald-50 text-emerald-600 border border-emerald-100"
+                                  } border`}>
+                                    {alum.school} Network
+                                  </span>
+                                  <span className={`px-2 py-0.5 rounded-full text-[9px] font-bold border ${
+                                    score >= 75
+                                      ? "bg-emerald-55 text-emerald-700 border-emerald-200"
+                                      : score >= 40
+                                      ? "bg-violet-50 text-violet-600 border-violet-100"
+                                      : "bg-slate-100 text-slate-550 border-slate-200"
+                                  }`}>
+                                    Match index: {score}%
+                                  </span>
+                                </div>
+                                <p className="text-xs text-slate-700 font-semibold">{alum.role} @ <span className="text-slate-900 font-bold">{alum.company}</span></p>
+                                <p className="text-[11px] text-slate-500 flex items-center gap-1">
+                                  <MapPin size={12} className="text-slate-400" /> {alum.city}, {alum.country} | Batch {alum.batch}
+                                </p>
                               </div>
-                              <p className="text-xs text-slate-700 font-semibold">{alum.role} @ <span className="text-slate-900 font-bold">{alum.company}</span></p>
-                              <p className="text-[11px] text-slate-500 flex items-center gap-1">
-                                <MapPin size={12} className="text-slate-400" /> {alum.city}, {alum.country} | Batch {alum.batch}
-                              </p>
+                            </div>
+
+                            <div>
+                              {existingRequest ? (
+                                <div className="flex flex-col md:items-end gap-1.5">
+                                  <span className={`px-2.5 py-1 rounded-full text-[9px] font-bold border ${getMentorshipStatusClass(existingRequest.status)}`}>
+                                    Request {getMentorshipStatusLabel(existingRequest.status)}
+                                  </span>
+                                  {existingRequest.scheduledAt && (
+                                    <span className="text-[10px] font-semibold text-slate-500">{formatMentorshipDate(existingRequest.scheduledAt)}</span>
+                                  )}
+                                </div>
+                              ) : requestingMentorId === alum.id ? (
+                                <div className="space-y-2 mt-3 md:mt-0">
+                                  <textarea
+                                    value={mentorshipNote}
+                                    onChange={(e) => setMentorshipNote(e.target.value)}
+                                    placeholder="Type note to send..."
+                                    className="w-full md:w-64 h-16 glass-input rounded-lg p-2 text-xs text-slate-800 focus:outline-none"
+                                  />
+                                  <div className="flex items-center gap-2">
+                                    <button
+                                      onClick={() => handleRequestMentorship(alum.id)}
+                                      className="h-8 px-3 rounded-lg bg-violet-600 hover:bg-violet-700 text-xs font-bold text-white flex items-center gap-1.5 transition-all"
+                                    >
+                                      <Send size={12} /> Send Inquiry
+                                    </button>
+                                    <button
+                                      onClick={() => setRequestingMentorId(null)}
+                                      className="h-8 px-3 rounded-lg bg-slate-100 text-xs text-slate-500 hover:text-slate-700 border border-slate-200"
+                                    >
+                                      Cancel
+                                    </button>
+                                  </div>
+                                </div>
+                              ) : (
+                                <button
+                                  onClick={() => {
+                                    setRequestingMentorId(alum.id);
+                                    setMentorshipNote(`Hi ${alum.user.name.split(" ")[0]}, I am a current student focusing on ${pref1Role}. I would love to ask you a couple of questions about working in ${alum.company || "your field"}!`);
+                                  }}
+                                  className="w-full md:w-auto h-9 px-4 rounded-xl bg-violet-600 hover:bg-violet-750 text-xs font-bold text-white flex items-center justify-center gap-1.5 transition-all shadow-sm"
+                                >
+                                  Request Mentoring
+                                </button>
+                              )}
                             </div>
                           </div>
-
-                          <div>
-                            {requestingMentorId === alum.id ? (
-                              <div className="space-y-2 mt-3 md:mt-0">
-                                <textarea 
-                                  value={mentorshipNote} 
-                                  onChange={(e) => setMentorshipNote(e.target.value)}
-                                  placeholder="Type note to send..."
-                                  className="w-full md:w-64 h-16 glass-input rounded-lg p-2 text-xs text-slate-800 focus:outline-none"
-                                />
-                                <div className="flex items-center gap-2">
-                                  <button
-                                    onClick={() => handleRequestMentorship(alum.id)}
-                                    className="h-8 px-3 rounded-lg bg-violet-600 hover:bg-violet-700 text-xs font-bold text-white flex items-center gap-1.5 transition-all"
-                                  >
-                                    <Send size={12} /> Send Inquiry
-                                  </button>
-                                  <button
-                                    onClick={() => setRequestingMentorId(null)}
-                                    className="h-8 px-3 rounded-lg bg-slate-100 text-xs text-slate-500 hover:text-slate-700 border border-slate-200"
-                                  >
-                                    Cancel
-                                  </button>
-                                </div>
-                              </div>
-                            ) : (
-                              <button
-                                onClick={() => {
-                                  setRequestingMentorId(alum.id);
-                                  setMentorshipNote(`Hi ${alum.user.name.split(" ")[0]}, I am current student focusing on ${pref1Role}. I would love to ask you a couple of questions about working in ${alum.company}!`);
-                                }}
-                                className="w-full md:w-auto h-9 px-4 rounded-xl bg-violet-600 hover:bg-violet-750 text-xs font-bold text-white flex items-center justify-center gap-1.5 transition-all shadow-sm"
-                              >
-                                Request Mentoring
-                              </button>
-                            )}
-                          </div>
-                        </div>
-                      ))
-                    }
+                        );
+                      })
+                    )}
                   </div>
                 </div>
               </div>
@@ -1362,7 +2017,7 @@ support@skillizee.io`;
                 {/* Requests Inbound List */}
                 <div className="lg:col-span-2 rounded-3xl glass-panel p-8 shadow-lg">
                   <h3 className="text-sm font-bold text-slate-900 mb-2">Student Mentorship Inquiries</h3>
-                  <p className="text-xs text-slate-400 mb-6">Manage incoming guidance request inquiries from current students.</p>
+                  <p className="text-xs text-slate-400 mb-6">View coordinator-managed guidance requests from current students.</p>
 
                   <div className="space-y-4">
                     {data?.mentorships.filter(m => m.alumniId === activeAlumni.id).length === 0 ? (
@@ -1381,30 +2036,12 @@ support@skillizee.io`;
                               </div>
                             </div>
 
-                            <div className="flex items-center gap-2">
-                              {req.status === "PENDING" ? (
-                                <>
-                                  <button
-                                    onClick={() => handleMentorshipAction(req.id, "ACCEPTED")}
-                                    className="h-8 w-8 rounded-lg bg-emerald-50 text-emerald-650 border border-emerald-100 flex items-center justify-center hover:bg-emerald-100 transition-all"
-                                  >
-                                    <Check size={16} />
-                                  </button>
-                                  <button
-                                    onClick={() => handleMentorshipAction(req.id, "DECLINED")}
-                                    className="h-8 w-8 rounded-lg bg-rose-50 text-rose-650 border border-rose-100 flex items-center justify-center hover:bg-rose-100 transition-all"
-                                  >
-                                    <X size={16} />
-                                  </button>
-                                </>
-                              ) : (
-                                <span className={`px-2.5 py-1 rounded-lg text-[9px] font-bold border ${
-                                  req.status === "ACCEPTED" 
-                                    ? "bg-emerald-50 text-emerald-650 border-emerald-100" 
-                                    : "bg-rose-50 text-rose-600 border-rose-100"
-                                }`}>
-                                  {req.status}
-                                </span>
+                            <div className="flex flex-col items-end gap-1.5">
+                              <span className={`px-2.5 py-1 rounded-lg text-[9px] font-bold border ${getMentorshipStatusClass(req.status)}`}>
+                                {getMentorshipStatusLabel(req.status)}
+                              </span>
+                              {req.scheduledAt && (
+                                <span className="text-[10px] font-semibold text-slate-500">{formatMentorshipDate(req.scheduledAt)}</span>
                               )}
                             </div>
                           </div>

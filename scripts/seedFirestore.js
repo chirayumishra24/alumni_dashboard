@@ -329,6 +329,10 @@ async function main() {
     status: 'PENDING',
     notes: 'Hello Priya, I am looking to break into Software Engineering in Google. I would appreciate some guidance on my CV!',
     createdAt: new Date().toISOString(),
+    scheduledAt: null,
+    meetingUrl: null,
+    meetingPlatform: null,
+    scheduledBy: null,
     student: seededStudentProfiles[0],
     alumni: seededCchsProfiles[0],
   });
@@ -341,20 +345,26 @@ async function main() {
     status: 'ACCEPTED',
     notes: 'Hi Vikram, I am focusing on product and tech roles in electric vehicles. I would love to connect and learn about your career path.',
     createdAt: new Date().toISOString(),
+    scheduledAt: null,
+    meetingUrl: null,
+    meetingPlatform: null,
+    scheduledBy: null,
     student: seededStudentProfiles[1],
     alumni: seededCcwsProfiles[0],
   });
 
   console.log('Seeding events...');
   const event1Ref = db.collection('events').doc();
+  const event1Id = event1Ref.id;
   await event1Ref.set({
-    id: event1Ref.id,
+    id: event1Id,
     title: 'Navigating Careers in Tech & Startups',
     description: 'Join Priya Singh (Google) and Tanya Sen (Organic Bloom) for a comprehensive panel discussion on starting your career in finance and tech.',
     eventDate: new Date(Date.now() + 1000 * 60 * 60 * 24 * 5).toISOString(),
     location: 'Online Zoom',
     meetingUrl: 'https://zoom.us/j/mockmeetingid123',
     bannerUrl: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&q=80&w=800',
+    invitationsSentAt: new Date().toISOString(),
   });
 
   const event2Ref = db.collection('events').doc();
@@ -366,6 +376,47 @@ async function main() {
     location: 'Online Google Meet',
     meetingUrl: 'https://meet.google.com/mock-meet-id',
     bannerUrl: 'https://images.unsplash.com/photo-1515187029135-18ee286d815b?auto=format&fit=crop&q=80&w=800',
+    invitationsSentAt: null,
+  });
+
+  console.log('Seeding event RSVPs...');
+  const rsvp1Ref = db.collection('event_rsvps').doc();
+  await rsvp1Ref.set({
+    id: rsvp1Ref.id,
+    eventId: event1Id,
+    alumniProfileId: seededCchsProfiles[0].id,
+    alumniName: seededCchsProfiles[0].user.name,
+    alumniEmail: seededCchsProfiles[0].user.email,
+    alumniSchool: seededCchsProfiles[0].school,
+    response: 'ACCEPTED',
+    respondedAt: new Date().toISOString(),
+    sentAt: new Date().toISOString(),
+  });
+
+  const rsvp2Ref = db.collection('event_rsvps').doc();
+  await rsvp2Ref.set({
+    id: rsvp2Ref.id,
+    eventId: event1Id,
+    alumniProfileId: seededCchsProfiles[1].id,
+    alumniName: seededCchsProfiles[1].user.name,
+    alumniEmail: seededCchsProfiles[1].user.email,
+    alumniSchool: seededCchsProfiles[1].school,
+    response: 'DECLINED',
+    respondedAt: new Date().toISOString(),
+    sentAt: new Date().toISOString(),
+  });
+
+  const rsvp3Ref = db.collection('event_rsvps').doc();
+  await rsvp3Ref.set({
+    id: rsvp3Ref.id,
+    eventId: event1Id,
+    alumniProfileId: seededCcwsProfiles[0].id,
+    alumniName: seededCcwsProfiles[0].user.name,
+    alumniEmail: seededCcwsProfiles[0].user.email,
+    alumniSchool: seededCcwsProfiles[0].school,
+    response: 'PENDING',
+    respondedAt: null,
+    sentAt: new Date().toISOString(),
   });
 
   console.log('Database Seeding successfully completed on Cloud Firestore!');

@@ -18,12 +18,38 @@ export default function LoginGate({ children }: LoginGateProps) {
   const [shake, setShake] = useState<boolean>(false);
 
   useEffect(() => {
-    // Check if verified in sessionStorage
-    const isAuth = sessionStorage.getItem("admin_authenticated");
-    if (isAuth === "true") {
-      setIsAuthenticated(true);
-    }
-    setCheckingSession(false);
+    let isMounted = true;
+
+    const verifySession = async () => {
+      try {
+        const res = await fetch("/api/auth", { method: "GET", cache: "no-store" });
+        const json = await res.json();
+        if (!isMounted) return;
+
+        if (res.ok && json.authenticated) {
+          sessionStorage.setItem("admin_authenticated", "true");
+          setIsAuthenticated(true);
+        } else {
+          sessionStorage.removeItem("admin_authenticated");
+          setIsAuthenticated(false);
+        }
+      } catch {
+        if (isMounted) {
+          sessionStorage.removeItem("admin_authenticated");
+          setIsAuthenticated(false);
+        }
+      } finally {
+        if (isMounted) {
+          setCheckingSession(false);
+        }
+      }
+    };
+
+    verifySession();
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   const handleLogin = async (e: React.FormEvent) => {

@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { 
-  LayoutDashboard, Users, ShieldAlert, HelpCircle, 
+  LayoutDashboard, Users, ShieldAlert, HelpCircle, Calendar,
   Menu, X, LogOut, ArrowLeftRight, Award, GraduationCap, UserSquare2
 } from "lucide-react";
 import Logo from "@/components/Logo";
@@ -23,6 +23,7 @@ export default function Sidebar({ currentTab, setCurrentTab, pendingCount, onLog
     { id: "DIRECTORY", label: "Alumni Directory", icon: Users },
     { id: "TESTIMONIALS", label: "Testimonials", icon: Award },
     { id: "MENTORSHIPS", label: "Mentorship Inquiries", icon: HelpCircle },
+    { id: "EVENTS", label: "Events & RSVPs", icon: Calendar },
     { id: "STUDENT_PERSPECTIVE", label: "Student Perspective", icon: GraduationCap },
     { id: "ALUMNI_PERSPECTIVE", label: "Alumni Perspective", icon: UserSquare2 },
   ];
