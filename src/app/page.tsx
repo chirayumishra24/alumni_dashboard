@@ -316,7 +316,7 @@ export default function PublicAlumniPage() {
   const batchYears = Array.from(new Set(alumni.map(a => a.batch.toString()))).sort((a, b) => b.localeCompare(a));
 
   return (
-    <div className="min-h-screen executive-mesh-bg text-slate-800 font-sans relative overflow-x-hidden selection:bg-maroon-600 selection:text-white grid-bg">
+    <div className="min-h-screen executive-mesh-bg text-slate-800 font-sans relative selection:bg-maroon-600 selection:text-white grid-bg">
       {/* ================= HERO BACKGROUND IMAGE CAROUSEL (INFINITE MARQUEE) ================= */}
       <div className="absolute top-[73px] left-0 right-0 h-[480px] overflow-hidden pointer-events-none z-0 opacity-100">
         {/* Fading Edge Masks */}
