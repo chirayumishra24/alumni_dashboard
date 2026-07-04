@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { firestore } from '@/lib/firebaseAdmin';
-import { parseCSV, cleanSheetData, toFirestorePayload } from '@/lib/sheetCleaner';
+import { parseCSV, cleanSheetData, toFirestorePayload, type RawSheetRow } from '@/lib/sheetCleaner';
 import { invalidateAlumniCache } from '@/lib/cache';
 
 export const dynamic = 'force-dynamic';
@@ -26,23 +26,29 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Step 1: Fetch CSV from Google Sheets
-    const csvResponse = await fetch(SHEET_CSV_URL, {
-      headers: { 'Accept': 'text/csv' },
+    // Step 1: Fetch from Google Sheets / Apps Script Web App
+    const isJsonEndpoint = SHEET_CSV_URL.includes('/macros/s/') || SHEET_CSV_URL.includes('/exec');
+    const response = await fetch(SHEET_CSV_URL, {
+      headers: isJsonEndpoint ? { 'Accept': 'application/json' } : { 'Accept': 'text/csv' },
       next: { revalidate: 0 },
     });
 
-    if (!csvResponse.ok) {
+    if (!response.ok) {
       return NextResponse.json(
-        { error: `Failed to fetch sheet: ${csvResponse.status} ${csvResponse.statusText}` },
+        { error: `Failed to fetch sheet: ${response.status} ${response.statusText}` },
         { status: 502 }
       );
     }
 
-    const csvText = await csvResponse.text();
+    // Step 2: Parse raw rows
+    let rawRows: RawSheetRow[] = [];
+    if (isJsonEndpoint) {
+      rawRows = await response.json() as RawSheetRow[];
+    } else {
+      const csvText = await response.text();
+      rawRows = parseCSV(csvText);
+    }
 
-    // Step 2: Parse CSV → raw rows
-    const rawRows = parseCSV(csvText);
     if (rawRows.length === 0) {
       return NextResponse.json({ error: 'No data rows found in sheet' }, { status: 422 });
     }

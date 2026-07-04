@@ -130,15 +130,22 @@ async function main() {
   const SHEET_URL = process.env.GOOGLE_SHEET_CSV_URL ||
     'https://docs.google.com/spreadsheets/d/1LJXBnAM-8t8cuBQ8jeE3m5vo1YWuLlbYn2dY3F1GQ60/gviz/tq?tqx=out:csv&gid=1703773069';
 
-  console.log('📥 Fetching Google Sheet CSV...');
+  const isJsonEndpoint = SHEET_URL.includes('/macros/s/') || SHEET_URL.includes('/exec');
+  console.log(`📥 Fetching Google Sheet data (${isJsonEndpoint ? 'JSON' : 'CSV'})...`);
+  
   const res = await fetch(SHEET_URL);
   if (!res.ok) {
-    console.error(`Failed to fetch sheet: ${res.status} ${res.statusText}`);
+    console.log(`Failed to fetch sheet: ${res.status} ${res.statusText}`);
     process.exit(1);
   }
 
-  const csvText = await res.text();
-  const rawRows = parseCSV(csvText);
+  let rawRows = [];
+  if (isJsonEndpoint) {
+    rawRows = await res.json();
+  } else {
+    const csvText = await res.text();
+    rawRows = parseCSV(csvText);
+  }
   console.log(`📊 Parsed ${rawRows.length} raw rows from sheet`);
 
   // Clean all rows
