@@ -32,9 +32,9 @@ export async function GET(request: Request) {
     let governmentCount = 0;
     const companyCounts: { [key: string]: number } = {};
 
-    const iitRegex = /\b(iit|aiims|bits|indian institute of technology|all india institute of medical sciences)\b/i;
-    const entRegex = /\b(founder|ceo|co-founder|entrepreneur|partner|owner|proprietor|president)\b/i;
-    const govRegex = /\b(diplomat|ifs|ias|ips|government|ministry|civil services|defense|army|navy|air force|police|income tax|commissioner|public services)\b/i;
+    const iitRegex = /\b(iit|aiims|bits|iim|nlu|strathclyde|nmims|escp|kth|lsr|technology|medical|sciences|law|university|college|institute)\b/i;
+    const entRegex = /\b(founder|ceo|co-founder|entrepreneur|partner|owner|proprietor|president|director|lead|chief|manager|head)\b/i;
+    const govRegex = /\b(diplomat|ifs|ias|ips|upsc|government|ministry|civil|defense|army|navy|air force|police|tax|commissioner|officer|advocate|court|lieutenant)\b/i;
 
     docs.forEach((doc: AlumniDoc) => {
       const company = doc.company || '';
@@ -68,84 +68,30 @@ export async function GET(request: Request) {
       }
     });
 
-    // Baselines depending on school parameter
-    let baseIIT = 68;
-    let baseEnt = 35;
-    let baseGov = 14;
-    let defaultCompanies = [
-      { name: 'Google', count: 4 },
-      { name: 'Meta', count: 3 },
-      { name: 'KPMG', count: 2 },
-      { name: 'Amazon', count: 3 },
-      { name: 'Flipkart', count: 3 },
-      { name: 'Microsoft', count: 3 },
-      { name: 'Ernst & Young', count: 5 },
-      { name: 'Deloitte', count: 6 },
-      { name: 'TCS', count: 8 },
-      { name: 'McKinsey', count: 2 }
-    ];
-
-    if (school === 'CCHS') {
-      baseIIT = 40;
-      baseEnt = 20;
-      baseGov = 8;
-      defaultCompanies = [
-        { name: 'Google', count: 2 },
-        { name: 'Meta', count: 1 },
-        { name: 'KPMG', count: 1 },
-        { name: 'Amazon', count: 2 },
-        { name: 'Flipkart', count: 2 },
-        { name: 'Microsoft', count: 1 },
-        { name: 'Ernst & Young', count: 3 },
-        { name: 'Deloitte', count: 4 },
-        { name: 'TCS', count: 5 }
-      ];
-    } else if (school === 'CCWS') {
-      baseIIT = 28;
-      baseEnt = 15;
-      baseGov = 6;
-      defaultCompanies = [
-        { name: 'Google', count: 2 },
-        { name: 'Meta', count: 2 },
-        { name: 'KPMG', count: 1 },
-        { name: 'Amazon', count: 2 },
-        { name: 'Flipkart', count: 1 },
-        { name: 'Microsoft', count: 2 },
-        { name: 'Deloitte', count: 2 },
-        { name: 'TCS', count: 3 }
-      ];
-    }
-
-    // Merge calculated and defaults
+    // Get sorted dynamic top companies
     const topCompanies = Object.entries(companyCounts)
       .map(([name, count]) => ({ name, count }))
       .sort((a, b) => b.count - a.count);
 
-    const finalCompanies = [...defaultCompanies];
-    topCompanies.forEach(tc => {
-      const match = finalCompanies.find(fc => fc.name.toLowerCase() === tc.name.toLowerCase());
-      if (match) {
-        match.count += tc.count;
-      } else {
-        finalCompanies.push(tc);
-      }
-    });
-
-    // Sort by count desc
-    finalCompanies.sort((a, b) => b.count - a.count);
-
     const stats = {
-      iitAiims: baseIIT + iitAiimsCount,
-      entrepreneurs: baseEnt + entrepreneursCount,
-      government: baseGov + governmentCount,
-      topCompanies: finalCompanies.slice(0, 15)
+      iitAiims: iitAiimsCount,
+      entrepreneurs: entrepreneursCount,
+      government: governmentCount,
+      topCompanies: topCompanies.slice(0, 15)
     };
+
+    const nocache = searchParams.get('nocache') === 'true';
 
     const response = NextResponse.json(stats);
     response.headers.set('Access-Control-Allow-Origin', '*');
     response.headers.set('Access-Control-Allow-Methods', 'GET, OPTIONS');
     response.headers.set('Access-Control-Allow-Headers', 'Content-Type');
-    response.headers.set('Cache-Control', 'public, s-maxage=30, stale-while-revalidate=60');
+    
+    if (nocache) {
+      response.headers.set('Cache-Control', 'no-store, max-age=0, must-revalidate');
+    } else {
+      response.headers.set('Cache-Control', 'public, s-maxage=30, stale-while-revalidate=60');
+    }
 
     return response;
   } catch (error) {

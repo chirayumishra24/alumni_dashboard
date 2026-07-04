@@ -1,11 +1,23 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import dynamic from 'next/dynamic';
+import { motion, AnimatePresence } from 'framer-motion';
 import { 
   MapPin, Search, X, Sparkles, PlusCircle, RefreshCw, Users, Mail, Play, Video, Briefcase, GraduationCap, Landmark
 } from "lucide-react";
 import { uploadFileToStorage } from "@/lib/firebase";
 import Logo from "@/components/Logo";
+
+const AlumniMap = dynamic(() => import('@/components/AlumniMap'), {
+  ssr: false,
+  loading: () => (
+    <div className="w-full h-[380px] md:h-[480px] rounded-[3rem] bg-slate-100 flex flex-col items-center justify-center gap-3 border border-slate-200 shadow-2xl">
+      <RefreshCw size={24} className="animate-spin text-amber-500" />
+      <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">Loading Connections Map...</span>
+    </div>
+  )
+});
 
 // Custom LinkedIn Icon SVG to bypass lucide-react version compatibility issues
 const LinkedinIcon = ({ size = 14, className = "" }: { size?: number; className?: string }) => (
@@ -101,9 +113,22 @@ export default function PublicAlumniPage() {
     setCurrentPage(1);
   }, [searchQuery, schoolFilter, batchFilter]);
 
-  // Registration form modal state
   const [showRegModal, setShowRegModal] = useState(false);
   const [toast, setToast] = useState<{ message: string; type: "success" | "error" } | null>(null);
+
+  // View modes: 'directory' | 'student' | 'mentor'
+  const [viewMode, setViewMode] = useState<'directory' | 'student' | 'mentor'>("directory");
+
+  // Mentorship System States
+  const [mentorships, setMentorships] = useState<any[]>([]);
+  const [loadingMentorships, setLoadingMentorships] = useState(false);
+  const [selectedMentorForReq, setSelectedMentorForReq] = useState<AlumniProfile | null>(null);
+  const [studentReqForm, setStudentReqForm] = useState({ name: "", email: "", notes: "" });
+  const [submittingMentorshipReq, setSubmittingMentorshipReq] = useState(false);
+
+  // Simulated Mentor profile (to display received requests)
+  const [simulatedMentor, setSimulatedMentor] = useState<AlumniProfile | null>(null);
+  const [actionInProgress, setActionInProgress] = useState<string | null>(null);
   
   // Placement stats state
   const [stats, setStats] = useState<{
@@ -143,6 +168,42 @@ export default function PublicAlumniPage() {
 
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [isSyncing, setIsSyncing] = useState(false);
+
+  const triggerSync = async () => {
+    setIsSyncing(true);
+    showToast("Synchronizing with Google Sheets...", "success");
+    try {
+      const res = await fetch("/api/cron/sync-sheets?secret=ccgs-cron-secret-2026");
+      const json = await res.json();
+      if (res.ok && json.success) {
+        showToast(`Sync complete! Added: ${json.created}, Updated: ${json.updated}`, "success");
+        const alumniRes = await fetch("/api/alumni?nocache=true");
+        if (alumniRes.ok) {
+          const alumniJson = await alumniRes.json();
+          setAlumni(alumniJson);
+          if (typeof window !== "undefined") {
+            localStorage.setItem("ccgs_alumni_data_cache", JSON.stringify(alumniJson));
+          }
+        }
+        const statsUrl = schoolFilter && schoolFilter !== "All" 
+          ? `/api/stats?school=${schoolFilter}&nocache=true` 
+          : "/api/stats?nocache=true";
+        const statsRes = await fetch(statsUrl);
+        if (statsRes.ok) {
+          const statsJson = await statsRes.json();
+          setStats(statsJson);
+        }
+      } else {
+        showToast(json.error || "Google Sheets sync failed", "error");
+      }
+    } catch (e) {
+      console.error(e);
+      showToast("Sync error. Please try again.", "error");
+    } finally {
+      setIsSyncing(false);
+    }
+  };
 
   const handleAvatarUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -222,13 +283,100 @@ export default function PublicAlumniPage() {
     }
   };
 
+  const fetchMentorships = async () => {
+    setLoadingMentorships(true);
+    try {
+      const res = await fetch("/api/data");
+      if (res.ok) {
+        const json = await res.json();
+        setMentorships(json.mentorships || []);
+      }
+    } catch (e) {
+      console.error("Failed to load mentorships:", e);
+    } finally {
+      setLoadingMentorships(false);
+    }
+  };
+
+  const handleRequestMentorship = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedMentorForReq) return;
+    setSubmittingMentorshipReq(true);
+
+    try {
+      // Use clean student email prefix/identifier as studentId
+      const studentId = studentReqForm.email.toLowerCase().trim().replace(/[^a-zA-Z0-9]/g, "_");
+      
+      const res = await fetch("/api/data", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "createMentorship",
+          studentId,
+          alumniId: selectedMentorForReq.id,
+          notes: studentReqForm.notes
+        })
+      });
+
+      const json = await res.json();
+      if (res.ok) {
+        showToast("Mentorship request submitted successfully!", "success");
+        setSelectedMentorForReq(null);
+        setStudentReqForm({ name: "", email: "", notes: "" });
+        fetchMentorships();
+      } else {
+        showToast(json.error || "Failed to submit request", "error");
+      }
+    } catch {
+      showToast("Error submitting mentorship request", "error");
+    } finally {
+      setSubmittingMentorshipReq(false);
+    }
+  };
+
+  const handleUpdateMentorshipStatus = async (connectionId: string, status: 'ACCEPTED' | 'DECLINED') => {
+    setActionInProgress(connectionId);
+    try {
+      const res = await fetch("/api/data", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "updateMentorshipStatus",
+          id: connectionId,
+          status
+        })
+      });
+
+      if (res.ok) {
+        showToast(`Request ${status.toLowerCase()}!`, "success");
+        fetchMentorships();
+      } else {
+        showToast("Failed to update request", "error");
+      }
+    } catch {
+      showToast("Error updating request", "error");
+    } finally {
+      setActionInProgress(null);
+    }
+  };
+
+  useEffect(() => {
+    if (viewMode === 'mentor' || viewMode === 'student') {
+      fetchMentorships();
+    }
+  }, [viewMode]);
+
   useEffect(() => {
     fetchAlumni();
-    // Auto-open registration if URL contains ?register=true
+    // Auto-open registration or switch view if URL contains parameters
     if (typeof window !== "undefined") {
       const params = new URLSearchParams(window.location.search);
       if (params.get("register") === "true") {
         setShowRegModal(true);
+      }
+      const v = params.get("view");
+      if (v === "student" || v === "mentor" || v === "directory") {
+        setViewMode(v as 'student' | 'mentor' | 'directory');
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -367,7 +515,20 @@ export default function PublicAlumniPage() {
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <Logo size={42} />
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
+            <button
+              onClick={triggerSync}
+              disabled={isSyncing}
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all border shadow-sm active:scale-95 duration-150 ${
+                isSyncing
+                  ? "bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed"
+                  : "bg-white hover:bg-slate-50 border-slate-200/80 text-slate-700"
+              }`}
+            >
+              <RefreshCw size={12} className={`${isSyncing ? "animate-spin text-maroon-600" : "text-slate-500"}`} />
+              <span>{isSyncing ? "Syncing..." : "Sync Sheets"}</span>
+            </button>
+
             <button 
               onClick={() => setShowRegModal(true)}
               className="group relative overflow-hidden flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-maroon-600 to-navy-700 hover:from-maroon-500 hover:to-navy-600 text-xs font-bold text-white shadow-[0_4px_14px_rgba(107,29,47,0.15)] hover:shadow-[0_6px_20px_rgba(107,29,47,0.25)] transition-all duration-300 hover:scale-[1.02] active:scale-95 border border-white/10"
@@ -381,16 +542,59 @@ export default function PublicAlumniPage() {
       </header>
 
       {/* Hero Showcase Section */}
-      <section className="max-w-7xl mx-auto px-8 pt-32 pb-24 text-center space-y-6 relative z-10">
-        
-        <h2 className="text-4xl md:text-[4.5rem] font-serif font-bold text-[#1b2a41] tracking-tight leading-[1.1] max-w-5xl mx-auto">
-          Connecting Past <span className="font-serif italic font-extrabold text-maroon-600">Achievers</span>, <br className="hidden md:inline" />
-          Inspiring Future <span className="font-serif italic font-extrabold text-navy-650">Leaders</span>
-        </h2>
+      <section className="max-w-7xl mx-auto px-8 pt-24 pb-20 relative z-10">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+          {/* Left Column: Heading and Description */}
+          <div className="lg:col-span-7 space-y-8 text-center lg:text-left">
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, ease: "easeOut" }}
+              className="space-y-6"
+            >
+              <h2 className="text-4xl md:text-[3.8rem] lg:text-[4.5rem] font-serif font-black text-[#1b2a41] tracking-tight leading-[1.08]">
+                Connecting Past <span className="font-serif italic font-extrabold text-maroon-600">Achievers</span>, <br />
+                Inspiring Future <span className="font-serif italic font-extrabold text-navy-650">Leaders</span>
+              </h2>
 
-        <p className="text-base md:text-lg text-slate-650 max-w-2xl mx-auto leading-relaxed font-sans font-medium italic">
-          &quot;Our legacy is built in the halls of Cambridge Court; our destiny is reflected in the global achievements of our alumni.&quot;
-        </p>
+              <p className="text-base md:text-lg text-slate-600 max-w-2xl mx-auto lg:mx-0 leading-relaxed font-sans font-medium italic">
+                &quot;Our legacy is built in the halls of Cambridge Court; our destiny is reflected in the global achievements of our alumni.&quot;
+              </p>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3, duration: 0.6 }}
+              className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start"
+            >
+              <button 
+                onClick={() => setShowRegModal(true)}
+                className="group relative overflow-hidden px-8 py-4 rounded-2xl bg-gradient-to-r from-maroon-600 to-navy-700 hover:from-maroon-500 hover:to-navy-600 text-xs font-black text-white uppercase tracking-widest shadow-xl transition-all duration-300 hover:scale-[1.03] active:scale-95 border border-white/10"
+              >
+                <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/15 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-out" />
+                <span>Join The Network</span>
+              </button>
+              
+              <a 
+                href="#directory"
+                className="px-8 py-4 rounded-2xl bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 text-xs font-black uppercase tracking-widest shadow-md transition-all duration-300 hover:scale-[1.03] active:scale-95 flex items-center justify-center"
+              >
+                Browse Alumni
+              </a>
+            </motion.div>
+          </div>
+
+          {/* Right Column: Interactive Leaflet Map */}
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.2, duration: 0.8 }}
+            className="lg:col-span-5 w-full flex justify-center"
+          >
+            <AlumniMap alumniData={alumni} />
+          </motion.div>
+        </div>
       </section>
 
       {/* ================= NETWORK IMPACT STATS (BLUE CONTAINER - FULL WIDTH) ================= */}
@@ -598,208 +802,610 @@ export default function PublicAlumniPage() {
       </section>
 
       {/* Directory Content Workspace */}
-      <main className="max-w-7xl mx-auto px-8 pb-20 space-y-8 relative z-10">
+      <main className="max-w-7xl mx-auto px-8 pb-20 space-y-8 relative z-10" id="directory">
         
-        {/* Filters and search panel - Refactored to glass-panel */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 p-5 rounded-[2rem] glass-panel">
-          {/* Search name, company, skills */}
-          <div className="md:col-span-2 relative">
-            <span className="absolute inset-y-0 left-3.5 flex items-center text-slate-400">
-              <Search size={14} />
-            </span>
-            <input 
-              type="text" 
-              placeholder="Search name, skills, role, company..." 
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full glass-input rounded-2xl pl-10 pr-4 py-3 text-xs text-slate-800 placeholder-slate-400 focus:outline-none font-medium"
-            />
-          </div>
-
-          {/* School filter */}
-          <div>
-            <select
-              value={schoolFilter}
-              onChange={(e) => setSchoolFilter(e.target.value)}
-              className="w-full glass-input rounded-2xl px-4 py-3 text-xs text-slate-700 focus:outline-none font-semibold"
-            >
-              <option value="All">All School Networks</option>
-              <option value="CCHS">CCHS Network</option>
-              <option value="CCWS">CCWS Network</option>
-            </select>
-          </div>
-
-          {/* Batch Filter */}
-          <div>
-            <select
-              value={batchFilter}
-              onChange={(e) => setBatchFilter(e.target.value)}
-              className="w-full glass-input rounded-2xl px-4 py-3 text-xs text-slate-700 focus:outline-none font-semibold"
-            >
-              <option value="All">All Graduation Years</option>
-              {batchYears.map(year => (
-                <option key={year} value={year}>Class of {year}</option>
-              ))}
-            </select>
-          </div>
+        {/* Sliding Tab Switcher */}
+        <div className="flex justify-center p-1.5 bg-slate-100/80 backdrop-blur-md rounded-2xl max-w-lg mx-auto border border-slate-200/50 shadow-sm">
+          <button 
+            onClick={() => setViewMode('directory')}
+            className={`flex-1 py-3 text-xs font-black uppercase tracking-widest rounded-xl transition-all duration-300 ${
+              viewMode === 'directory' 
+                ? "bg-slate-900 text-white shadow-lg" 
+                : "text-slate-500 hover:text-slate-800 hover:bg-slate-50"
+            }`}
+          >
+            Explore Directory
+          </button>
+          <button 
+            onClick={() => setViewMode('student')}
+            className={`flex-1 py-3 text-xs font-black uppercase tracking-widest rounded-xl transition-all duration-300 ${
+              viewMode === 'student' 
+                ? "bg-slate-900 text-white shadow-lg" 
+                : "text-slate-500 hover:text-slate-800 hover:bg-slate-50"
+            }`}
+          >
+            Student View
+          </button>
+          <button 
+            onClick={() => setViewMode('mentor')}
+            className={`flex-1 py-3 text-xs font-black uppercase tracking-widest rounded-xl transition-all duration-300 ${
+              viewMode === 'mentor' 
+                ? "bg-slate-900 text-white shadow-lg" 
+                : "text-slate-500 hover:text-slate-800 hover:bg-slate-50"
+            }`}
+          >
+            Mentor View
+          </button>
         </div>
 
-        {/* Directory Grid */}
-        {loading ? (
-          <div className="flex justify-center py-20">
-            <div className="flex flex-col items-center gap-3">
-              <RefreshCw size={24} className="animate-spin text-violet-500" />
-              <span className="text-xs font-semibold tracking-wider text-slate-500">REFRESHING DIRECTORY GRID...</span>
+        {/* ── 1. EXPLORE DIRECTORY VIEW ────────────────────────────────────────── */}
+        {viewMode === 'directory' && (
+          <div className="space-y-8 animate-fade-in">
+            {/* Filters and search panel - Refactored to glass-panel */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 p-5 rounded-[2rem] glass-panel">
+              {/* Search name, company, skills */}
+              <div className="md:col-span-2 relative">
+                <span className="absolute inset-y-0 left-3.5 flex items-center text-slate-400">
+                  <Search size={14} />
+                </span>
+                <input 
+                  type="text" 
+                  placeholder="Search name, skills, role, company..." 
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full glass-input rounded-2xl pl-10 pr-4 py-3 text-xs text-slate-800 placeholder-slate-400 focus:outline-none font-medium"
+                />
+              </div>
+
+              {/* School filter */}
+              <div>
+                <select
+                  value={schoolFilter}
+                  onChange={(e) => setSchoolFilter(e.target.value)}
+                  className="w-full glass-input rounded-2xl px-4 py-3 text-xs text-slate-700 focus:outline-none font-semibold"
+                >
+                  <option value="All">All School Networks</option>
+                  <option value="CCHS">CCHS Network</option>
+                  <option value="CCWS">CCWS Network</option>
+                </select>
+              </div>
+
+              {/* Batch Filter */}
+              <div>
+                <select
+                  value={batchFilter}
+                  onChange={(e) => setBatchFilter(e.target.value)}
+                  className="w-full glass-input rounded-2xl px-4 py-3 text-xs text-slate-700 focus:outline-none font-semibold"
+                >
+                  <option value="All">All Graduation Years</option>
+                  {batchYears.map(year => (
+                    <option key={year} value={year}>Class of {year}</option>
+                  ))}
+                </select>
+              </div>
             </div>
-          </div>
-        ) : (
-          <>
-            {filteredAlumni.length === 0 ? (
-              <div className="text-center py-20 rounded-[2rem] glass-panel">
-                <span className="text-slate-400 text-xs font-semibold block uppercase tracking-wider">No Alumni Found</span>
-                <p className="text-[11px] text-slate-500 mt-1">Try adjusting your filters or search keywords.</p>
+
+            {loading ? (
+              <div className="flex justify-center py-20">
+                <div className="flex flex-col items-center gap-3">
+                  <RefreshCw size={24} className="animate-spin text-violet-500" />
+                  <span className="text-xs font-semibold tracking-wider text-slate-500">REFRESHING DIRECTORY GRID...</span>
+                </div>
               </div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-5">
-                {paginatedAlumni.map((alum) => (
-                  <div 
-                    key={alum.id} 
-                    onClick={() => setSelectedAlumni(alum)}
-                    className="group bg-white rounded-3xl border border-slate-100 hover:border-maroon-700/20 hover:-translate-y-1 shadow-[0_4px_20px_rgba(0,0,0,0.015)] hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col justify-between h-[360px] cursor-pointer"
+              <>
+                {filteredAlumni.length === 0 ? (
+                  <div className="text-center py-20 rounded-[2rem] glass-panel">
+                    <span className="text-slate-400 text-xs font-semibold block uppercase tracking-wider">No Alumni Found</span>
+                    <p className="text-[11px] text-slate-500 mt-1">Try adjusting your filters or search keywords.</p>
+                  </div>
+                ) : (
+                  <motion.div 
+                    layout
+                    className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-5"
                   >
-                    
-                    <div className="p-6 flex-1 flex flex-col justify-between">
-                      <div>
-                        {/* Header: Class batch & City */}
-                        <div className="flex items-center justify-between text-[8px] md:text-[9px] text-slate-400 font-bold uppercase tracking-wider mb-5">
-                          <span>Class of {alum.batch}</span>
-                          <div className="flex items-center gap-1">
-                            <MapPin size={9} className="text-slate-350" />
-                            <span>{alum.city || 'India'}</span>
-                          </div>
-                        </div>
+                    <AnimatePresence mode="popLayout">
+                      {paginatedAlumni.map((alum) => (
+                        <motion.div 
+                          layout
+                          initial={{ opacity: 0, y: 30 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, scale: 0.95 }}
+                          whileHover={{ y: -8, scale: 1.015 }}
+                          transition={{ type: "spring", stiffness: 300, damping: 22 }}
+                          key={alum.id} 
+                          onClick={() => setSelectedAlumni(alum)}
+                          className="group bg-white rounded-3xl border border-slate-100 hover:border-maroon-700/20 shadow-[0_4px_20px_rgba(0,0,0,0.015)] hover:shadow-2xl transition-all duration-300 overflow-hidden flex flex-col justify-between h-[370px] cursor-pointer relative"
+                        >
+                          <div className={`h-1.5 w-full ${alum.school === 'CCHS' ? 'bg-maroon-600' : 'bg-navy-600'}`} />
 
-                        {/* Centered Image with Background Circle */}
-                        <div className="flex justify-center mb-4">
-                          <div className="relative w-24 h-24 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center p-1.5">
-                            <div className="relative w-full h-full rounded-full overflow-hidden bg-slate-100 flex items-center justify-center">
-                              <img 
-                                src={alum.user.avatarUrl || `https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=120`} 
-                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" 
-                                alt={alum.user.name} 
-                              />
-                              {/* Hover "Click to zoom" Overlay */}
-                              <div className="absolute inset-0 bg-[#002147]/85 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col items-center justify-center pointer-events-none">
-                                <span className="text-[8px] text-white font-extrabold uppercase tracking-widest text-center px-2 leading-tight">
-                                  Click To Zoom
+                          <div className="p-6 flex-1 flex flex-col justify-between">
+                            <div>
+                              <div className="flex items-center justify-between text-[8px] md:text-[9px] text-slate-450 font-bold uppercase tracking-wider mb-4">
+                                <span className="flex items-center gap-1">
+                                  <span className={`w-1.5 h-1.5 rounded-full ${alum.school === 'CCHS' ? 'bg-maroon-500' : 'bg-navy-500'}`} />
+                                  {alum.school} Network
                                 </span>
+                                <div className="flex items-center gap-1">
+                                  <MapPin size={9} className="text-slate-350" />
+                                  <span>{alum.city || 'India'}</span>
+                                </div>
+                              </div>
+     
+                              <div className="flex justify-center mb-4">
+                                <div className="relative w-24 h-24 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center p-1.5">
+                                  <div className="relative w-full h-full rounded-full overflow-hidden bg-slate-100 flex items-center justify-center">
+                                    <img 
+                                      src={alum.user.avatarUrl || `https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=120`} 
+                                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300" 
+                                      alt={alum.user.name} 
+                                    />
+                                    <div className="absolute inset-0 bg-[#002147]/85 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col items-center justify-center pointer-events-none">
+                                      <span className="text-[8px] text-white font-extrabold uppercase tracking-widest text-center px-2 leading-tight">
+                                        View Profile
+                                      </span>
+                                    </div>
+                                  </div>
+                                  
+                                  {alum.isVerified && (
+                                    <div className="absolute -bottom-1 -right-1 bg-amber-500 text-white rounded-full p-1 border border-white shadow-md" title="Verified Alumni">
+                                      <Sparkles size={8} className="fill-current" />
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+     
+                              <div className="text-center space-y-1">
+                                <h3 className="font-serif text-sm font-extrabold text-[#6b1d2f] truncate transition-colors group-hover:text-maroon-700">
+                                  {alum.user.name}
+                                </h3>
+                                <p className="text-[9px] text-[#001f3f] font-black uppercase tracking-wider truncate mt-0.5">
+                                  {alum.role || "Alumni"}
+                                </p>
+                                {alum.company && (
+                                  <p className="text-[8px] text-slate-450 font-bold truncate leading-none mt-0.5">
+                                    {alum.company}
+                                  </p>
+                                )}
                               </div>
                             </div>
-                          </div>
-                        </div>
-
-                        {/* Content centered below circle */}
-                        <div className="text-center space-y-1">
-                          <h3 className="font-serif text-sm font-bold text-[#6b1d2f] truncate transition-colors">
-                            {alum.user.name}
-                          </h3>
-                          <p className="text-[9px] text-red-700 font-extrabold uppercase tracking-wide truncate mt-0.5">
-                            {alum.role || "Alumni"}
-                          </p>
-                          {alum.company && (
-                            <p className="text-[8px] text-slate-400 font-medium truncate leading-none mt-0.5">
-                              {alum.company}
+     
+                            <p className="text-slate-500 text-[10.5px] leading-relaxed line-clamp-2 mt-4 text-center italic">
+                              &ldquo;{alum.bio || alum.skills || "Proud graduate of Cambridge Court."}&rdquo;
                             </p>
-                          )}
+                          </div>
+     
+                          <div 
+                            onClick={(e) => e.stopPropagation()}
+                            className="border-t border-slate-100/60 px-6 py-3 flex items-center justify-center gap-4 bg-slate-50/50"
+                          >
+                            {alum.user.email ? (
+                              <a 
+                                href={`mailto:${alum.user.email}`} 
+                                className="text-slate-400 hover:text-maroon-700 transition-colors p-1"
+                                title="Send Email"
+                              >
+                                <Mail size={13} className="stroke-[2.5]" />
+                              </a>
+                            ) : (
+                              <Mail size={13} className="text-slate-200" />
+                            )}
+
+                            {alum.linkedin ? (
+                              <a 
+                                href={alum.linkedin} 
+                                target="_blank" 
+                                rel="noopener noreferrer" 
+                                className="text-slate-400 hover:text-navy-600 transition-colors p-1"
+                                title="LinkedIn Profile"
+                              >
+                                <LinkedinIcon size={12} />
+                              </a>
+                            ) : (
+                              <LinkedinIcon size={12} className="text-slate-200" />
+                            )}
+                          </div>
+                        </motion.div>
+                      ))}
+                    </AnimatePresence>
+                  </motion.div>
+                )}
+
+                {/* Pagination Controls */}
+                {totalPages > 1 && (
+                  <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-10 p-4 rounded-2xl bg-white/10 border border-white/20 backdrop-blur-md shadow-sm">
+                    <span className="text-[10px] text-slate-500 font-extrabold uppercase tracking-wider">
+                      Showing {(currentPage - 1) * itemsPerPage + 1} - {Math.min(currentPage * itemsPerPage, filteredAlumni.length)} of {filteredAlumni.length} alumni
+                    </span>
+                    
+                    <div className="flex items-center gap-1.5">
+                      <button
+                        disabled={currentPage === 1}
+                        onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                        className="px-3.5 py-2 rounded-xl text-[10px] font-extrabold uppercase tracking-wider transition-all bg-white/40 hover:bg-white/80 border border-white/60 text-slate-700 disabled:opacity-40 disabled:hover:bg-white/40 shadow-sm flex items-center gap-1 active:scale-95 disabled:active:scale-100"
+                      >
+                        Previous
+                      </button>
+
+                      <div className="flex items-center gap-0.5">
+                        {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => {
+                          const isNear = Math.abs(pageNum - currentPage) <= 1;
+                          const isFirstOrLast = pageNum === 1 || pageNum === totalPages;
+                          
+                          if (!isNear && !isFirstOrLast) {
+                            if (pageNum === 2 || pageNum === totalPages - 1) {
+                              return <span key={pageNum} className="px-1.5 text-xs text-slate-400 font-extrabold select-none">...</span>;
+                            }
+                            return null;
+                          }
+
+                          return (
+                            <button
+                              key={pageNum}
+                              onClick={() => setCurrentPage(pageNum)}
+                              className={`w-8 h-8 rounded-xl text-[10px] font-extrabold transition-all border shadow-sm active:scale-95 ${
+                                currentPage === pageNum
+                                  ? "bg-gradient-to-r from-maroon-600 to-navy-700 text-white border-transparent"
+                                  : "bg-white/40 hover:bg-white/80 border-white/60 text-slate-750"
+                              }`}
+                            >
+                              {pageNum}
+                            </button>
+                          );
+                        })}
+                      </div>
+
+                      <button
+                        disabled={currentPage === totalPages}
+                        onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                        className="px-3.5 py-2 rounded-xl text-[10px] font-extrabold uppercase tracking-wider transition-all bg-white/40 hover:bg-white/80 border border-white/60 text-slate-700 disabled:opacity-40 disabled:hover:bg-white/40 shadow-sm flex items-center gap-1 active:scale-95 disabled:active:scale-100"
+                      >
+                        Next
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+        )}
+
+        {/* ── 2. STUDENT VIEW (Mentorship Hub) ─────────────────────────────────── */}
+        {viewMode === 'student' && (
+          <div className="space-y-8 animate-fade-in">
+            <div className="glass-panel p-8 text-center space-y-4">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-100 text-[10px] font-bold text-emerald-700 uppercase tracking-wider">
+                <Sparkles size={11} className="fill-current animate-pulse" /> Find a Mentor
+              </span>
+              <h3 className="text-2xl font-serif font-black text-slate-900">Academic &amp; Career Mentorship Hub</h3>
+              <p className="text-xs text-slate-550 max-w-xl mx-auto leading-relaxed">
+                Connect directly with CCHS &amp; CCWS alumni placed at elite institutions and corporations. Request 1-on-1 career guidance, portfolio reviews, and university planning.
+              </p>
+            </div>
+
+            {/* List Mentors Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+              {alumni.map((alum) => {
+                // Determine if they are mapped as a mentor in DB
+                const isMentor = alum.isMentor || alum.skills.toLowerCase().includes("mentor") || alum.batch < 2020;
+                if (!isMentor) return null;
+
+                return (
+                  <motion.div
+                    key={alum.id}
+                    whileHover={{ y: -5 }}
+                    className="bg-white rounded-[2rem] border border-slate-100 p-6 flex flex-col justify-between h-[340px] shadow-sm hover:shadow-xl transition-all duration-300 relative overflow-hidden"
+                  >
+                    <div className="space-y-4">
+                      {/* Top metadata */}
+                      <div className="flex items-center justify-between text-[8px] font-extrabold uppercase text-slate-450 tracking-wider">
+                        <span>Class of {alum.batch || '2016'}</span>
+                        <span className={`px-2 py-0.5 rounded-full ${alum.school === 'CCHS' ? 'bg-maroon-50 text-maroon-700' : 'bg-navy-50 text-navy-700'}`}>
+                          {alum.school} Network
+                        </span>
+                      </div>
+
+                      {/* Mentor details */}
+                      <div className="flex items-center gap-3.5">
+                        <img 
+                          src={alum.user.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(alum.user.name)}`}
+                          className="w-12 h-12 rounded-full object-cover border border-slate-100 shadow-sm"
+                          alt={alum.user.name} 
+                        />
+                        <div className="text-left min-w-0">
+                          <h4 className="font-serif text-sm font-bold text-[#6b1d2f] truncate">{alum.user.name}</h4>
+                          <span className="block text-[9px] text-[#001f3f] font-black uppercase tracking-wider truncate">{alum.role || 'Alumni'}</span>
+                          <span className="block text-[8px] text-slate-400 font-bold truncate">{alum.company || 'Global Lead'}</span>
                         </div>
                       </div>
 
-                      {/* Biography / Details */}
-                      <p className="text-slate-500 text-[11px] leading-relaxed line-clamp-2 mt-4 text-center">
-                        {alum.bio || alum.skills}
+                      {/* Skills Tags */}
+                      <div className="space-y-1.5">
+                        <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest block">Fields of Guidance:</span>
+                        <div className="flex flex-wrap gap-1">
+                          {alum.skills.split(',').slice(0, 3).map((tag, i) => (
+                            <span key={i} className="text-[9px] bg-slate-50 border border-slate-200/50 text-slate-600 font-semibold px-2 py-0.5 rounded-lg">
+                              {tag.trim()}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+
+                      <p className="text-[10px] text-slate-500 leading-relaxed line-clamp-2 italic">
+                        &ldquo;{alum.bio || "Available to review CVs and provide interview guidance."}&rdquo;
                       </p>
                     </div>
 
-                    {/* Footer Links (Centered Envelope) */}
-                    <div 
-                      onClick={(e) => e.stopPropagation()}
-                      className="border-t border-slate-100/60 px-6 py-3.5 flex items-center justify-center bg-slate-50/50"
+                    {/* Request CTA Button */}
+                    <button
+                      onClick={() => setSelectedMentorForReq(alum)}
+                      className="w-full mt-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-950 text-white font-bold text-[10px] uppercase tracking-wider transition-all hover:scale-[1.01] active:scale-95 cursor-pointer shadow-xs flex items-center justify-center gap-1.5"
                     >
-                      {alum.user.email ? (
-                        <a 
-                          href={`mailto:${alum.user.email}`} 
-                          className="text-slate-400 hover:text-maroon-700 transition-colors"
-                          title="Send Email"
-                        >
-                          <Mail size={13} className="stroke-[2.5]" />
-                        </a>
-                      ) : (
-                        <Mail size={13} className="text-slate-200" />
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {/* Pagination Controls */}
-            {totalPages > 1 && (
-              <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-10 p-4 rounded-2xl bg-white/10 border border-white/20 backdrop-blur-md shadow-sm">
-                <span className="text-[10px] text-slate-500 font-extrabold uppercase tracking-wider">
-                  Showing {(currentPage - 1) * itemsPerPage + 1} - {Math.min(currentPage * itemsPerPage, filteredAlumni.length)} of {filteredAlumni.length} alumni
-                </span>
-                
-                <div className="flex items-center gap-1.5">
-                  <button
-                    disabled={currentPage === 1}
-                    onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                    className="px-3.5 py-2 rounded-xl text-[10px] font-extrabold uppercase tracking-wider transition-all bg-white/40 hover:bg-white/80 border border-white/60 text-slate-700 disabled:opacity-40 disabled:hover:bg-white/40 shadow-sm flex items-center gap-1 active:scale-95 disabled:active:scale-100"
-                  >
-                    Previous
-                  </button>
-
-                  <div className="flex items-center gap-0.5">
-                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => {
-                      const isNear = Math.abs(pageNum - currentPage) <= 1;
-                      const isFirstOrLast = pageNum === 1 || pageNum === totalPages;
-                      
-                      if (!isNear && !isFirstOrLast) {
-                        if (pageNum === 2 || pageNum === totalPages - 1) {
-                          return <span key={pageNum} className="px-1.5 text-xs text-slate-400 font-extrabold select-none">...</span>;
-                        }
-                        return null;
-                      }
-
-                      return (
-                        <button
-                          key={pageNum}
-                          onClick={() => setCurrentPage(pageNum)}
-                          className={`w-8 h-8 rounded-xl text-[10px] font-extrabold transition-all border shadow-sm active:scale-95 ${
-                            currentPage === pageNum
-                              ? "bg-gradient-to-r from-maroon-600 to-navy-700 text-white border-transparent"
-                              : "bg-white/40 hover:bg-white/80 border-white/60 text-slate-750"
-                          }`}
-                        >
-                          {pageNum}
-                        </button>
-                      );
-                    })}
-                  </div>
-
-                  <button
-                    disabled={currentPage === totalPages}
-                    onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                    className="px-3.5 py-2 rounded-xl text-[10px] font-extrabold uppercase tracking-wider transition-all bg-white/40 hover:bg-white/80 border border-white/60 text-slate-700 disabled:opacity-40 disabled:hover:bg-white/40 shadow-sm flex items-center gap-1 active:scale-95 disabled:active:scale-100"
-                  >
-                    Next
-                  </button>
-                </div>
-              </div>
-            )}
-          </>
+                      <Sparkles size={11} className="text-amber-300 fill-current" />
+                      <span>Request Mentorship</span>
+                    </button>
+                  </motion.div>
+                );
+              })}
+            </div>
+          </div>
         )}
 
+        {/* ── 3. MENTOR PORTAL VIEW ───────────────────────────────────────────── */}
+        {viewMode === 'mentor' && (
+          <div className="space-y-8 animate-fade-in">
+            {/* Quick Simulate Login Banner */}
+            {!simulatedMentor ? (
+              <div className="glass-panel p-12 text-center space-y-6 max-w-xl mx-auto">
+                <div className="p-4 bg-maroon-50 rounded-full inline-block text-maroon-700">
+                  <Landmark size={28} />
+                </div>
+                <div className="space-y-2">
+                  <h3 className="text-xl font-serif font-black text-slate-950">Mentor Workstation Portal</h3>
+                  <p className="text-xs text-slate-550 leading-relaxed">
+                    Select a verified alumni profile from the list below to enter your simulated workstation. Manage student requests and details.
+                  </p>
+                </div>
+
+                <div className="space-y-3">
+                  <label className="text-[9px] font-black uppercase text-slate-500 tracking-wider block text-left">Choose Mentor Profile to Simulate:</label>
+                  <select
+                    onChange={(e) => {
+                      const alum = alumni.find(a => a.id === e.target.value);
+                      if (alum) setSimulatedMentor(alum);
+                    }}
+                    defaultValue=""
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-xs text-slate-800 font-semibold focus:outline-none focus:border-maroon-700/50"
+                  >
+                    <option value="" disabled>-- Select Profile --</option>
+                    {alumni.map(a => (
+                      <option key={a.id} value={a.id}>{a.user.name} ({a.company || 'Alumni'})</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                
+                {/* Left Side: Profile HUD details */}
+                <div className="lg:col-span-4 bg-white border border-slate-100 rounded-[2.5rem] p-8 space-y-6 shadow-sm">
+                  <div className="flex justify-between items-center">
+                    <span className="px-3 py-1 rounded-full bg-emerald-50 border border-emerald-100 text-[8px] font-bold text-emerald-700 uppercase tracking-wider">
+                      Simulated Workspace Active
+                    </span>
+                    <button 
+                      onClick={() => setSimulatedMentor(null)}
+                      className="text-[10px] font-bold text-slate-400 hover:text-red-650 transition-colors uppercase tracking-wider"
+                    >
+                      Logout
+                    </button>
+                  </div>
+
+                  <div className="flex flex-col items-center text-center space-y-4">
+                    <img 
+                      src={simulatedMentor.user.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(simulatedMentor.user.name)}`}
+                      className="w-20 h-20 rounded-full object-cover border-4 border-slate-50 shadow-md"
+                      alt={simulatedMentor.user.name} 
+                    />
+                    <div>
+                      <h4 className="font-serif text-lg font-bold text-slate-900">{simulatedMentor.user.name}</h4>
+                      <p className="text-xs text-slate-500 font-medium">{simulatedMentor.role} at {simulatedMentor.company || 'Global Lead'}</p>
+                    </div>
+                  </div>
+
+                  {/* Profile completeness meter */}
+                  <div className="space-y-1.5 border-t border-b border-slate-100 py-4">
+                    <div className="flex justify-between text-[9px] font-black uppercase text-slate-450 tracking-wider">
+                      <span>Profile Completeness</span>
+                      <span>{simulatedMentor.profileComplete}%</span>
+                    </div>
+                    <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                      <div className="bg-gradient-to-r from-maroon-600 to-amber-500 h-full rounded-full" style={{ width: `${simulatedMentor.profileComplete}%` }} />
+                    </div>
+                  </div>
+
+                  <div className="space-y-4 text-xs">
+                    <div className="space-y-0.5">
+                      <span className="block text-[8px] font-black uppercase text-slate-400 tracking-wider">E-mail:</span>
+                      <span className="font-bold text-slate-700">{simulatedMentor.user.email || '—'}</span>
+                    </div>
+                    <div className="space-y-0.5">
+                      <span className="block text-[8px] font-black uppercase text-slate-400 tracking-wider">School:</span>
+                      <span className="font-bold text-slate-700">{simulatedMentor.school} Network Group</span>
+                    </div>
+                    <div className="space-y-0.5">
+                      <span className="block text-[8px] font-black uppercase text-slate-400 tracking-wider">Expertise tags:</span>
+                      <span className="font-bold text-slate-700">{simulatedMentor.skills}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Right Side: Live Received Mentorship Connections */}
+                <div className="lg:col-span-8 space-y-6">
+                  <div className="bg-slate-900 text-white rounded-[2rem] p-6 shadow flex justify-between items-center">
+                    <div>
+                      <h4 className="font-serif text-md font-bold">Received Requests Dashboard</h4>
+                      <p className="text-[10px] text-slate-400">Manage pending 1-on-1 mentorship connects received from current students.</p>
+                    </div>
+                    <div className="px-4 py-2 bg-white/10 rounded-xl text-xs font-bold">
+                      Total: {mentorships.filter(m => m.alumniId === simulatedMentor.id).length}
+                    </div>
+                  </div>
+
+                  {/* Filter and display requests */}
+                  {loadingMentorships ? (
+                    <div className="text-center py-12 bg-white rounded-[2rem] border border-slate-100">
+                      <RefreshCw className="animate-spin text-maroon-700 mx-auto" size={20} />
+                      <span className="text-[10px] font-bold text-slate-450 uppercase tracking-widest mt-2 block">Loading pending connects...</span>
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      {mentorships.filter(m => m.alumniId === simulatedMentor.id).length === 0 ? (
+                        <div className="text-center py-16 bg-white rounded-[2rem] border border-slate-100 space-y-2">
+                          <span className="text-slate-400 text-xs font-semibold block uppercase tracking-wider">No Connect Requests</span>
+                          <p className="text-[11px] text-slate-500">You haven&apos;t received any student mentorship requests yet.</p>
+                        </div>
+                      ) : (
+                        mentorships.filter(m => m.alumniId === simulatedMentor.id).map((req) => (
+                          <motion.div
+                            key={req.id}
+                            initial={{ opacity: 0, x: 10 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            className="bg-white border border-slate-100 rounded-[2rem] p-6 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6"
+                          >
+                            <div className="space-y-2 flex-1 text-left">
+                              <div className="flex items-center gap-2">
+                                <h5 className="font-serif text-sm font-bold text-[#001f3f]">{req.student?.user?.name || req.studentId}</h5>
+                                <span className={`text-[8px] font-black uppercase tracking-wider px-2 py-0.5 rounded ${
+                                  req.status === 'PENDING' 
+                                    ? 'bg-amber-50 text-amber-700 border border-amber-100'
+                                    : req.status === 'ACCEPTED'
+                                      ? 'bg-emerald-50 text-emerald-700 border border-emerald-100'
+                                      : 'bg-red-50 text-red-700 border border-red-100'
+                                }`}>
+                                  {req.status}
+                                </span>
+                              </div>
+
+                              <p className="text-xs text-slate-600 bg-slate-50 p-3.5 rounded-xl border border-slate-100 italic leading-relaxed">
+                                &ldquo;{req.notes || "No notes provided by student."}&rdquo;
+                              </p>
+
+                              <span className="block text-[9px] text-slate-400 font-bold">
+                                Received on: {new Date(req.createdAt).toLocaleDateString(undefined, { dateStyle: 'medium' })}
+                              </span>
+                            </div>
+
+                            {/* Accept/Decline action buttons */}
+                            {req.status === 'PENDING' && (
+                              <div className="flex sm:flex-col gap-2 shrink-0 w-full sm:w-auto">
+                                <button
+                                  disabled={actionInProgress === req.id}
+                                  onClick={() => handleUpdateMentorshipStatus(req.id, 'ACCEPTED')}
+                                  className="flex-1 py-2 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-[10px] font-extrabold uppercase tracking-wider transition-all disabled:opacity-50"
+                                >
+                                  {actionInProgress === req.id ? 'Loading...' : 'Accept'}
+                                </button>
+                                <button
+                                  disabled={actionInProgress === req.id}
+                                  onClick={() => handleUpdateMentorshipStatus(req.id, 'DECLINED')}
+                                  className="flex-1 py-2 px-4 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-[10px] font-extrabold uppercase tracking-wider transition-all disabled:opacity-50 border border-slate-200/50"
+                                >
+                                  Decline
+                                </button>
+                              </div>
+                            )}
+
+                            {req.status === 'ACCEPTED' && (
+                              <div className="text-right shrink-0">
+                                <span className="text-[10px] text-emerald-700 font-bold uppercase tracking-wider block">Connection Active</span>
+                                <a href={`mailto:${req.student?.user?.email}`} className="text-[9px] text-slate-500 hover:text-slate-700 underline font-semibold mt-1 block">Email Mentee</a>
+                              </div>
+                            )}
+                          </motion.div>
+                        ))
+                      )}
+                    </div>
+                  )}
+
+                </div>
+
+              </div>
+            )}
+          </div>
+        )}
       </main>
+      {/* ================= MODAL: STUDENT REQUEST MENTORSHIP ================= */}
+      {selectedMentorForReq && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4 animate-fade-in" data-lenis-prevent>
+          <div className="w-full max-w-md rounded-[2.5rem] bg-white border border-slate-100 p-8 shadow-2xl space-y-6 relative animate-scale-in text-left">
+            <button 
+              onClick={() => setSelectedMentorForReq(null)}
+              className="absolute top-6 right-6 p-2 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 transition-all duration-200 cursor-pointer z-20 hover:scale-105"
+            >
+              <X size={14} />
+            </button>
+
+            <div className="space-y-1">
+              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-maroon-50 text-[9px] font-black text-maroon-700 uppercase tracking-widest border border-maroon-100/50">
+                1-on-1 Connect
+              </span>
+              <h3 className="text-xl font-bold tracking-tight text-slate-900 font-serif">Request Career Guidance</h3>
+              <p className="text-xs text-slate-500 mt-1 font-semibold">You are requesting mentorship from <span className="text-[#6b1d2f] font-bold">{selectedMentorForReq.user.name}</span>.</p>
+            </div>
+
+            <form onSubmit={handleRequestMentorship} className="space-y-4">
+              <div className="space-y-1.5">
+                <label className="text-[9px] font-black text-slate-450 uppercase tracking-wider block">Your Full Name</label>
+                <input 
+                  type="text" 
+                  required
+                  value={studentReqForm.name} 
+                  onChange={e => setStudentReqForm({...studentReqForm, name: e.target.value})}
+                  placeholder="Enter your name"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-xs text-slate-800 focus:bg-white focus:border-maroon-700/50 focus:ring-1 focus:ring-maroon-700/20 transition-all duration-200 focus:outline-none"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-[9px] font-black text-slate-450 uppercase tracking-wider block">Your Email Address</label>
+                <input 
+                  type="email" 
+                  required
+                  value={studentReqForm.email} 
+                  onChange={e => setStudentReqForm({...studentReqForm, email: e.target.value})}
+                  placeholder="Enter your email"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-xs text-slate-800 focus:bg-white focus:border-maroon-700/50 focus:ring-1 focus:ring-maroon-700/20 transition-all duration-200 focus:outline-none"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-[9px] font-black text-slate-450 uppercase tracking-wider block">Describe what guidance you need</label>
+                <textarea 
+                  required
+                  value={studentReqForm.notes} 
+                  onChange={e => setStudentReqForm({...studentReqForm, notes: e.target.value})}
+                  placeholder="What questions do you have? e.g. college applications, prep strategies, role guidance..."
+                  rows={4}
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-xs text-slate-800 focus:bg-white focus:border-maroon-700/50 focus:ring-1 focus:ring-maroon-700/20 transition-all duration-200 focus:outline-none resize-none"
+                />
+              </div>
+
+              <button 
+                type="submit"
+                disabled={submittingMentorshipReq}
+                className={`w-full py-3.5 rounded-xl text-xs font-bold text-white transition-all shadow-md uppercase tracking-wider focus:outline-none focus:ring-2 focus:ring-maroon-700/20 active:scale-[0.99] duration-150 flex items-center justify-center gap-2 ${
+                  submittingMentorshipReq
+                    ? "bg-slate-400 cursor-not-allowed opacity-75"
+                    : "bg-[#001f3f] hover:bg-[#00162d]"
+                }`}
+              >
+                {submittingMentorshipReq ? "Submitting Request..." : "Submit Connect Request"}
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
 
       {/* ================= DETAIL PROFILE MODAL ================= */}
       {selectedAlumni && (

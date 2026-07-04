@@ -11,8 +11,10 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const school = searchParams.get('school'); // e.g. "CCHS", "CCWS", "CCIS"
 
+    const nocache = searchParams.get('nocache') === 'true';
+
     // Check custom server-side in-memory cache first
-    const cachedList = getAlumniCache(school);
+    const cachedList = nocache ? null : getAlumniCache(school);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let list: any[] = [];
 
@@ -38,7 +40,7 @@ export async function GET(request: Request) {
         fetchedList = snapshot.docs
           .map((doc: QueryDocumentSnapshot) => doc.data());
       } else if (school === 'CCIS') {
-        // CCIS displays data for both CCHS and CCWS, top 25 profiles each on page 1
+        // CCIS displays data for both CCHS and CCWS, top 30 profiles each on page 1
         const [cchsSnapshot, ccwsSnapshot] = await Promise.all([
           alumniRef
             .where('school', '==', 'CCHS')
@@ -53,11 +55,11 @@ export async function GET(request: Request) {
         const cchsTop = cchsSnapshot.docs
           .map((doc: QueryDocumentSnapshot) => doc.data())
           .sort((a: { batch?: number }, b: { batch?: number }) => (b.batch || 0) - (a.batch || 0))
-          .slice(0, 25);
+          .slice(0, 30);
         const ccwsTop = ccwsSnapshot.docs
           .map((doc: QueryDocumentSnapshot) => doc.data())
           .sort((a: { batch?: number }, b: { batch?: number }) => (b.batch || 0) - (a.batch || 0))
-          .slice(0, 25);
+          .slice(0, 30);
         fetchedList = [...cchsTop, ...ccwsTop];
       } else {
         // Return all verified if no school parameter specified
@@ -93,7 +95,12 @@ export async function GET(request: Request) {
     response.headers.set('Access-Control-Allow-Origin', '*');
     response.headers.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
     response.headers.set('Access-Control-Allow-Headers', 'Content-Type');
-    response.headers.set('Cache-Control', 'public, s-maxage=30, stale-while-revalidate=60');
+    
+    if (nocache) {
+      response.headers.set('Cache-Control', 'no-store, max-age=0, must-revalidate');
+    } else {
+      response.headers.set('Cache-Control', 'public, s-maxage=30, stale-while-revalidate=60');
+    }
 
     return response;
   } catch (error) {
