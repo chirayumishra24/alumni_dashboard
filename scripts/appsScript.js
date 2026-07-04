@@ -237,3 +237,53 @@ function testConnection() {
     Logger.log("Test failed: " + err.message);
   }
 }
+
+// ═══════════════════════════════════════════════════════════════════════════
+// HTTP GET ENDPOINT (Serves sheet data directly as clean JSON)
+// ═══════════════════════════════════════════════════════════════════════════
+
+function doGet(e) {
+  var sheets = SpreadsheetApp.getActiveSpreadsheet().getSheets();
+  var sheet = null;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].getSheetId() === TARGET_SHEET_GID) {
+      sheet = sheets[i];
+      break;
+    }
+  }
+  
+  if (!sheet) {
+    return ContentService.createTextOutput(JSON.stringify({ error: "Target sheet not found" }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+  
+  var data = sheet.getDataRange().getValues();
+  if (data.length < 2) {
+    return ContentService.createTextOutput(JSON.stringify([]))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+  
+  var headers = data[0];
+  var rows = [];
+  
+  for (var r = 1; r < data.length; r++) {
+    var row = data[r];
+    var hasData = false;
+    for (var c = 0; c < row.length; c++) {
+      if (row[c] !== "" && row[c] !== null && row[c] !== undefined) {
+        hasData = true;
+        break;
+      }
+    }
+    if (!hasData) continue;
+    
+    var rowObj = {};
+    for (var k = 0; k < headers.length; k++) {
+      rowObj[headers[k]] = row[k] !== undefined ? String(row[k]) : "";
+    }
+    rows.push(rowObj);
+  }
+  
+  return ContentService.createTextOutput(JSON.stringify(rows))
+    .setMimeType(ContentService.MimeType.JSON);
+}
