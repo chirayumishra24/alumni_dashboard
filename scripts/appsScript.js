@@ -19,7 +19,7 @@
 // CONFIGURATION — UPDATE THESE VALUES
 // ═══════════════════════════════════════════════════════════════════════════
 
-const DASHBOARD_SYNC_URL = "https://your-dashboard-domain.com/api/sync";  // <-- UPDATE THIS
+const DASHBOARD_SYNC_URL = "https://alumni-dashboard-six.vercel.app/api/sync";
 const SYNC_SECRET = "ccgs-alumni-sync-2026";  // Must match .env SYNC_SECRET
 const TARGET_SHEET_GID = 1703773069;  // The specific sheet tab to monitor
 
