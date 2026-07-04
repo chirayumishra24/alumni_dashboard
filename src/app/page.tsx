@@ -66,6 +66,24 @@ interface AlumniProfile {
   bio?: string | null;
 }
 
+interface MentorshipRequest {
+  id: string;
+  studentId: string;
+  alumniId: string;
+  notes: string;
+  status: 'PENDING' | 'ACCEPTED' | 'DECLINED';
+  createdAt: string;
+  student?: {
+    id: string;
+    user: {
+      name: string;
+      email: string;
+      avatarUrl: string | null;
+    };
+  };
+  alumni?: AlumniProfile;
+}
+
 const ALUMNI_VIDEOS_L2R = [
   { id: "jnQe7v8XwrU", title: "IIT Roorkee Testimony", name: "Divisha Khurana", role: "IIT Roorkee (Electrical)", image: "https://img.youtube.com/vi/jnQe7v8XwrU/0.jpg" },
   { id: "6gw7mva7OzU", title: "NLSIU Law Graduation Testimony", name: "Yashashvi Bharadwaj", role: "NLSIU Law Graduate", image: "https://img.youtube.com/vi/6gw7mva7OzU/0.jpg" },
@@ -120,7 +138,7 @@ export default function PublicAlumniPage() {
   const [viewMode, setViewMode] = useState<'directory' | 'student' | 'mentor'>("directory");
 
   // Mentorship System States
-  const [mentorships, setMentorships] = useState<any[]>([]);
+  const [mentorships, setMentorships] = useState<MentorshipRequest[]>([]);
   const [loadingMentorships, setLoadingMentorships] = useState(false);
   const [selectedMentorForReq, setSelectedMentorForReq] = useState<AlumniProfile | null>(null);
   const [studentReqForm, setStudentReqForm] = useState({ name: "", email: "", notes: "" });
