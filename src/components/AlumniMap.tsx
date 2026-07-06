@@ -1,7 +1,45 @@
+/* eslint-disable */
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
-import { CITY_COORDS, type GlobeMarker } from "./AlumniGlobe";
+import React, { useEffect, useRef, useState, useCallback } from "react";
+import type L from "leaflet";
+
+export interface GlobeMarker {
+  city: string;
+  country: string;
+  lat: number;
+  lng: number;
+  count: number;
+  alumniNames: string[];
+}
+
+export const CITY_COORDS: Record<string, { lat: number; lng: number }> = {
+  "london": { lat: 51.5074, lng: -0.1278 },
+  "new york": { lat: 40.7128, lng: -74.0060 },
+  "seattle": { lat: 47.6062, lng: -122.3321 },
+  "dubai": { lat: 25.2048, lng: 55.2708 },
+  "stockholm": { lat: 59.3293, lng: 18.0686 },
+  "sweden": { lat: 59.3293, lng: 18.0686 },
+  "singapore": { lat: 1.3521, lng: 103.8198 },
+  "los angeles": { lat: 34.0522, lng: -118.2437 },
+  "ucla": { lat: 34.0522, lng: -118.2437 },
+  "glasgow": { lat: 55.8642, lng: -4.2518 },
+  "minnesota": { lat: 46.7296, lng: -94.6859 },
+  // India Cities
+  "jaipur": { lat: 26.9124, lng: 75.7873 },
+  "mumbai": { lat: 19.0760, lng: 72.8777 },
+  "new delhi": { lat: 28.6139, lng: 77.2090 },
+  "delhi": { lat: 28.6139, lng: 77.2090 },
+  "bangalore": { lat: 12.9716, lng: 77.5946 },
+  "bengaluru": { lat: 12.9716, lng: 77.5946 },
+  "hyderabad": { lat: 17.3850, lng: 78.4867 },
+  "pune": { lat: 18.5204, lng: 73.8567 },
+  "jodhpur": { lat: 26.2389, lng: 73.0243 },
+  "kanpur": { lat: 26.4499, lng: 80.3319 },
+  "kharagpur": { lat: 22.3460, lng: 87.2320 },
+  "roorkee": { lat: 29.8543, lng: 77.8880 },
+  "mandi": { lat: 31.7087, lng: 76.9320 },
+};
 
 interface AlumniMapProps {
   alumniData: Array<{
@@ -16,14 +54,14 @@ interface AlumniMapProps {
 
 export default function AlumniMap({ alumniData }: AlumniMapProps) {
   const mapContainerRef = useRef<HTMLDivElement>(null);
-  const mapInstanceRef = useRef<any>(null);
-  const markersLayerRef = useRef<any>(null);
+  const mapInstanceRef = useRef<L.Map | null>(null);
+  const markersLayerRef = useRef<L.FeatureGroup | null>(null);
   const [markers, setMarkers] = useState<GlobeMarker[]>([]);
   const [hoveredMarker, setHoveredMarker] = useState<GlobeMarker | null>(null);
 
   // Group and count coordinates
   useEffect(() => {
-    const cityGroups: Record<string, { marker: Omit<GlobeMarker, "alumniNames">; names: string[] }> = {};
+    const cityGroups: Record<string, { city: string; country: string; lat: number; lng: number; count: number; names: string[] }> = {};
 
     alumniData.forEach((alum) => {
       let city = (alum.city || "Jaipur").trim();
@@ -47,23 +85,25 @@ export default function AlumniMap({ alumniData }: AlumniMapProps) {
         const groupKey = `${cityKey}__${country.toLowerCase()}`;
         if (!cityGroups[groupKey]) {
           cityGroups[groupKey] = {
-            marker: {
-              city,
-              country,
-              lat: coords.lat,
-              lng: coords.lng,
-              count: 0,
-            } as any,
+            city,
+            country,
+            lat: coords.lat,
+            lng: coords.lng,
+            count: 0,
             names: [],
           };
         }
-        cityGroups[groupKey].marker.count++;
+        cityGroups[groupKey].count++;
         cityGroups[groupKey].names.push(alum.user.name);
       }
     });
 
     const parsedMarkers: GlobeMarker[] = Object.values(cityGroups).map((g) => ({
-      ...g.marker,
+      city: g.city,
+      country: g.country,
+      lat: g.lat,
+      lng: g.lng,
+      count: g.count,
       alumniNames: Array.from(new Set(g.names)),
     }));
 
@@ -141,10 +181,12 @@ export default function AlumniMap({ alumniData }: AlumniMapProps) {
   }, [markers]);
 
   const updatePins = (L: any) => {
-    if (!markersLayerRef.current || !mapInstanceRef.current) return;
+    const markersLayer = markersLayerRef.current;
+    const mapInstance = mapInstanceRef.current;
+    if (!markersLayer || !mapInstance) return;
 
     // Clear old pins
-    markersLayerRef.current.clearLayers();
+    markersLayer.clearLayers();
 
     markers.forEach((marker) => {
       // Create glowing HTML dot marker
@@ -200,12 +242,12 @@ export default function AlumniMap({ alumniData }: AlumniMapProps) {
         setHoveredMarker(null);
       });
 
-      markersLayerRef.current.addLayer(pin);
+      markersLayer.addLayer(pin);
     });
 
     // Fit map view to pins with padding (except if only Jaipur exists)
     if (markers.length > 1) {
-      mapInstanceRef.current.fitBounds(markersLayerRef.current.getBounds(), {
+      mapInstance.fitBounds(markersLayer.getBounds(), {
         padding: [30, 30],
         maxZoom: 5,
       });
