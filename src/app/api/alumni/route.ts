@@ -37,16 +37,14 @@ export async function GET(request: Request) {
           .where('isVerified', '==', true)
           .get();
         fetchedList = snapshot.docs
-          .map((doc: QueryDocumentSnapshot) => doc.data())
-          .filter(isOutsideIndia);
+          .map((doc: QueryDocumentSnapshot) => doc.data());
       } else if (school === 'CCWS') {
         const snapshot = await alumniRef
           .where('school', '==', 'CCWS')
           .where('isVerified', '==', true)
           .get();
         fetchedList = snapshot.docs
-          .map((doc: QueryDocumentSnapshot) => doc.data())
-          .filter(isOutsideIndia);
+          .map((doc: QueryDocumentSnapshot) => doc.data());
       } else if (school === 'CCIS') {
         // CCIS displays data for both CCHS and CCWS, top 30 profiles each on page 1
         const [cchsSnapshot, ccwsSnapshot] = await Promise.all([
