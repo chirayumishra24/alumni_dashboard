@@ -21,6 +21,11 @@ export default function CountdownBanner() {
 
   const [timeLeft, setTimeLeft] = useState<CountdownTime>({ days: 0, hours: 0, minutes: 0, seconds: 0 });
   const [hasFinished, setHasFinished] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   useEffect(() => {
     // Attempt to load events from the API
@@ -69,10 +74,15 @@ export default function CountdownBanner() {
     return () => clearInterval(interval);
   }, [eventData.date]);
 
-  if (hasFinished) return null;
+  if (!isMounted || hasFinished) return null;
 
   return (
-    <section className="max-w-7xl mx-auto px-6 md:px-8 mt-10 relative z-10 text-left">
+    <motion.section
+      initial={{ opacity: 0, y: 15 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      className="max-w-7xl mx-auto px-6 md:px-8 mt-10 relative z-10 text-left"
+    >
       <div className="bg-gradient-to-r from-maroon-700 via-maroon-600 to-navy-700 text-white rounded-[2.5rem] p-6 md:p-8 relative overflow-hidden shadow-xl border border-white/10">
         
         {/* Decorative elements */}
@@ -140,6 +150,6 @@ export default function CountdownBanner() {
         </div>
 
       </div>
-    </section>
+    </motion.section>
   );
 }
