@@ -64,7 +64,7 @@ export default function Navbar({ isSyncing, triggerSync, setShowRegModal, contex
           >
             <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/15 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-out" />
             <PlusCircle size={14} className="group-hover:rotate-90 group-hover:scale-110 transition-all duration-300 text-amber-350 shrink-0" />
-            <span>Register Profile</span>
+            <span className="hidden sm:inline">Register Profile</span>
           </button>
         </div>
       </div>
