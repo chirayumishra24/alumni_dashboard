@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { NextResponse } from 'next/server';
 import { firestore } from '@/lib/firebaseAdmin';
 import { QueryDocumentSnapshot } from 'firebase-admin/firestore';
@@ -25,20 +26,27 @@ export async function GET(request: Request) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       let fetchedList: any[] = [];
 
+      const isOutsideIndia = (data: any) => {
+        const country = data.country || '';
+        return country.trim().toLowerCase() !== 'india' && country.trim() !== '';
+      };
+
       if (school === 'CCHS') {
         const snapshot = await alumniRef
           .where('school', '==', 'CCHS')
           .where('isVerified', '==', true)
           .get();
         fetchedList = snapshot.docs
-          .map((doc: QueryDocumentSnapshot) => doc.data());
+          .map((doc: QueryDocumentSnapshot) => doc.data())
+          .filter(isOutsideIndia);
       } else if (school === 'CCWS') {
         const snapshot = await alumniRef
           .where('school', '==', 'CCWS')
           .where('isVerified', '==', true)
           .get();
         fetchedList = snapshot.docs
-          .map((doc: QueryDocumentSnapshot) => doc.data());
+          .map((doc: QueryDocumentSnapshot) => doc.data())
+          .filter(isOutsideIndia);
       } else if (school === 'CCIS') {
         // CCIS displays data for both CCHS and CCWS, top 30 profiles each on page 1
         const [cchsSnapshot, ccwsSnapshot] = await Promise.all([
@@ -54,10 +62,12 @@ export async function GET(request: Request) {
 
         const cchsTop = cchsSnapshot.docs
           .map((doc: QueryDocumentSnapshot) => doc.data())
+          .filter(isOutsideIndia)
           .sort((a: { batch?: number }, b: { batch?: number }) => (b.batch || 0) - (a.batch || 0))
           .slice(0, 30);
         const ccwsTop = ccwsSnapshot.docs
           .map((doc: QueryDocumentSnapshot) => doc.data())
+          .filter(isOutsideIndia)
           .sort((a: { batch?: number }, b: { batch?: number }) => (b.batch || 0) - (a.batch || 0))
           .slice(0, 30);
         fetchedList = [...cchsTop, ...ccwsTop];

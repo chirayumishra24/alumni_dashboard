@@ -9,6 +9,7 @@ interface AlumniDoc {
   role?: string;
   bio?: string | null;
   skills?: string;
+  country?: string;
 }
 
 export async function GET(request: Request) {
@@ -28,12 +29,11 @@ export async function GET(request: Request) {
 
     // Calculate dynamic counts
     let iitAiimsCount = 0;
-    let entrepreneursCount = 0;
+    let outsideIndiaCount = 0;
     let governmentCount = 0;
     const companyCounts: { [key: string]: number } = {};
 
     const iitRegex = /\b(iit|aiims|bits|iim|nlu|strathclyde|nmims|escp|kth|lsr|technology|medical|sciences|law|university|college|institute)\b/i;
-    const entRegex = /\b(founder|ceo|co-founder|entrepreneur|partner|owner|proprietor|president|director|lead|chief|manager|head)\b/i;
     const govRegex = /\b(diplomat|ifs|ias|ips|upsc|government|ministry|civil|defense|army|navy|air force|police|tax|commissioner|officer|advocate|court|lieutenant)\b/i;
 
     docs.forEach((doc: AlumniDoc) => {
@@ -41,11 +41,17 @@ export async function GET(request: Request) {
       const role = doc.role || '';
       const bio = doc.bio || '';
       const skills = doc.skills || '';
+      const country = doc.country || '';
 
       const fullText = `${company} ${role} ${bio} ${skills}`.toLowerCase();
 
       if (iitRegex.test(fullText)) iitAiimsCount++;
-      if (entRegex.test(fullText)) entrepreneursCount++;
+      
+      const cleanCountry = country.trim().toLowerCase();
+      if (cleanCountry && cleanCountry !== 'india') {
+        outsideIndiaCount++;
+      }
+      
       if (govRegex.test(fullText)) governmentCount++;
 
       if (company.trim()) {
@@ -75,7 +81,7 @@ export async function GET(request: Request) {
 
     const stats = {
       iitAiims: iitAiimsCount,
-      entrepreneurs: entrepreneursCount,
+      outsideIndia: outsideIndiaCount,
       government: governmentCount,
       topCompanies: topCompanies.slice(0, 15)
     };

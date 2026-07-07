@@ -227,6 +227,55 @@ async function main() {
       const bio = [record.experience, record.education].filter(Boolean).join(' • ') || null;
       const skills = [record.education, record.experience].filter(Boolean).join(', ') || 'Alumni';
 
+      const fullText = `${record.education} ${record.institution} ${record.experience} ${record.currentRole} ${record.currentCompany}`.toLowerCase();
+      
+      let city = 'Jaipur';
+      let country = 'India';
+      let latitude = 26.9124;
+      let longitude = 75.7873;
+
+      if (fullText.includes('london') || fullText.includes('escp')) {
+        city = 'London';
+        country = 'United Kingdom';
+        latitude = 51.5074;
+        longitude = -0.1278;
+      } else if (fullText.includes('dubai')) {
+        city = 'Dubai';
+        country = 'United Arab Emirates';
+        latitude = 25.2048;
+        longitude = 55.2708;
+      } else if (fullText.includes('sweden') || fullText.includes('kth') || fullText.includes('pierce')) {
+        city = 'Stockholm';
+        country = 'Sweden';
+        latitude = 59.3293;
+        longitude = 18.0686;
+      } else if (fullText.includes('ucla') || fullText.includes('los angeles')) {
+        city = 'Los Angeles';
+        country = 'United States';
+        latitude = 34.0522;
+        longitude = -118.2437;
+      } else if (fullText.includes('minnesota')) {
+        city = 'Minneapolis';
+        country = 'United States';
+        latitude = 46.7296;
+        longitude = -94.6859;
+      } else if (fullText.includes('strathclyde') || fullText.includes('glasgow')) {
+        city = 'Glasgow';
+        country = 'United Kingdom';
+        latitude = 55.8642;
+        longitude = -4.2518;
+      } else if (fullText.includes('seattle')) {
+        city = 'Seattle';
+        country = 'United States';
+        latitude = 47.6062;
+        longitude = -122.3321;
+      } else if (fullText.includes('singapore')) {
+        city = 'Singapore';
+        country = 'Singapore';
+        latitude = 1.3521;
+        longitude = 103.8198;
+      }
+
       const profileData = {
         id: profileId,
         userId,
@@ -236,8 +285,10 @@ async function main() {
         company: record.currentCompany || record.institution || '',
         role: record.currentRole || '',
         industry: record.education || 'General',
-        country: 'India',
-        city: 'Jaipur',
+        country,
+        city,
+        latitude,
+        longitude,
         skills,
         isVerified: true,
         isEmailVerified: !!record.email,
@@ -268,6 +319,11 @@ async function main() {
         if (profileData.phone && profileData.phone !== existingData.phone) updates.phone = profileData.phone;
         if (profileData.bio && profileData.bio !== existingData.bio) updates.bio = profileData.bio;
         if (profileData.skills && profileData.skills !== existingData.skills) updates.skills = profileData.skills;
+        
+        if (profileData.country !== existingData.country) updates.country = profileData.country;
+        if (profileData.city !== existingData.city) updates.city = profileData.city;
+        if (profileData.latitude !== existingData.latitude) updates.latitude = profileData.latitude;
+        if (profileData.longitude !== existingData.longitude) updates.longitude = profileData.longitude;
 
         if (userData.email && !userData.email.includes('@placeholder.local') && userData.email !== existingData.user?.email) {
           updates.user = { ...existingData.user, email: userData.email };
