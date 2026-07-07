@@ -146,7 +146,7 @@ export default function PerspectiveSimulator({
 }: PerspectiveSimulatorProps) {
 
   return (
-    <main className="max-w-7xl mx-auto px-6 md:px-8 pb-20 space-y-8 relative z-10" id="directory">
+    <main className="max-w-[1550px] mx-auto px-6 md:px-12 pb-20 space-y-8 relative z-10" id="directory">
       
       {/* Sliding Tab Switcher */}
       <div className="flex justify-center p-1.5 bg-slate-100/80 backdrop-blur-md rounded-2xl max-w-lg mx-auto border border-slate-200/50 shadow-sm">
@@ -244,7 +244,7 @@ export default function PerspectiveSimulator({
               ) : (
                 <motion.div 
                   layout
-                  className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-5"
+                  className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
                 >
                   <AnimatePresence mode="popLayout">
                     {paginatedAlumni.map((alum) => (
@@ -257,7 +257,7 @@ export default function PerspectiveSimulator({
                         transition={{ type: "spring", stiffness: 300, damping: 22 }}
                         key={alum.id} 
                         onClick={() => setSelectedAlumni(alum)}
-                        className="group bg-white rounded-3xl border border-slate-105 hover:border-maroon-700/20 shadow-[0_4px_20px_rgba(0,0,0,0.015)] hover:shadow-2xl transition-all duration-300 overflow-hidden flex flex-col justify-between h-[370px] cursor-pointer relative"
+                        className="group bg-white rounded-3xl border border-slate-200 hover:border-maroon-700/35 shadow-[0_4px_15px_rgba(0,0,0,0.035)] hover:shadow-[0_15px_30px_rgba(0,0,0,0.075)] transition-all duration-300 overflow-hidden flex flex-col justify-between h-[370px] cursor-pointer relative"
                       >
                         <div className={`h-1.5 w-full ${alum.school === 'CCHS' ? 'bg-maroon-600' : 'bg-navy-600'}`} />
 
