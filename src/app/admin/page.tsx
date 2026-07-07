@@ -4,7 +4,7 @@
 import React, { useState, useEffect } from "react";
 import { 
   Users, Calendar, Star, MapPin, Check, X, Sparkles, Send, 
-  RefreshCw, UserCheck, Filter, Mail, Copy, PlusCircle, ShieldCheck, Search, Trash2, Video
+  RefreshCw, UserCheck, Filter, Mail, Copy, PlusCircle, ShieldCheck, Search, Trash2, Video, Edit
 } from "lucide-react";
 import { uploadFileToStorage } from "@/lib/firebase";
 import LoginGate from "@/components/LoginGate";
@@ -227,6 +227,106 @@ function AdminDashboardContent() {
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [sendingEmail, setSendingEmail] = useState(false);
+
+  // Edit Alumni Modal State
+  const [editingAlumni, setEditingAlumni] = useState<AlumniProfile | null>(null);
+  const [editForm, setEditForm] = useState({
+    name: "",
+    email: "",
+    batch: "2024",
+    program: "Science",
+    school: "CCHS",
+    company: "",
+    role: "",
+    skills: "",
+    linkedin: "",
+    phone: "",
+    city: "",
+    avatarUrl: "",
+    bio: ""
+  });
+
+  const [uploadingEditAvatar, setUploadingEditAvatar] = useState(false);
+
+  const handleEditAlumniClick = (alum: AlumniProfile) => {
+    setEditingAlumni(alum);
+    setEditForm({
+      name: alum.user.name || "",
+      email: alum.user.email || "",
+      batch: String(alum.batch || 2024),
+      program: alum.program || "Science",
+      school: alum.school || "CCHS",
+      company: alum.company || "",
+      role: alum.role || "",
+      skills: alum.skills || "",
+      linkedin: alum.linkedin || "",
+      phone: alum.phone || "",
+      city: alum.city || "",
+      avatarUrl: alum.user.avatarUrl || "",
+      bio: alum.bio || ""
+    });
+  };
+
+  const handleEditAvatarUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file || !editingAlumni) return;
+
+    setUploadingEditAvatar(true);
+    try {
+      const path = `avatars/alumni_${editingAlumni.id}_${Date.now()}.jpg`;
+      const url = await uploadFileToStorage(file, path);
+      setEditForm(prev => ({ ...prev, avatarUrl: url }));
+      showToast("Image uploaded successfully!", "success");
+    } catch (error) {
+      console.error("Avatar upload failed:", error);
+      showToast("Failed to upload image", "error");
+    } finally {
+      setUploadingEditAvatar(false);
+    }
+  };
+
+  const handleUpdateAlumni = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingAlumni) return;
+
+    setSubmitting(true);
+    try {
+      const res = await fetch("/api/data", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "editAlumni",
+          id: editingAlumni.id,
+          name: editForm.name,
+          email: editForm.email,
+          batch: editForm.batch,
+          program: editForm.program,
+          school: editForm.school,
+          company: editForm.company,
+          role: editForm.role,
+          skills: editForm.skills,
+          linkedin: editForm.linkedin,
+          phone: editForm.phone,
+          city: editForm.city,
+          avatarUrl: editForm.avatarUrl,
+          bio: editForm.bio
+        }),
+      });
+
+      if (res.ok) {
+        showToast("Alumni profile successfully updated!", "success");
+        setEditingAlumni(null);
+        fetchData();
+      } else {
+        const json = await res.json();
+        showToast(json.error || "Failed to update profile", "error");
+      }
+    } catch {
+      showToast("Update action error", "error");
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   const handleAvatarUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -1174,6 +1274,14 @@ support@skillizee.io`;
                           </button>
 
                           <button
+                            onClick={() => handleEditAlumniClick(alum)}
+                            className="p-2 rounded-xl border border-slate-200 hover:border-blue-250 hover:bg-blue-50 text-slate-400 hover:text-blue-600 transition-all active:scale-95 shadow-sm"
+                            title="Edit Registration Request"
+                          >
+                            <Edit size={12} />
+                          </button>
+
+                          <button
                             onClick={() => handleDeleteAlumni(alum.id)}
                             className="p-2 rounded-xl border border-slate-200 hover:border-rose-250 hover:bg-rose-50 text-slate-400 hover:text-rose-600 transition-all active:scale-95 shadow-sm"
                             title="Delete Registration Request"
@@ -1273,6 +1381,13 @@ support@skillizee.io`;
                               </span>
                             </td>
                             <td className="py-4 text-right">
+                              <button
+                                onClick={() => handleEditAlumniClick(alum)}
+                                className="p-1.5 rounded-lg text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-all active:scale-90 mr-1"
+                                title="Edit Profile"
+                              >
+                                <Edit size={13} />
+                              </button>
                               <button
                                 onClick={() => handleDeleteAlumni(alum.id)}
                                 className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-all active:scale-90"
@@ -2437,6 +2552,229 @@ support@skillizee.io`;
       )}
 
       {/* ================= MODAL: CUSTOM CONFIRMATION ================= */}
+      {/* ================= MODAL: EDIT ALUMNI PROFILE ================= */}
+      {editingAlumni && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center glass-modal-overlay p-4 animate-fade-in">
+          <div className="w-full max-w-lg rounded-[2.5rem] bg-white border border-slate-100 p-8 shadow-2xl space-y-6 relative max-h-[90vh] overflow-y-auto text-left">
+            <button 
+              onClick={() => setEditingAlumni(null)}
+              className="absolute top-6 right-6 text-slate-400 hover:text-slate-655 transition-colors"
+            >
+              <X size={20} />
+            </button>
+
+            <div>
+              <h2 className="text-xl font-serif font-black tracking-tight text-slate-900">Edit Alumni Profile</h2>
+              <p className="text-xs text-slate-500 mt-1">Make corrections and updates to the selected alumnus profile.</p>
+            </div>
+
+            <form onSubmit={handleUpdateAlumni} className="space-y-4">
+              {/* Profile Image Edit / Upload */}
+              <div className="flex items-center gap-4 bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                <div className="h-16 w-16 rounded-full overflow-hidden border border-slate-200 bg-slate-100 flex items-center justify-center shrink-0">
+                  {editForm.avatarUrl ? (
+                    <img src={editForm.avatarUrl} className="h-full w-full object-cover" alt="avatar" />
+                  ) : (
+                    <Users size={24} className="text-slate-400" />
+                  )}
+                </div>
+                <div>
+                  <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">Profile Photo</span>
+                  <div className="flex gap-2">
+                    <label className="inline-flex h-8 items-center justify-center rounded-xl bg-maroon-600 hover:bg-maroon-700 px-3 text-[10px] font-extrabold uppercase tracking-wider text-white cursor-pointer transition-all active:scale-95 shadow-sm">
+                      {uploadingEditAvatar ? "Uploading..." : "Upload Photo"}
+                      <input 
+                        type="file" 
+                        accept="image/*" 
+                        onChange={handleEditAvatarUpload} 
+                        className="hidden" 
+                        disabled={uploadingEditAvatar}
+                      />
+                    </label>
+                    {editForm.avatarUrl && (
+                      <button
+                        type="button"
+                        onClick={() => setEditForm(prev => ({ ...prev, avatarUrl: "" }))}
+                        className="h-8 rounded-xl border border-slate-200 hover:bg-slate-100 px-3 text-[10px] font-extrabold uppercase tracking-wider text-slate-600 transition-all active:scale-95"
+                      >
+                        Remove
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Full Name</label>
+                  <input 
+                    type="text" 
+                    required
+                    value={editForm.name} 
+                    onChange={e => setEditForm({...editForm, name: e.target.value})}
+                    placeholder="Enter name"
+                    className="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-800 focus:outline-none focus:border-maroon-500 focus:bg-white transition-all"
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Email Address</label>
+                  <input 
+                    type="email" 
+                    required
+                    value={editForm.email} 
+                    onChange={e => setEditForm({...editForm, email: e.target.value})}
+                    placeholder="name@example.com"
+                    className="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-800 focus:outline-none focus:border-maroon-500 focus:bg-white transition-all"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Graduation Batch</label>
+                  <select
+                    value={editForm.batch}
+                    onChange={e => setEditForm({...editForm, batch: e.target.value})}
+                    className="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-800 focus:outline-none focus:border-maroon-500 focus:bg-white transition-all"
+                  >
+                    {Array.from({ length: 30 }, (_, i) => String(2026 - i)).map(year => (
+                      <option key={year} value={year}>{year}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Program Stream</label>
+                  <select
+                    value={editForm.program}
+                    onChange={e => setEditForm({...editForm, program: e.target.value})}
+                    className="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-800 focus:outline-none focus:border-maroon-500 focus:bg-white transition-all"
+                  >
+                    <option value="Science">Science</option>
+                    <option value="Commerce">Commerce</option>
+                    <option value="Humanities">Humanities</option>
+                  </select>
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Affiliated School</label>
+                  <select
+                    value={editForm.school}
+                    onChange={e => setEditForm({...editForm, school: e.target.value})}
+                    className="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-800 focus:outline-none focus:border-maroon-500 focus:bg-white transition-all"
+                  >
+                    <option value="CCHS">CCHS (High School)</option>
+                    <option value="CCWS">CCWS (World School)</option>
+                    <option value="CCIS">CCIS (International)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Company Name</label>
+                  <input 
+                    type="text" 
+                    value={editForm.company} 
+                    onChange={e => setEditForm({...editForm, company: e.target.value})}
+                    placeholder="e.g. Google"
+                    className="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-800 focus:outline-none focus:border-maroon-500 focus:bg-white transition-all"
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Job Role</label>
+                  <input 
+                    type="text" 
+                    value={editForm.role} 
+                    onChange={e => setEditForm({...editForm, role: e.target.value})}
+                    placeholder="e.g. Software Engineer"
+                    className="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-800 focus:outline-none focus:border-maroon-500 focus:bg-white transition-all"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">LinkedIn Profile URL</label>
+                  <input 
+                    type="url" 
+                    value={editForm.linkedin} 
+                    onChange={e => setEditForm({...editForm, linkedin: e.target.value})}
+                    placeholder="https://linkedin.com/in/username"
+                    className="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-800 focus:outline-none focus:border-maroon-500 focus:bg-white transition-all"
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Phone Number</label>
+                  <input 
+                    type="tel" 
+                    value={editForm.phone} 
+                    onChange={e => setEditForm({...editForm, phone: e.target.value})}
+                    placeholder="+91 XXXXX XXXXX"
+                    className="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-800 focus:outline-none focus:border-maroon-500 focus:bg-white transition-all"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">City / Location</label>
+                  <input 
+                    type="text" 
+                    value={editForm.city} 
+                    onChange={e => setEditForm({...editForm, city: e.target.value})}
+                    placeholder="e.g. Jaipur"
+                    className="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-800 focus:outline-none focus:border-maroon-500 focus:bg-white transition-all"
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Skills (Comma Separated)</label>
+                  <input 
+                    type="text" 
+                    value={editForm.skills} 
+                    onChange={e => setEditForm({...editForm, skills: e.target.value})}
+                    placeholder="React, TypeScript, Product Management"
+                    className="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-800 focus:outline-none focus:border-maroon-500 focus:bg-white transition-all"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Short Biography</label>
+                <textarea
+                  value={editForm.bio}
+                  onChange={e => setEditForm({...editForm, bio: e.target.value})}
+                  placeholder="Tell us about yourself..."
+                  rows={3}
+                  className="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-4 py-2 text-xs text-slate-800 focus:outline-none focus:border-maroon-500 focus:bg-white transition-all resize-none"
+                />
+              </div>
+
+              <div className="flex gap-3 justify-end pt-4 border-t border-slate-100">
+                <button 
+                  type="button"
+                  onClick={() => setEditingAlumni(null)}
+                  className="px-5 py-3 rounded-xl border border-slate-250 hover:bg-slate-50 text-xs font-bold text-slate-700 transition-all active:scale-95"
+                >
+                  Cancel
+                </button>
+                <button 
+                  type="submit"
+                  disabled={submitting || uploadingEditAvatar}
+                  className="px-6 py-3 rounded-xl bg-gradient-to-r from-maroon-600 to-navy-700 hover:from-maroon-500 hover:to-navy-600 text-xs font-bold text-white transition-all disabled:opacity-50 active:scale-95 shadow-md"
+                >
+                  {submitting ? "Saving..." : "Save Changes"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
       {confirmModal.isOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center glass-modal-overlay p-4 animate-fade-in">
           <div className="w-full max-w-md rounded-[2.5rem] bg-white border border-slate-100 p-8 shadow-2xl space-y-6 relative text-left">

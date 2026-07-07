@@ -228,6 +228,84 @@ export async function PATCH(request: Request) {
       return NextResponse.json({ success: true, profile: updated });
     }
 
+    if (action === 'editAlumni') {
+      const { 
+        id,
+        name,
+        email,
+        batch,
+        program,
+        school,
+        company,
+        role,
+        skills,
+        linkedin,
+        phone,
+        city,
+        avatarUrl,
+        bio
+      } = body;
+
+      const profileRef = firestore.collection('alumni_profiles').doc(id);
+      const profileDoc = await profileRef.get();
+
+      if (!profileDoc.exists) {
+        return NextResponse.json({ error: 'Alumni profile not found' }, { status: 404 });
+      }
+
+      const currentProfile = profileDoc.data();
+      const userId = currentProfile?.userId;
+
+      // Prepare updated profile fields
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const updatedProfile: any = {
+        batch: parseInt(batch) || currentProfile?.batch || 2024,
+        program: program ?? currentProfile?.program ?? '',
+        school: school ?? currentProfile?.school ?? 'CCHS',
+        company: company ?? currentProfile?.company ?? '',
+        role: role ?? currentProfile?.role ?? '',
+        skills: skills ?? currentProfile?.skills ?? '',
+        linkedin: linkedin ?? currentProfile?.linkedin ?? '',
+        phone: phone ?? currentProfile?.phone ?? '',
+        city: city ?? currentProfile?.city ?? '',
+        bio: bio ?? currentProfile?.bio ?? '',
+      };
+
+      // Handle nested user updates
+      const updatedUser = {
+        ...(currentProfile?.user || {}),
+      };
+
+      if (name) updatedUser.name = name;
+      if (email) updatedUser.email = email;
+      if (avatarUrl !== undefined) {
+        updatedUser.avatarUrl = avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(name || updatedUser.name)}&background=6b1d2f&color=fff`;
+      }
+
+      updatedProfile.user = updatedUser;
+
+      // Update the profile in Firestore
+      await profileRef.update(updatedProfile);
+
+      // Also sync user changes back to 'users' collection
+      if (userId) {
+        const userRef = firestore.collection('users').doc(userId);
+        const userDoc = await userRef.get();
+        if (userDoc.exists) {
+          await userRef.update({
+            name: updatedUser.name,
+            email: updatedUser.email,
+            avatarUrl: updatedUser.avatarUrl
+          });
+        }
+      }
+
+      // Invalidate custom in-memory cache
+      invalidateAlumniCache();
+
+      return NextResponse.json({ success: true, profile: { ...currentProfile, ...updatedProfile } });
+    }
+
     if (action === 'deleteAlumni') {
       const profileRef = firestore.collection('alumni_profiles').doc(id);
       const profileDoc = await profileRef.get();
