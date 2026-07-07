@@ -182,6 +182,31 @@ function AdminDashboardContent() {
   // Email Draft Modal State
   const [draftEmailTarget, setDraftEmailTarget] = useState<AlumniProfile | null>(null);
   
+  // Custom Confirmation Modal State
+  const [confirmModal, setConfirmModal] = useState<{
+    isOpen: boolean;
+    title: string;
+    message: string;
+    onConfirm: () => void;
+  }>({
+    isOpen: false,
+    title: "",
+    message: "",
+    onConfirm: () => {},
+  });
+
+  const triggerConfirm = (title: string, message: string, onConfirm: () => void) => {
+    setConfirmModal({
+      isOpen: true,
+      title,
+      message,
+      onConfirm: () => {
+        onConfirm();
+        setConfirmModal(prev => ({ ...prev, isOpen: false }));
+      }
+    });
+  };
+  
   // Self-Registration Modal State
   const [showRegModal, setShowRegModal] = useState(false);
   const [regForm, setRegForm] = useState({
@@ -425,26 +450,29 @@ function AdminDashboardContent() {
   };
 
   // Delete an alumnus profile permanently
-  const handleDeleteAlumni = async (id: string) => {
-    if (!window.confirm("Are you sure you want to permanently delete this alumni profile? This action cannot be undone.")) {
-      return;
-    }
-    try {
-      const res = await fetch("/api/data", {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "deleteAlumni", id }),
-      });
-      if (res.ok) {
-        showToast("Alumni profile permanently deleted", "success");
-        fetchData();
-      } else {
-        const json = await res.json();
-        showToast(json.error || "Failed to delete alumni profile", "error");
+  const handleDeleteAlumni = (id: string) => {
+    triggerConfirm(
+      "Delete Alumni Profile",
+      "Are you sure you want to permanently delete this alumni profile? This action cannot be undone.",
+      async () => {
+        try {
+          const res = await fetch("/api/data", {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ action: "deleteAlumni", id }),
+          });
+          if (res.ok) {
+            showToast("Alumni profile permanently deleted", "success");
+            fetchData();
+          } else {
+            const json = await res.json();
+            showToast(json.error || "Failed to delete alumni profile", "error");
+          }
+        } catch {
+          showToast("Delete action error", "error");
+        }
       }
-    } catch {
-      showToast("Delete action error", "error");
-    }
+    );
   };
 
   // Submit Alumni Self-Registration
@@ -1651,19 +1679,24 @@ support@skillizee.io`;
                               )}
 
                               <button
-                                onClick={async () => {
-                                  if (!window.confirm("Are you sure you want to delete this event? This will delete all associated RSVP records.")) return;
-                                  try {
-                                    const res = await fetch(`/api/events?eventId=${event.id}`, { method: "DELETE" });
-                                    if (res.ok) {
-                                      showToast("Event deleted successfully", "success");
-                                      fetchData();
-                                    } else {
-                                      showToast("Failed to delete event", "error");
+                                onClick={() => {
+                                  triggerConfirm(
+                                    "Delete Event",
+                                    "Are you sure you want to delete this event? This will delete all associated RSVP records.",
+                                    async () => {
+                                      try {
+                                        const res = await fetch(`/api/events?eventId=${event.id}`, { method: "DELETE" });
+                                        if (res.ok) {
+                                          showToast("Event deleted successfully", "success");
+                                          fetchData();
+                                        } else {
+                                          showToast("Failed to delete event", "error");
+                                        }
+                                      } catch {
+                                        showToast("Error deleting event", "error");
+                                      }
                                     }
-                                  } catch {
-                                    showToast("Error deleting event", "error");
-                                  }
+                                  );
                                 }}
                                 className="p-1.5 rounded-xl border border-rose-250 hover:bg-rose-50/50 text-rose-700 transition-all ml-auto"
                               >
@@ -2397,6 +2430,44 @@ support@skillizee.io`;
                 className="px-5 py-3 rounded-xl bg-slate-100 border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-200 transition-all"
               >
                 Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ================= MODAL: CUSTOM CONFIRMATION ================= */}
+      {confirmModal.isOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center glass-modal-overlay p-4 animate-fade-in">
+          <div className="w-full max-w-md rounded-[2.5rem] bg-white border border-slate-100 p-8 shadow-2xl space-y-6 relative text-left">
+            <button 
+              onClick={() => setConfirmModal(prev => ({ ...prev, isOpen: false }))}
+              className="absolute top-6 right-6 text-slate-400 hover:text-slate-655 transition-colors"
+            >
+              <X size={18} />
+            </button>
+
+            <div className="space-y-2">
+              <h3 className="text-lg font-serif font-black tracking-tight text-slate-900">
+                {confirmModal.title}
+              </h3>
+              <p className="text-xs font-medium text-slate-500 leading-relaxed">
+                {confirmModal.message}
+              </p>
+            </div>
+
+            <div className="flex gap-3 justify-end pt-2">
+              <button
+                onClick={() => setConfirmModal(prev => ({ ...prev, isOpen: false }))}
+                className="px-5 py-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-700 text-[10px] font-extrabold uppercase tracking-wider transition-all active:scale-[0.97]"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmModal.onConfirm}
+                className="px-5 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-[10px] font-extrabold uppercase tracking-wider transition-all shadow-md shadow-rose-200 active:scale-[0.97]"
+              >
+                Confirm Delete
               </button>
             </div>
           </div>

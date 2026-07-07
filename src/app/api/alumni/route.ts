@@ -200,7 +200,7 @@ export async function POST(request: Request) {
     });
 
     // Construct dynamic verification link using request origin
-    const origin = new URL(request.url).origin;
+    const origin = process.env.NEXT_PUBLIC_APP_URL || new URL(request.url).origin;
     const verificationLink = `${origin}/verify?id=${profileId}`;
 
     // Trigger automatic registration received email in background

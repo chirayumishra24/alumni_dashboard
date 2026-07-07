@@ -81,7 +81,7 @@ export async function PATCH(request: Request) {
       return NextResponse.json({ success: true, sentCount: 0, message: 'No verified alumni found matching criteria' });
     }
 
-    const origin = new URL(request.url).origin;
+    const origin = process.env.NEXT_PUBLIC_APP_URL || new URL(request.url).origin;
     let sentCount = 0;
 
     interface RsvpDocQueueItem {
