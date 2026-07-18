@@ -395,7 +395,7 @@ export default function PublicAlumniPage() {
 
   // Derived Filtered Lists
   const filteredAlumni = alumni.filter(a => {
-    const matchSchool = schoolFilter === "All" || a.school === schoolFilter;
+    const matchSchool = schoolFilter === "All" || a.school === schoolFilter || (schoolFilter === "CCIS" && (a.school === "CCHS" || a.school === "CCWS"));
     const matchBatch = batchFilter === "All" || a.batch.toString() === batchFilter;
     const matchSearch = a.user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
                         a.skills.toLowerCase().includes(searchQuery.toLowerCase()) ||

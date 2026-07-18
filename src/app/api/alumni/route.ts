@@ -46,7 +46,7 @@ export async function GET(request: Request) {
         fetchedList = snapshot.docs
           .map((doc: QueryDocumentSnapshot) => doc.data());
       } else if (school === 'CCIS') {
-        // CCIS displays data for both CCHS and CCWS, top 30 profiles each on page 1
+        // CCIS displays data for both CCHS and CCWS, top 30 profiles each sorted by heuristics
         const [cchsSnapshot, ccwsSnapshot] = await Promise.all([
           alumniRef
             .where('school', '==', 'CCHS')
@@ -58,16 +58,50 @@ export async function GET(request: Request) {
             .get()
         ]);
 
-        const cchsTop = cchsSnapshot.docs
-          .map((doc: QueryDocumentSnapshot) => doc.data())
-          .filter(isOutsideIndia)
-          .sort((a: { batch?: number }, b: { batch?: number }) => (b.batch || 0) - (a.batch || 0))
-          .slice(0, 30);
-        const ccwsTop = ccwsSnapshot.docs
-          .map((doc: QueryDocumentSnapshot) => doc.data())
-          .filter(isOutsideIndia)
-          .sort((a: { batch?: number }, b: { batch?: number }) => (b.batch || 0) - (a.batch || 0))
-          .slice(0, 30);
+        const PROMINENT_ENTITIES = ['google', 'microsoft', 'meta', 'apple', 'tesla', 'amazon', 'deloitte', 'ey', 'tcs', 'ias', 'ips', 'aiims'];
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const scoreProfile = (p: any) => {
+          let score = p.profileComplete || 0;
+          const country = (p.country || '').trim().toLowerCase();
+          if (country && country !== 'india') {
+            score += 100;
+          }
+          if (p.isMentor) {
+            score += 50;
+          }
+          const company = (p.company || '').trim().toLowerCase();
+          const role = (p.role || '').trim().toLowerCase();
+          if (company && role) {
+            score += 30;
+          }
+          const hasProminentCompany = PROMINENT_ENTITIES.some(entity => company.includes(entity));
+          const hasProminentRole = PROMINENT_ENTITIES.some(entity => role.includes(entity));
+          if (hasProminentCompany || hasProminentRole) {
+            score += 20;
+          }
+          if ((p.bio || '').trim().length > 20) {
+            score += 15;
+          }
+          const batchYear = Number(p.batch) || 2000;
+          score += (batchYear - 2000) * 0.1;
+          return score;
+        };
+
+        const cchsScored = cchsSnapshot.docs.map((doc: QueryDocumentSnapshot) => {
+          const data = doc.data();
+          return { data, score: scoreProfile(data) };
+        });
+        cchsScored.sort((a: { score: number }, b: { score: number }) => b.score - a.score);
+        const cchsTop = cchsScored.slice(0, 30).map((item: { data: any }) => item.data);
+
+        const ccwsScored = ccwsSnapshot.docs.map((doc: QueryDocumentSnapshot) => {
+          const data = doc.data();
+          return { data, score: scoreProfile(data) };
+        });
+        ccwsScored.sort((a: { score: number }, b: { score: number }) => b.score - a.score);
+        const ccwsTop = ccwsScored.slice(0, 30).map((item: { data: any }) => item.data);
+
         fetchedList = [...cchsTop, ...ccwsTop];
       } else {
         // Return all verified if no school parameter specified
