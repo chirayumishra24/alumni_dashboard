@@ -24,19 +24,19 @@ export default function FeaturesBento() {
       <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
         
         {/* Card 1: Interactive Directory (Col Span 7) */}
-        <div className="md:col-span-7 rounded-[2.5rem] bg-gradient-to-br from-white to-slate-50/50 border border-slate-200/60 p-8 flex flex-col justify-between shadow-md group hover:shadow-xl transition-all duration-300 relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-48 h-48 bg-violet-400/5 rounded-full blur-3xl" />
+        <div className="md:col-span-7 rounded-[2.5rem] bg-white/70 backdrop-blur-md border border-slate-200/80 p-8 flex flex-col justify-between shadow-[0_10px_30px_rgba(15,23,42,0.02)] group hover:shadow-[0_20px_50px_rgba(107,29,47,0.06)] hover:bg-white/90 hover:scale-[1.015] hover:border-maroon-250/50 transition-all duration-300 relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-violet-400/5 rounded-full blur-3xl pointer-events-none" />
           
           <div className="space-y-4">
-            <div className="p-3 bg-violet-50 text-violet-650 rounded-2xl w-fit border border-violet-100/50">
+            <div className="p-3 bg-gradient-to-br from-violet-500/10 to-indigo-500/10 text-violet-650 rounded-2xl w-fit border border-violet-100/50 group-hover:scale-115 transition-all duration-300">
               <Search size={20} />
             </div>
-            <div className="space-y-1.5">
+            <div className="space-y-2">
               <div className="flex items-center gap-2">
-                <h3 className="text-lg font-bold text-slate-900 font-serif">Interactive Alumni Directory</h3>
-                <span className="px-2 py-0.5 rounded bg-emerald-50 text-emerald-650 border border-emerald-100/50 text-[8px] font-extrabold uppercase">Live</span>
+                <h3 className="text-xl font-bold text-slate-900 font-serif">Interactive Alumni Directory</h3>
+                <span className="px-2.5 py-0.5 rounded bg-emerald-50 text-emerald-650 border border-emerald-100/50 text-[8px] font-black uppercase tracking-wider">Live</span>
               </div>
-              <p className="text-xs text-slate-550 leading-relaxed max-w-md">
+              <p className="text-xs md:text-sm text-slate-500 leading-relaxed max-w-md font-medium">
                 Search, filter, and discover graduates by graduation batch, school campus, professional expertise, city location, or industry domain.
               </p>
             </div>
@@ -57,16 +57,16 @@ export default function FeaturesBento() {
         </div>
 
         {/* Card 2: Smart Mentorship (Col Span 5) */}
-        <div className="md:col-span-5 rounded-[2.5rem] bg-gradient-to-br from-white to-slate-50/50 border border-slate-200/60 p-8 flex flex-col justify-between shadow-md group hover:shadow-xl transition-all duration-300 relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-48 h-48 bg-amber-400/5 rounded-full blur-3xl" />
+        <div className="md:col-span-5 rounded-[2.5rem] bg-white/70 backdrop-blur-md border border-slate-200/80 p-8 flex flex-col justify-between shadow-[0_10px_30px_rgba(15,23,42,0.02)] group hover:shadow-[0_20px_50px_rgba(50,74,112,0.06)] hover:bg-white/90 hover:scale-[1.015] hover:border-navy-200/50 transition-all duration-300 relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-amber-400/5 rounded-full blur-3xl pointer-events-none" />
           
           <div className="space-y-4">
-            <div className="p-3 bg-amber-50 text-amber-650 rounded-2xl w-fit border border-amber-100/50">
+            <div className="p-3 bg-gradient-to-br from-amber-500/10 to-orange-500/10 text-amber-650 rounded-2xl w-fit border border-amber-100/50 group-hover:scale-115 transition-all duration-300">
               <Sparkles size={20} />
             </div>
-            <div className="space-y-1.5">
-              <h3 className="text-lg font-bold text-slate-900 font-serif">Smart Mentorship Hub</h3>
-              <p className="text-xs text-slate-550 leading-relaxed">
+            <div className="space-y-2">
+              <h3 className="text-xl font-bold text-slate-900 font-serif">Smart Mentorship Hub</h3>
+              <p className="text-xs md:text-sm text-slate-500 leading-relaxed font-medium">
                 Connect directly for guidance. Request one-on-one sessions, receive meeting schedules, and matching score indicators.
               </p>
             </div>
@@ -89,40 +89,40 @@ export default function FeaturesBento() {
         </div>
 
         {/* Card 3: Resume Vault (Col Span 5) */}
-        <div className="md:col-span-5 rounded-[2.5rem] bg-gradient-to-br from-white to-slate-50/50 border border-slate-200/60 p-8 flex flex-col justify-between shadow-md group hover:shadow-xl transition-all duration-300 relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-48 h-48 bg-emerald-400/5 rounded-full blur-3xl" />
+        <div className="md:col-span-5 rounded-[2.5rem] bg-white/70 backdrop-blur-md border border-slate-200/80 p-8 flex flex-col justify-between shadow-[0_10px_30px_rgba(15,23,42,0.02)] group hover:shadow-[0_20px_50px_rgba(16,185,129,0.06)] hover:bg-white/90 hover:scale-[1.015] hover:border-emerald-250/50 transition-all duration-300 relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-400/5 rounded-full blur-3xl pointer-events-none" />
           
           <div className="space-y-4">
-            <div className="p-3 bg-emerald-50 text-emerald-650 rounded-2xl w-fit border border-emerald-100/50">
+            <div className="p-3 bg-gradient-to-br from-emerald-500/10 to-teal-500/10 text-emerald-650 rounded-2xl w-fit border border-emerald-100/50 group-hover:scale-115 transition-all duration-300">
               <FileText size={20} />
             </div>
-            <div className="space-y-1.5">
-              <h3 className="text-lg font-bold text-slate-900 font-serif">Resume Vault</h3>
-              <p className="text-xs text-slate-550 leading-relaxed">
+            <div className="space-y-2">
+              <h3 className="text-xl font-bold text-slate-900 font-serif">Resume Vault</h3>
+              <p className="text-xs md:text-sm text-slate-500 leading-relaxed font-medium">
                 Securely store and share PDF resumes directly inside Firebase Storage for instant review and professional referrals.
               </p>
             </div>
           </div>
 
           {/* Graphical Mockup inside card */}
-          <div className="mt-8 bg-slate-50 border border-dashed border-slate-200/80 rounded-2xl p-5 text-center space-y-1.5 transform group-hover:scale-[1.01] transition-transform duration-300">
+          <div className="mt-8 bg-slate-50 border border-dashed border-slate-250 rounded-2xl p-5 text-center space-y-1.5 transform group-hover:scale-[1.01] transition-transform duration-300">
             <FileText size={18} className="mx-auto text-slate-400" />
             <span className="block text-[10px] font-bold text-slate-700">Drag &amp; Drop Resume</span>
-            <span className="block text-[8px] text-slate-400 font-semibold">Supports PDF format · Max 5MB</span>
+            <span className="block text-[8px] text-slate-450 font-semibold">Supports PDF format · Max 5MB</span>
           </div>
         </div>
 
         {/* Card 4: Administrative Dashboard (Col Span 7) */}
-        <div className="md:col-span-7 rounded-[2.5rem] bg-gradient-to-br from-white to-slate-50/50 border border-slate-200/60 p-8 flex flex-col justify-between shadow-md group hover:shadow-xl transition-all duration-300 relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-48 h-48 bg-[#001f3f]/5 rounded-full blur-3xl" />
+        <div className="md:col-span-7 rounded-[2.5rem] bg-white/70 backdrop-blur-md border border-slate-200/80 p-8 flex flex-col justify-between shadow-[0_10px_30px_rgba(15,23,42,0.02)] group hover:shadow-[0_20px_50px_rgba(107,29,47,0.06)] hover:bg-white/90 hover:scale-[1.015] hover:border-maroon-250/50 transition-all duration-300 relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-[#001f3f]/5 rounded-full blur-3xl pointer-events-none" />
           
           <div className="space-y-4">
-            <div className="p-3 bg-slate-100 text-slate-700 rounded-2xl w-fit border border-slate-200/55">
+            <div className="p-3 bg-gradient-to-br from-slate-500/10 to-zinc-500/10 text-slate-700 rounded-2xl w-fit border border-slate-250 group-hover:scale-115 transition-all duration-300">
               <Award size={20} />
             </div>
-            <div className="space-y-1.5">
-              <h3 className="text-lg font-bold text-slate-900 font-serif">Admin Vetting &amp; Sheets Sync</h3>
-              <p className="text-xs text-slate-550 leading-relaxed max-w-md">
+            <div className="space-y-2">
+              <h3 className="text-xl font-bold text-slate-900 font-serif">Admin Vetting &amp; Sheets Sync</h3>
+              <p className="text-xs md:text-sm text-slate-500 leading-relaxed max-w-md font-medium">
                 Keep directories secure. Our admin gate reviews all self-registrations, with automated synchronization to your school's master spreadsheet.
               </p>
             </div>

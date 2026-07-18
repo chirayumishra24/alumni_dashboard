@@ -166,12 +166,15 @@ export default function HeroSection({ alumni, setShowRegModal, context = "dashbo
           </div>
 
           {/* Map / Globe Rendering Container */}
-          <div className="w-full relative min-h-[380px] md:min-h-[480px]">
-            {visualMode === "map" ? (
-              <AlumniMap alumniData={alumni} />
-            ) : (
-              <AlumniGlobe alumniData={alumni} />
-            )}
+          <div className="w-full relative min-h-[380px] md:min-h-[480px] p-3 rounded-[3rem] bg-white/45 backdrop-blur-xl border border-white/60 shadow-[0_20px_50px_rgba(15,23,42,0.08)] overflow-hidden group transition-all duration-500 hover:shadow-[0_20px_60px_rgba(107,29,47,0.1)] hover:border-white/80">
+            <div className="absolute inset-0 bg-gradient-to-tr from-maroon-500/5 to-navy-500/5 pointer-events-none rounded-[3rem] z-10 border border-white/10" />
+            <div className="w-full h-full rounded-[2.5rem] overflow-hidden relative">
+              {visualMode === "map" ? (
+                <AlumniMap alumniData={alumni} />
+              ) : (
+                <AlumniGlobe alumniData={alumni} />
+              )}
+            </div>
           </div>
         </motion.div>
       </div>

@@ -10,8 +10,8 @@ export default function AlumniOfTheMonth() {
     <section className="max-w-7xl mx-auto px-6 md:px-8 py-16 relative z-10">
       <div className="bg-gradient-to-br from-slate-900 via-navy-800 to-slate-950 text-white rounded-[3rem] p-8 md:p-12 relative overflow-hidden shadow-2xl border border-white/5">
         {/* Glow Effects */}
-        <div className="absolute top-0 right-0 w-80 h-80 bg-maroon-500/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 left-0 w-80 h-80 bg-navy-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute top-0 right-0 w-[450px] h-[450px] bg-gradient-to-br from-maroon-500/15 to-transparent rounded-full blur-[100px] pointer-events-none animate-pulse-glow" />
+        <div className="absolute bottom-0 left-0 w-[450px] h-[450px] bg-gradient-to-br from-navy-500/15 to-transparent rounded-full blur-[100px] pointer-events-none animate-pulse-glow" />
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center relative z-10">
           
@@ -54,30 +54,30 @@ export default function AlumniOfTheMonth() {
 
             {/* Micro timeline inside card */}
             <div className="space-y-4 pt-4 border-t border-white/5">
-              <span className="text-[9px] font-black uppercase tracking-wider text-slate-450 block">Milestones &amp; Journey:</span>
+              <span className="text-[9px] font-black uppercase tracking-wider text-slate-400 block">Milestones &amp; Journey:</span>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 
-                <div className="bg-white/5 p-3.5 rounded-2xl border border-white/5 space-y-1">
+                <div className="bg-white/5 p-4 rounded-2xl border border-white/5 space-y-1 hover:border-white/15 hover:bg-white/10 hover:scale-[1.02] transition-all duration-300 group">
                   <div className="flex items-center gap-1.5 text-amber-300">
-                    <GraduationCap size={14} />
+                    <GraduationCap size={14} className="group-hover:animate-bounce" />
                     <span className="text-[10px] font-extrabold uppercase tracking-wide">Education</span>
                   </div>
                   <span className="block text-xs font-bold text-white">NLSIU Bangalore</span>
                   <span className="block text-[9px] text-slate-400 leading-none">B.A. LL.B (Hons.)</span>
                 </div>
 
-                <div className="bg-white/5 p-3.5 rounded-2xl border border-white/5 space-y-1">
+                <div className="bg-white/5 p-4 rounded-2xl border border-white/5 space-y-1 hover:border-white/15 hover:bg-white/10 hover:scale-[1.02] transition-all duration-300 group">
                   <div className="flex items-center gap-1.5 text-amber-300">
-                    <Briefcase size={14} />
+                    <Briefcase size={14} className="group-hover:animate-bounce" />
                     <span className="text-[10px] font-extrabold uppercase tracking-wide">Practice</span>
                   </div>
                   <span className="block text-xs font-bold text-white">Supreme Court</span>
                   <span className="block text-[9px] text-slate-400 leading-none">Constitutional Law</span>
                 </div>
 
-                <div className="bg-white/5 p-3.5 rounded-2xl border border-white/5 space-y-1">
+                <div className="bg-white/5 p-4 rounded-2xl border border-white/5 space-y-1 hover:border-white/15 hover:bg-white/10 hover:scale-[1.02] transition-all duration-300 group">
                   <div className="flex items-center gap-1.5 text-amber-300">
-                    <Award size={14} />
+                    <Award size={14} className="group-hover:animate-bounce" />
                     <span className="text-[10px] font-extrabold uppercase tracking-wide">Achievement</span>
                   </div>
                   <span className="block text-xs font-bold text-white">UPSC Rank 178</span>

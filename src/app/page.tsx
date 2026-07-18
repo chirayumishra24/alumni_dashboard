@@ -5,6 +5,7 @@ import React, { useState, useEffect } from "react";
 import { PlusCircle, X } from "lucide-react";
 import { uploadFileToStorage } from "@/lib/firebase";
 import Logo from "@/components/Logo";
+import { motion } from "framer-motion";
 
 // Import modular landing components
 import Navbar from "@/components/landing/Navbar";
@@ -450,66 +451,86 @@ export default function PublicAlumniPage() {
       />
 
       {/* Countdown Event Alert */}
-      <CountdownBanner />
+      <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-40px" }} transition={{ duration: 0.5 }}>
+        <CountdownBanner />
+      </motion.div>
 
       {/* Placement & Academic Metrics */}
-      <NetworkStats stats={stats} />
+      <motion.div initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-40px" }} transition={{ duration: 0.6 }}>
+        <NetworkStats stats={stats} />
+      </motion.div>
 
       {/* Featured Alumni of the Month */}
-      <AlumniOfTheMonth />
+      <motion.div initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-40px" }} transition={{ duration: 0.6 }}>
+        <AlumniOfTheMonth />
+      </motion.div>
 
       {/* Industry Sector Distribution */}
-      <IndustryDistribution />
+      <motion.div initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-40px" }} transition={{ duration: 0.6 }}>
+        <IndustryDistribution />
+      </motion.div>
 
       {/* Core Platform Features Bento Layout */}
-      <FeaturesBento />
+      <motion.div initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-40px" }} transition={{ duration: 0.6 }}>
+        <FeaturesBento />
+      </motion.div>
 
       {/* Value Propositions contrast panels */}
-      <AudienceBenefits />
+      <motion.div initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-40px" }} transition={{ duration: 0.6 }}>
+        <AudienceBenefits />
+      </motion.div>
 
       {/* Video Success Spotlights */}
-      <SpotlightVideos setActiveVideoId={setActiveVideoId} />
+      <motion.div initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-40px" }} transition={{ duration: 0.6 }}>
+        <SpotlightVideos setActiveVideoId={setActiveVideoId} />
+      </motion.div>
 
       {/* Dynamic Vetting Process timeline */}
-      <VerificationProcess />
+      <motion.div initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-40px" }} transition={{ duration: 0.6 }}>
+        <VerificationProcess />
+      </motion.div>
 
       {/* Wall of Testimonials / Social Proof */}
-      <AlumniTestimonials />
+      <motion.div initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-40px" }} transition={{ duration: 0.6 }}>
+        <AlumniTestimonials />
+      </motion.div>
 
       {/* Interactive Perspectives Simulator Workstations */}
-      <PerspectiveSimulator
-        viewMode={viewMode}
-        setViewMode={setViewMode}
-        alumni={alumni}
-        loading={loading}
-        searchQuery={searchQuery}
-        setSearchQuery={setSearchQuery}
-        schoolFilter={schoolFilter}
-        setSchoolFilter={setSchoolFilter}
-        batchFilter={batchFilter}
-        setBatchFilter={setBatchFilter}
-        batchYears={batchYears}
-        filteredAlumni={filteredAlumni}
-        paginatedAlumni={paginatedAlumni}
-        selectedAlumni={selectedAlumni}
-        setSelectedAlumni={setSelectedAlumni}
-        currentPage={currentPage}
-        setCurrentPage={setCurrentPage}
-        totalPages={totalPages}
-        selectedMentorForReq={selectedMentorForReq}
-        setSelectedMentorForReq={setSelectedMentorForReq}
-        studentReqForm={studentReqForm}
-        setStudentReqForm={setStudentReqForm}
-        submittingMentorshipReq={submittingMentorshipReq}
-        handleRequestMentorship={handleRequestMentorship}
-        simulatedMentor={simulatedMentor}
-        setSimulatedMentor={setSimulatedMentor}
-        mentorships={mentorships}
-        loadingMentorships={loadingMentorships}
-        actionInProgress={actionInProgress}
-        handleUpdateMentorshipStatus={handleUpdateMentorshipStatus}
-        context={context}
-      />
+      <motion.div initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-40px" }} transition={{ duration: 0.6 }}>
+        <PerspectiveSimulator
+          viewMode={viewMode}
+          setViewMode={setViewMode}
+          alumni={alumni}
+          loading={loading}
+          searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
+          schoolFilter={schoolFilter}
+          setSchoolFilter={setSchoolFilter}
+          batchFilter={batchFilter}
+          setBatchFilter={setBatchFilter}
+          batchYears={batchYears}
+          filteredAlumni={filteredAlumni}
+          paginatedAlumni={paginatedAlumni}
+          selectedAlumni={selectedAlumni}
+          setSelectedAlumni={setSelectedAlumni}
+          currentPage={currentPage}
+          setCurrentPage={setCurrentPage}
+          totalPages={totalPages}
+          selectedMentorForReq={selectedMentorForReq}
+          setSelectedMentorForReq={setSelectedMentorForReq}
+          studentReqForm={studentReqForm}
+          setStudentReqForm={setStudentReqForm}
+          submittingMentorshipReq={submittingMentorshipReq}
+          handleRequestMentorship={handleRequestMentorship}
+          simulatedMentor={simulatedMentor}
+          setSimulatedMentor={setSimulatedMentor}
+          mentorships={mentorships}
+          loadingMentorships={loadingMentorships}
+          actionInProgress={actionInProgress}
+          handleUpdateMentorshipStatus={handleUpdateMentorshipStatus}
+          context={context}
+        />
+      </motion.div>
 
       {/* CTA Bottom Banner */}
       <section className="max-w-7xl mx-auto px-6 md:px-8 mt-16 md:mt-24 relative z-10">

@@ -149,33 +149,33 @@ export default function PerspectiveSimulator({
     <main className="max-w-[1550px] mx-auto px-6 md:px-12 pb-20 space-y-8 relative z-10" id="directory">
       
       {/* Sliding Tab Switcher */}
-      <div className="flex justify-center p-1.5 bg-slate-100/80 backdrop-blur-md rounded-2xl max-w-lg mx-auto border border-slate-200/50 shadow-sm">
+      <div className="flex justify-center p-1.5 bg-white/40 backdrop-blur-xl rounded-2xl max-w-lg mx-auto border border-white/60 shadow-[0_10px_35px_rgba(15,23,42,0.04)]">
         <button 
           onClick={() => setViewMode('directory')}
-          className={`flex-1 py-3 text-xs font-black uppercase tracking-widest rounded-xl transition-all duration-300 ${
+          className={`flex-1 py-3 text-xs font-black uppercase tracking-widest rounded-xl transition-all duration-300 hover:scale-[1.01] ${
             viewMode === 'directory' 
-              ? "bg-slate-900 text-white shadow-lg" 
-              : "text-slate-500 hover:text-slate-800 hover:bg-slate-50"
+              ? "bg-gradient-to-r from-maroon-600 to-navy-700 text-white shadow-lg shadow-maroon-900/10 border border-white/10" 
+              : "text-slate-500 hover:text-slate-800 hover:bg-white/30"
           }`}
         >
           Explore Directory
         </button>
         <button 
           onClick={() => setViewMode('student')}
-          className={`flex-1 py-3 text-xs font-black uppercase tracking-widest rounded-xl transition-all duration-300 ${
+          className={`flex-1 py-3 text-xs font-black uppercase tracking-widest rounded-xl transition-all duration-300 hover:scale-[1.01] ${
             viewMode === 'student' 
-              ? "bg-slate-900 text-white shadow-lg" 
-              : "text-slate-500 hover:text-slate-800 hover:bg-slate-50"
+              ? "bg-gradient-to-r from-maroon-600 to-navy-700 text-white shadow-lg shadow-maroon-900/10 border border-white/10" 
+              : "text-slate-500 hover:text-slate-800 hover:bg-white/30"
           }`}
         >
           Student View
         </button>
         <button 
           onClick={() => setViewMode('mentor')}
-          className={`flex-1 py-3 text-xs font-black uppercase tracking-widest rounded-xl transition-all duration-300 ${
+          className={`flex-1 py-3 text-xs font-black uppercase tracking-widest rounded-xl transition-all duration-300 hover:scale-[1.01] ${
             viewMode === 'mentor' 
-              ? "bg-slate-900 text-white shadow-lg" 
-              : "text-slate-500 hover:text-slate-800 hover:bg-slate-50"
+              ? "bg-gradient-to-r from-maroon-600 to-navy-700 text-white shadow-lg shadow-maroon-900/10 border border-white/10" 
+              : "text-slate-500 hover:text-slate-800 hover:bg-white/30"
           }`}
         >
           Mentor View
@@ -185,7 +185,7 @@ export default function PerspectiveSimulator({
       {/* ── 1. EXPLORE DIRECTORY VIEW ────────────────────────────────────────── */}
       {viewMode === 'directory' && (
         <div className="space-y-8 animate-fade-in text-left">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 p-5 rounded-[2rem] glass-panel">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 p-5 rounded-[2.5rem] bg-white/40 backdrop-blur-xl border border-white/60 shadow-[0_10px_40px_rgba(15,23,42,0.03)]">
             <div className={`relative ${context !== "dashboard" ? "md:col-span-3" : "md:col-span-2"}`}>
               <span className="absolute inset-y-0 left-3.5 flex items-center text-slate-400">
                 <Search size={14} />
@@ -195,7 +195,7 @@ export default function PerspectiveSimulator({
                 placeholder="Search name, skills, role, company..." 
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full glass-input rounded-2xl pl-10 pr-4 py-3 text-xs text-slate-800 placeholder-slate-400 focus:outline-none font-medium bg-white border border-slate-200"
+                className="w-full rounded-2xl pl-10 pr-4 py-3.5 text-xs text-slate-850 placeholder-slate-400 focus:outline-none font-semibold bg-white/70 border border-slate-200/50 shadow-inner focus:bg-white focus:border-maroon-600/50 focus:ring-4 focus:ring-maroon-650/5 transition-all duration-300"
               />
             </div>
 
@@ -204,7 +204,7 @@ export default function PerspectiveSimulator({
                 <select
                   value={schoolFilter}
                   onChange={(e) => setSchoolFilter(e.target.value)}
-                  className="w-full glass-input rounded-2xl px-4 py-3 text-xs text-slate-705 focus:outline-none font-semibold bg-white border border-slate-200"
+                  className="w-full rounded-2xl px-4 py-3.5 text-xs text-slate-700 focus:outline-none font-bold bg-white/70 border border-slate-200/50 shadow-inner focus:bg-white focus:border-maroon-600/50 focus:ring-4 focus:ring-maroon-650/5 transition-all duration-300"
                 >
                   <option value="All">All School Networks</option>
                   <option value="CCHS">CCHS Network</option>
@@ -217,7 +217,7 @@ export default function PerspectiveSimulator({
               <select
                 value={batchFilter}
                 onChange={(e) => setBatchFilter(e.target.value)}
-                className="w-full glass-input rounded-2xl px-4 py-3 text-xs text-slate-705 focus:outline-none font-semibold bg-white border border-slate-200"
+                className="w-full rounded-2xl px-4 py-3.5 text-xs text-slate-700 focus:outline-none font-bold bg-white/70 border border-slate-200/50 shadow-inner focus:bg-white focus:border-maroon-600/50 focus:ring-4 focus:ring-maroon-650/5 transition-all duration-300"
               >
                 <option value="All">All Graduation Years</option>
                 {batchYears.map(year => (
@@ -230,144 +230,162 @@ export default function PerspectiveSimulator({
           {loading ? (
             <div className="flex justify-center py-20">
               <div className="flex flex-col items-center gap-3">
-                <RefreshCw size={24} className="animate-spin text-violet-500" />
+                <RefreshCw size={24} className="animate-spin text-maroon-600" />
                 <span className="text-xs font-semibold tracking-wider text-slate-500">REFRESHING DIRECTORY GRID...</span>
               </div>
             </div>
           ) : (
             <>
               {filteredAlumni.length === 0 ? (
-                <div className="text-center py-20 rounded-[2rem] glass-panel">
+                <div className="text-center py-20 rounded-[2.5rem] bg-white/40 backdrop-blur-xl border border-white/60 shadow-sm">
                   <span className="text-slate-400 text-xs font-semibold block uppercase tracking-wider">No Alumni Found</span>
                   <p className="text-[11px] text-slate-500 mt-1">Try adjusting your filters or search keywords.</p>
                 </div>
               ) : (
-                <motion.div 
-                  layout
-                  className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6"
-                >
-                  <AnimatePresence mode="popLayout">
-                    {paginatedAlumni.map((alum) => (
-                      <motion.div 
-                        layout
-                        initial={{ opacity: 0, y: 30 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, scale: 0.95 }}
-                        whileHover={{ y: -8, scale: 1.015 }}
-                        transition={{ type: "spring", stiffness: 300, damping: 22 }}
-                        key={alum.id} 
-                        onClick={() => setSelectedAlumni(alum)}
-                        className="group bg-white rounded-3xl border border-slate-200 hover:border-maroon-700/35 shadow-[0_4px_15px_rgba(0,0,0,0.035)] hover:shadow-[0_15px_30px_rgba(0,0,0,0.075)] transition-all duration-300 overflow-hidden flex flex-col justify-between h-[370px] cursor-pointer relative"
-                      >
-                        <div className={`h-1.5 w-full ${alum.school === 'CCHS' ? 'bg-maroon-600' : 'bg-navy-600'}`} />
+                <div className="space-y-6">
+                  {(() => {
+                    const rowsCount = 6;
+                    const rows: AlumniProfile[][] = Array.from({ length: rowsCount }, () => []);
+                    filteredAlumni.forEach((alum, index) => {
+                      rows[index % rowsCount].push(alum);
+                    });
 
-                        <div className="p-6 flex-1 flex flex-col justify-between">
-                          <div>
-                            <div className="flex items-center justify-between text-[8px] md:text-[9px] text-slate-450 font-bold uppercase tracking-wider mb-4">
-                              <span className="flex items-center gap-1">
-                                <span className={`w-1.5 h-1.5 rounded-full ${alum.school === 'CCHS' ? 'bg-maroon-500' : 'bg-navy-500'}`} />
-                                {alum.school} Network
-                              </span>
-                              <div className="flex items-center gap-1">
-                                <MapPin size={9} className="text-slate-350" />
-                                <span>{alum.city || 'India'}</span>
-                              </div>
-                            </div>
-   
-                            <div className="flex justify-center mb-4">
-                              <div className="relative w-24 h-24 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center p-1.5">
-                                <div className="relative w-full h-full rounded-full overflow-hidden bg-slate-100 flex items-center justify-center">
-                                  <img 
-                                    src={alum.user.avatarUrl || `https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=120`} 
-                                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300" 
-                                    alt={alum.user.name} 
-                                  />
-                                  <div className="absolute inset-0 bg-[#002147]/85 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col items-center justify-center pointer-events-none">
-                                    <span className="text-[8px] text-white font-extrabold uppercase tracking-widest text-center px-2 leading-tight">
-                                      View Profile
-                                    </span>
-                                  </div>
-                                </div>
-                                
-                                {alum.isVerified && (
-                                  <div className="absolute -bottom-1 -right-1 bg-amber-500 text-white rounded-full p-1 border border-white shadow-md" title="Verified Alumni">
-                                    <Sparkles size={8} className="fill-current" />
-                                  </div>
-                                )}
-                              </div>
-                            </div>
-   
-                            <div className="text-center space-y-1">
-                              <h3 className="font-serif text-sm font-extrabold text-[#6b1d2f] truncate transition-colors group-hover:text-maroon-700">
-                                {alum.user.name}
-                              </h3>
-                              <p className="text-[9px] text-[#001f3f] font-black uppercase tracking-wider truncate mt-0.5">
-                                {alum.role || "Alumni"}
-                              </p>
-                              {alum.company && (
-                                <div className="flex items-center gap-1.5 justify-center mt-1">
-                                  <div className="w-4 h-4 rounded bg-slate-100 flex items-center justify-center text-[8px] font-black uppercase text-slate-500 overflow-hidden border border-slate-200 shrink-0">
-                                    <img
-                                      src={`https://logo.clearbit.com/${alum.company.toLowerCase().replace(/\s+/g, '')}.com`}
-                                      onError={(e) => {
-                                        (e.target as HTMLElement).style.display = 'none';
-                                      }}
-                                      className="w-full h-full object-contain"
-                                      alt=""
-                                    />
-                                    <span className="text-[7.5px]">{alum.company.charAt(0)}</span>
-                                  </div>
-                                  <p className="text-[8px] text-slate-450 font-bold truncate leading-none">
-                                    {alum.company}
-                                  </p>
-                                </div>
-                              )}
+                    return (
+                      <div className="marquee-container marquee-mask py-4 space-y-6 overflow-hidden">
+                        {rows.map((rowItems, rowIndex) => {
+                          if (rowItems.length === 0) return null;
 
-                              {alum.skills && (
-                                <div className="flex flex-wrap gap-1 justify-center pt-2">
-                                  {alum.skills.split(',').slice(0, 2).map((skill: string, i: number) => (
-                                    <span key={i} className="text-[8px] font-bold bg-slate-50 border border-slate-200/60 text-slate-550 px-2 py-0.5 rounded-md">
-                                      {skill.trim()}
-                                    </span>
-                                  ))}
+                          // Duplicate items to ensure continuity in marquee track
+                          const repeatedItems = [];
+                          const repeatMultiplier = Math.max(3, Math.ceil(15 / rowItems.length));
+                          for (let i = 0; i < repeatMultiplier; i++) {
+                            repeatedItems.push(...rowItems);
+                          }
+
+                          const directionClass = rowIndex % 2 === 0 ? "marquee-track-right" : "marquee-track-left";
+
+                          return (
+                            <div key={rowIndex} className={`${directionClass} gap-6`}>
+                              {repeatedItems.map((alum, itemIndex) => (
+                                <div 
+                                  key={`${alum.id}-${rowIndex}-${itemIndex}`} 
+                                  onClick={() => setSelectedAlumni(alum)}
+                                  className="group bg-white/70 backdrop-blur-md rounded-[2.5rem] border border-slate-200/60 hover:border-maroon-500/30 shadow-[0_8px_30px_rgba(15,23,42,0.02)] hover:shadow-[0_20px_50px_rgba(107,29,47,0.07)] hover:bg-white/95 transition-all duration-500 overflow-hidden flex flex-col justify-between h-[385px] w-[265px] shrink-0 cursor-pointer relative"
+                                >
+                                  <div className={`h-1.5 w-full ${alum.school === 'CCHS' ? 'bg-maroon-600' : 'bg-navy-600'}`} />
+
+                                  <div className="p-6 flex-1 flex flex-col justify-between">
+                                    <div>
+                                      <div className="flex items-center justify-between text-[8px] md:text-[9px] text-slate-450 font-bold uppercase tracking-wider mb-4">
+                                        <span className="flex items-center gap-1">
+                                          <span className={`w-1.5 h-1.5 rounded-full ${alum.school === 'CCHS' ? 'bg-maroon-500' : 'bg-navy-500'}`} />
+                                          {alum.school} Network
+                                        </span>
+                                        <div className="flex items-center gap-1">
+                                          <MapPin size={9} className="text-slate-350" />
+                                          <span>{alum.city || 'India'}</span>
+                                        </div>
+                                      </div>
+              
+                                      <div className="flex justify-center mb-4">
+                                        <div className="relative w-24 h-24 rounded-full bg-gradient-to-br from-maroon-500/10 to-navy-500/10 border border-white/80 shadow-md flex items-center justify-center p-1 z-10">
+                                          <div className="relative w-full h-full rounded-full overflow-hidden bg-slate-100 flex items-center justify-center">
+                                            <img 
+                                              src={alum.user.avatarUrl || `https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=120`} 
+                                              className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500" 
+                                              alt={alum.user.name} 
+                                            />
+                                            <div className="absolute inset-0 bg-[#002147]/85 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col items-center justify-center pointer-events-none">
+                                              <span className="text-[8px] text-white font-extrabold uppercase tracking-widest text-center px-2 leading-tight">
+                                                View Profile
+                                              </span>
+                                            </div>
+                                          </div>
+                                          
+                                          {alum.isVerified && (
+                                            <div className="absolute -bottom-1 -right-1 bg-amber-500 text-white rounded-full p-1 border border-white shadow-md z-20" title="Verified Alumni">
+                                              <Sparkles size={8} className="fill-current" />
+                                            </div>
+                                          )}
+                                        </div>
+                                      </div>
+              
+                                      <div className="text-center space-y-1">
+                                        <h3 className="font-serif text-sm font-extrabold text-[#6b1d2f] truncate transition-colors group-hover:text-maroon-700">
+                                          {alum.user.name}
+                                        </h3>
+                                        <p className="text-[9px] text-[#001f3f] font-black uppercase tracking-wider truncate mt-0.5">
+                                          {alum.role || "Alumni"}
+                                        </p>
+                                        {alum.company && (
+                                          <div className="flex items-center gap-1.5 justify-center mt-1">
+                                            <div className="w-4 h-4 rounded bg-slate-100 flex items-center justify-center text-[8px] font-black uppercase text-slate-500 overflow-hidden border border-slate-200 shrink-0">
+                                              <img
+                                                src={`https://logo.clearbit.com/${alum.company.toLowerCase().replace(/\s+/g, '')}.com`}
+                                                onError={(e) => {
+                                                  (e.target as HTMLElement).style.display = 'none';
+                                                }}
+                                                className="w-full h-full object-contain"
+                                                alt=""
+                                              />
+                                              <span className="text-[7.5px]">{alum.company.charAt(0)}</span>
+                                            </div>
+                                            <p className="text-[8px] text-slate-450 font-bold truncate leading-none">
+                                              {alum.company}
+                                            </p>
+                                          </div>
+                                        )}
+ 
+                                        {alum.skills && (
+                                          <div className="flex flex-wrap gap-1 justify-center pt-2.5">
+                                            {alum.skills.split(',').slice(0, 2).map((skill: string, i: number) => (
+                                              <span key={i} className="text-[8px] font-black bg-maroon-500/5 border border-maroon-500/10 text-maroon-700 px-2.5 py-1 rounded-lg uppercase tracking-wide">
+                                                {skill.trim()}
+                                              </span>
+                                            ))}
+                                          </div>
+                                        )}
+                                      </div>
+                                    </div>
+              
+                                    <p className="text-slate-500 text-[10px] leading-relaxed line-clamp-2 mt-4 text-center italic font-medium">
+                                      &ldquo;{alum.bio || "Proud graduate of Cambridge Court."}&rdquo;
+                                    </p>
+                                  </div>
+              
+                                  <div 
+                                    onClick={(e) => e.stopPropagation()}
+                                    className="border-t border-slate-100 px-6 py-4 flex items-center justify-center gap-5 bg-slate-50/40"
+                                  >
+                                    {alum.user.email && (
+                                      <a href={`mailto:${alum.user.email}`} className="text-slate-400 hover:text-[#6b1d2f] transition-colors" title="Email Address">
+                                        <Mail size={13} className="stroke-[2.5]" />
+                                      </a>
+                                    )}
+                                    {alum.linkedin && (
+                                      <a href={alum.linkedin} target="_blank" rel="noopener noreferrer" className="text-slate-400 hover:text-[#6b1d2f] transition-colors" title="LinkedIn Profile">
+                                        <LinkedinIcon size={12} className="stroke-[2.5]" />
+                                      </a>
+                                    )}
+                                  </div>
                                 </div>
-                              )}
+                              ))}
                             </div>
-                          </div>
-   
-                          <p className="text-slate-500 text-[10px] leading-relaxed line-clamp-2 mt-4 text-center italic">
-                            &ldquo;{alum.bio || "Proud graduate of Cambridge Court."}&rdquo;
-                          </p>
-                        </div>
-   
-                        <div 
-                          onClick={(e) => e.stopPropagation()}
-                          className="border-t border-slate-100/60 px-6 py-3 flex items-center justify-center gap-4 bg-slate-50/50"
-                        >
-                          {alum.user.email && (
-                            <a href={`mailto:${alum.user.email}`} className="text-slate-400 hover:text-[#6b1d2f] transition-colors" title="Email Address">
-                              <Mail size={13} className="stroke-[2.5]" />
-                            </a>
-                          )}
-                          {alum.linkedin && (
-                            <a href={alum.linkedin} target="_blank" rel="noopener noreferrer" className="text-slate-400 hover:text-[#6b1d2f] transition-colors" title="LinkedIn Profile">
-                              <LinkedinIcon size={12} className="stroke-[2.5]" />
-                            </a>
-                          )}
-                        </div>
-                      </motion.div>
-                    ))}
-                  </AnimatePresence>
-                </motion.div>
+                          );
+                        })}
+                      </div>
+                    );
+                  })()}
+                </div>
               )}
 
               {/* Pagination */}
-              {totalPages > 1 && (
-                <div className="flex items-center justify-center gap-2 pt-6">
+              {totalPages > 1 && viewMode !== 'directory' && (
+                <div className="flex items-center justify-center gap-2 pt-8">
                   <button 
                     onClick={() => setCurrentPage(Math.max(currentPage - 1, 1))}
                     disabled={currentPage === 1}
-                    className="px-3.5 py-2 rounded-xl border border-slate-200 text-xs font-bold bg-white text-slate-700 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+                    className="px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-bold bg-white text-slate-700 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
                   >
                     Prev
                   </button>
@@ -375,10 +393,10 @@ export default function PerspectiveSimulator({
                     <button 
                       key={idx + 1}
                       onClick={() => setCurrentPage(idx + 1)}
-                      className={`h-8 w-8 rounded-xl text-xs font-bold transition-all duration-200 ${
+                      className={`h-9 w-9 rounded-xl text-xs font-bold transition-all duration-200 ${
                         currentPage === idx + 1 
-                          ? "bg-slate-905 text-white shadow-md scale-105" 
-                          : "border border-slate-200 bg-white text-slate-750 hover:bg-slate-50"
+                          ? "bg-gradient-to-r from-maroon-600 to-navy-700 text-white shadow-md scale-105 border border-white/15" 
+                          : "border border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
                       }`}
                     >
                       {idx + 1}
@@ -387,7 +405,7 @@ export default function PerspectiveSimulator({
                   <button 
                     onClick={() => setCurrentPage(Math.min(currentPage + 1, totalPages))}
                     disabled={currentPage === totalPages}
-                    className="px-3.5 py-2 rounded-xl border border-slate-200 text-xs font-bold bg-white text-slate-700 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+                    className="px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-bold bg-white text-slate-700 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
                   >
                     Next
                   </button>
@@ -421,7 +439,7 @@ export default function PerspectiveSimulator({
                 <motion.div
                   key={alum.id}
                   whileHover={{ y: -5 }}
-                  className="bg-white rounded-[2rem] border border-slate-105 p-6 flex flex-col justify-between h-[340px] shadow-sm hover:shadow-xl transition-all duration-300 relative overflow-hidden text-left"
+                  className="bg-white/70 backdrop-blur-md rounded-[2.5rem] border border-slate-200/60 hover:border-maroon-500/30 p-6 flex flex-col justify-between h-[355px] shadow-[0_8px_30px_rgba(15,23,42,0.02)] hover:shadow-[0_20px_50px_rgba(107,29,47,0.07)] hover:bg-white/95 transition-all duration-500 relative overflow-hidden text-left"
                 >
                   <div className="space-y-4">
                     <div className="flex items-center justify-between text-[8px] font-extrabold uppercase text-slate-450 tracking-wider">
@@ -434,7 +452,7 @@ export default function PerspectiveSimulator({
                     <div className="flex items-center gap-3.5">
                       <img 
                         src={alum.user.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(alum.user.name)}`}
-                        className="w-12 h-12 rounded-full object-cover border border-slate-100 shadow-sm"
+                        className="w-12 h-12 rounded-full object-cover border border-slate-200 shadow-sm shrink-0"
                         alt={alum.user.name} 
                       />
                       <div className="text-left min-w-0">
@@ -448,21 +466,21 @@ export default function PerspectiveSimulator({
                       <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest block">Fields of Guidance:</span>
                       <div className="flex flex-wrap gap-1">
                         {alum.skills.split(',').slice(0, 3).map((tag, i) => (
-                          <span key={i} className="text-[9px] bg-slate-50 border border-slate-200/50 text-slate-600 font-semibold px-2 py-0.5 rounded-lg">
+                          <span key={i} className="text-[9px] bg-maroon-500/5 border border-maroon-500/10 text-maroon-700 font-bold px-2 py-0.5 rounded-lg uppercase tracking-wide">
                             {tag.trim()}
                           </span>
                         ))}
                       </div>
                     </div>
 
-                    <p className="text-[10px] text-slate-550 leading-relaxed line-clamp-2 italic">
+                    <p className="text-[10px] text-slate-500 leading-relaxed line-clamp-2 italic font-medium">
                       &ldquo;{alum.bio || "Available to review CVs and provide interview guidance."}&rdquo;
                     </p>
                   </div>
 
                   <button
                     onClick={() => setSelectedMentorForReq(alum)}
-                    className="w-full mt-4 py-2.5 rounded-xl bg-slate-905 hover:bg-slate-950 text-white font-bold text-[10px] uppercase tracking-wider transition-all hover:scale-[1.01] active:scale-95 cursor-pointer shadow-xs flex items-center justify-center gap-1.5 border border-transparent"
+                    className="w-full mt-4 py-3 rounded-xl bg-gradient-to-r from-maroon-600 to-navy-700 hover:from-maroon-500 hover:to-navy-600 text-white font-extrabold text-[10px] uppercase tracking-widest transition-all hover:scale-[1.01] active:scale-95 cursor-pointer shadow-md flex items-center justify-center gap-1.5 border border-white/10"
                   >
                     <Sparkles size={11} className="text-amber-350 fill-current" />
                     <span>Request Mentorship</span>
@@ -478,26 +496,26 @@ export default function PerspectiveSimulator({
       {viewMode === 'mentor' && (
         <div className="space-y-8 animate-fade-in text-left">
           {!simulatedMentor ? (
-            <div className="glass-panel p-12 text-center space-y-6 max-w-xl mx-auto">
-              <div className="p-4 bg-maroon-50 rounded-full inline-block text-maroon-700">
+            <div className="p-12 text-center space-y-6 max-w-xl mx-auto rounded-[3rem] bg-white/40 backdrop-blur-xl border border-white/60 shadow-[0_15px_45px_rgba(15,23,42,0.04)]">
+              <div className="p-4.5 bg-maroon-50 rounded-full inline-block text-maroon-700 border border-maroon-100/50">
                 <Landmark size={28} />
               </div>
-              <div className="space-y-2">
+              <div className="space-y-2.5">
                 <h3 className="text-xl font-serif font-black text-slate-950">Mentor Workstation Portal</h3>
-                <p className="text-xs text-slate-550 leading-relaxed">
+                <p className="text-xs md:text-sm text-slate-500 leading-relaxed font-medium">
                   Select a verified alumni profile from the list below to enter your simulated workstation. Manage student requests and details.
                 </p>
               </div>
 
               <div className="space-y-3">
-                <label className="text-[9px] font-black uppercase text-slate-500 tracking-wider block text-left">Choose Mentor Profile to Simulate:</label>
+                <label className="text-[9px] font-black uppercase text-slate-450 tracking-wider block text-left">Choose Mentor Profile to Simulate:</label>
                 <select
                   onChange={(e) => {
                     const alum = alumni.find(a => a.id === e.target.value);
                     if (alum) setSimulatedMentor(alum);
                   }}
                   defaultValue=""
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-xs text-slate-800 font-semibold focus:outline-none focus:border-maroon-700/50"
+                  className="w-full bg-white/70 border border-slate-200/50 rounded-xl px-4 py-3.5 text-xs text-slate-800 font-bold focus:outline-none focus:border-maroon-700/50 shadow-inner focus:ring-4 focus:ring-maroon-650/5 transition-all"
                 >
                   <option value="" disabled>-- Select Profile --</option>
                   {alumni.map(a => (
@@ -509,14 +527,14 @@ export default function PerspectiveSimulator({
           ) : (
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
               {/* Left Side: Profile details */}
-              <div className="lg:col-span-4 bg-white border border-slate-100 rounded-[2.5rem] p-8 space-y-6 shadow-sm">
+              <div className="lg:col-span-4 bg-white/70 backdrop-blur-md border border-slate-200/60 rounded-[2.5rem] p-8 space-y-6 shadow-[0_10px_30px_rgba(15,23,42,0.02)]">
                 <div className="flex justify-between items-center">
                   <span className="px-3 py-1 rounded-full bg-emerald-50 border border-emerald-100 text-[8px] font-bold text-emerald-700 uppercase tracking-wider">
                     Simulated Workspace Active
                   </span>
                   <button 
                     onClick={() => setSimulatedMentor(null)}
-                    className="text-[10px] font-bold text-slate-400 hover:text-red-650 transition-colors uppercase tracking-wider"
+                    className="text-[10px] font-bold text-slate-400 hover:text-red-655 transition-colors uppercase tracking-wider"
                   >
                     Logout
                   </button>
@@ -525,23 +543,23 @@ export default function PerspectiveSimulator({
                 <div className="flex flex-col items-center text-center space-y-4">
                   <img 
                     src={simulatedMentor.user.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(simulatedMentor.user.name)}`}
-                    className="w-20 h-20 rounded-full object-cover border-4 border-slate-50 shadow-md animate-fade-in"
+                    className="w-20 h-20 rounded-full object-cover border-4 border-slate-100 shadow-md animate-fade-in"
                     alt={simulatedMentor.user.name} 
                   />
                   <div>
                     <h4 className="font-serif text-lg font-bold text-slate-900">{simulatedMentor.user.name}</h4>
-                    <p className="text-xs text-slate-500 font-medium">{simulatedMentor.role} at {simulatedMentor.company || 'Global Lead'}</p>
+                    <p className="text-xs text-slate-550 font-medium">{simulatedMentor.role} at {simulatedMentor.company || 'Global Lead'}</p>
                   </div>
                 </div>
 
                 {/* completeness bar */}
-                <div className="space-y-1.5 border-t border-b border-slate-100 py-4">
+                <div className="space-y-1.5 border-t border-b border-slate-100/60 py-4">
                   <div className="flex justify-between text-[9px] font-black uppercase text-slate-450 tracking-wider">
                     <span>Profile Completeness</span>
                     <span>{simulatedMentor.profileComplete}%</span>
                   </div>
                   <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
-                    <div className="bg-gradient-to-r from-maroon-600 to-amber-500 h-full rounded-full" style={{ width: `${simulatedMentor.profileComplete}%` }} />
+                    <div className="bg-gradient-to-r from-maroon-600 to-navy-750 h-full rounded-full animate-pulse-glow" style={{ width: `${simulatedMentor.profileComplete}%` }} />
                   </div>
                 </div>
 
@@ -654,18 +672,18 @@ export default function PerspectiveSimulator({
 
       {/* ================= MODAL: ALUMNI INDIVIDUAL DETAIL CARD ================= */}
       {selectedAlumni && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-fade-in" data-lenis-prevent>
-          <div className="w-full max-w-sm rounded-[2.5rem] bg-white border border-slate-100 p-8 shadow-2xl space-y-6 relative animate-fade-in text-slate-800 text-left">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/40 backdrop-blur-xl p-4 animate-fade-in" data-lenis-prevent>
+          <div className="w-full max-w-sm rounded-[3rem] bg-white/90 border border-white p-8 shadow-2xl space-y-6 relative animate-scale-in text-slate-800 text-left">
             <button 
               onClick={() => setSelectedAlumni(null)}
-              className="absolute top-6 right-6 p-2 rounded-full bg-slate-105 hover:bg-slate-200 text-slate-500 transition-all duration-200 cursor-pointer hover:scale-105"
+              className="absolute top-6 right-6 p-2 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 transition-all duration-200 cursor-pointer hover:scale-108 active:scale-95"
               aria-label="Close details"
             >
               <X size={14} />
             </button>
 
             <div className="flex flex-col items-center">
-              <div className="relative w-24 h-24 rounded-full bg-slate-50 border border-slate-200 flex items-center justify-center p-1.5 mb-4">
+              <div className="relative w-24 h-24 rounded-full bg-gradient-to-br from-maroon-500/10 to-navy-500/10 border border-white shadow-md flex items-center justify-center p-1.5 mb-4 z-10">
                 <div className="w-full h-full rounded-full overflow-hidden bg-slate-100 flex items-center justify-center">
                   <img 
                     src={selectedAlumni.user.avatarUrl || `https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=120`} 
@@ -674,7 +692,7 @@ export default function PerspectiveSimulator({
                   />
                 </div>
                 {selectedAlumni.isVerified && (
-                  <div className="absolute -bottom-1 -right-1 bg-amber-500 text-white rounded-full p-1 border border-white shadow-md">
+                  <div className="absolute -bottom-1 -right-1 bg-amber-500 text-white rounded-full p-1 border border-white shadow-md z-20">
                     <Sparkles size={8} className="fill-current" />
                   </div>
                 )}
@@ -684,7 +702,7 @@ export default function PerspectiveSimulator({
                 <h3 className="font-serif text-lg font-black text-slate-900 leading-tight">
                   {selectedAlumni.user.name}
                 </h3>
-                <span className={`px-2 py-0.5 rounded text-[8px] font-black uppercase border ${
+                <span className={`px-2.5 py-0.5 rounded text-[8px] font-black uppercase border ${
                   selectedAlumni.school === 'CCHS' ? 'bg-violet-50 text-violet-750 border-violet-100/50' : 'bg-emerald-50 text-emerald-750 border-emerald-100/50'
                 }`}>
                   {selectedAlumni.school} Alumni Network
@@ -724,7 +742,7 @@ export default function PerspectiveSimulator({
                 {selectedAlumni.user.email && (
                   <a 
                     href={`mailto:${selectedAlumni.user.email}`} 
-                    className="w-full py-3.5 px-6 rounded-2xl bg-[#fdf5f6] hover:bg-[#fbebee] text-[#6b1d2f] font-extrabold text-[11px] uppercase tracking-widest transition-all duration-300 flex items-center justify-center gap-2 border border-[#6b1d2f]/10 shadow-xs hover:scale-[1.01] cursor-pointer"
+                    className="w-full py-3.5 px-6 rounded-2xl bg-gradient-to-r from-maroon-600 to-navy-700 hover:from-maroon-500 hover:to-navy-600 text-white font-extrabold text-[11px] uppercase tracking-widest transition-all duration-300 flex items-center justify-center gap-2 border border-white/10 shadow-md hover:scale-[1.01] active:scale-95 cursor-pointer"
                     title="Send Email"
                   >
                     <Mail size={13} className="stroke-[2.5]" />
@@ -752,11 +770,11 @@ export default function PerspectiveSimulator({
 
       {/* ================= MODAL: STUDENT REQUEST MENTORSHIP ================= */}
       {selectedMentorForReq && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-fade-in" data-lenis-prevent>
-          <div className="w-full max-w-sm rounded-[2.5rem] bg-white border border-slate-100 p-8 shadow-2xl space-y-6 relative animate-fade-in text-left">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/40 backdrop-blur-xl p-4 animate-fade-in" data-lenis-prevent>
+          <div className="w-full max-w-sm rounded-[3rem] bg-white/90 border border-white p-8 shadow-2xl space-y-6 relative animate-scale-in text-left">
             <button 
               onClick={() => setSelectedMentorForReq(null)}
-              className="absolute top-6 right-6 p-2 rounded-full bg-slate-105 hover:bg-slate-200 text-slate-500 transition-all duration-200 cursor-pointer z-20 hover:scale-105"
+              className="absolute top-6 right-6 p-2 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 transition-all duration-200 cursor-pointer z-20 hover:scale-108 active:scale-95"
             >
               <X size={14} />
             </button>
@@ -778,7 +796,7 @@ export default function PerspectiveSimulator({
                   value={studentReqForm.name} 
                   onChange={e => setStudentReqForm({...studentReqForm, name: e.target.value})}
                   placeholder="Enter your name"
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-xs text-slate-800 focus:bg-white focus:border-maroon-700/50 focus:ring-1 focus:ring-maroon-700/20 transition-all duration-200 focus:outline-none"
+                  className="w-full bg-white/70 border border-slate-200/50 rounded-xl px-4 py-3.5 text-xs text-slate-800 focus:bg-white focus:border-maroon-700/50 focus:ring-4 focus:ring-maroon-650/5 transition-all duration-200 focus:outline-none"
                 />
               </div>
 
@@ -790,7 +808,7 @@ export default function PerspectiveSimulator({
                   value={studentReqForm.email} 
                   onChange={e => setStudentReqForm({...studentReqForm, email: e.target.value})}
                   placeholder="Enter your email"
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-xs text-slate-800 focus:bg-white focus:border-maroon-700/50 focus:ring-1 focus:ring-maroon-700/20 transition-all duration-200 focus:outline-none"
+                  className="w-full bg-white/70 border border-slate-200/50 rounded-xl px-4 py-3.5 text-xs text-slate-800 focus:bg-white focus:border-maroon-700/50 focus:ring-4 focus:ring-maroon-650/5 transition-all duration-200 focus:outline-none"
                 />
               </div>
 
@@ -802,17 +820,17 @@ export default function PerspectiveSimulator({
                   onChange={e => setStudentReqForm({...studentReqForm, notes: e.target.value})}
                   placeholder="What questions do you have? e.g. college applications, prep strategies, role guidance..."
                   rows={4}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-xs text-slate-800 focus:bg-white focus:border-maroon-700/50 focus:ring-1 focus:ring-maroon-700/20 transition-all duration-200 focus:outline-none resize-none"
+                  className="w-full bg-white/70 border border-slate-200/50 rounded-xl px-4 py-3.5 text-xs text-slate-800 focus:bg-white focus:border-maroon-700/50 focus:ring-4 focus:ring-maroon-650/5 transition-all duration-200 focus:outline-none resize-none"
                 />
               </div>
 
               <button 
                 type="submit"
                 disabled={submittingMentorshipReq}
-                className={`w-full py-3.5 rounded-xl text-xs font-bold text-white transition-all shadow-md uppercase tracking-wider focus:outline-none focus:ring-2 focus:ring-maroon-700/20 active:scale-[0.99] duration-150 flex items-center justify-center gap-2 ${
+                className={`w-full py-3.5 rounded-xl text-xs font-extrabold text-white transition-all shadow-md uppercase tracking-widest focus:outline-none active:scale-[0.98] duration-150 flex items-center justify-center gap-2 ${
                   submittingMentorshipReq
                     ? "bg-slate-400 cursor-not-allowed opacity-75"
-                    : "bg-[#001f3f] hover:bg-[#00162d]"
+                    : "bg-gradient-to-r from-maroon-600 to-navy-700 hover:from-maroon-500 hover:to-navy-600"
                 }`}
               >
                 {submittingMentorshipReq ? "Submitting Request..." : "Submit Connect Request"}
