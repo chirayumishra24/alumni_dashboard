@@ -145,6 +145,8 @@ export default function PerspectiveSimulator({
   context = "dashboard"
 }: PerspectiveSimulatorProps) {
 
+  const [pausedRow, setPausedRow] = React.useState<number | null>(null);
+
   return (
     <main className="max-w-[1550px] mx-auto px-6 md:px-12 pb-20 space-y-8 relative z-10" id="directory">
       
@@ -265,7 +267,16 @@ export default function PerspectiveSimulator({
                           const directionClass = rowIndex % 2 === 0 ? "marquee-track-right" : "marquee-track-left";
 
                           return (
-                            <div key={rowIndex} className={`${directionClass} gap-6`}>
+                            <div 
+                              key={rowIndex} 
+                              className={`${directionClass} gap-6`}
+                              style={{
+                                animationPlayState: pausedRow === rowIndex ? 'paused' : undefined
+                              }}
+                              onTouchStart={() => setPausedRow(rowIndex)}
+                              onTouchEnd={() => setPausedRow(null)}
+                              onTouchCancel={() => setPausedRow(null)}
+                            >
                               {repeatedItems.map((alum, itemIndex) => (
                                 <div 
                                   key={`${alum.id}-${rowIndex}-${itemIndex}`} 
