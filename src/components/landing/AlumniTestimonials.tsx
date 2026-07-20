@@ -69,8 +69,13 @@ const SEED_TESTIMONIALS: Testimonial[] = [
   }
 ];
 
-export default function AlumniTestimonials() {
+interface AlumniTestimonialsProps {
+  embedded?: boolean;
+}
+
+export default function AlumniTestimonials({ embedded = false }: AlumniTestimonialsProps) {
   const [testimonials, setTestimonials] = useState<Testimonial[]>(SEED_TESTIMONIALS);
+  const [showAll, setShowAll] = useState(false);
 
   useEffect(() => {
     const fetchTestimonials = async () => {
@@ -103,6 +108,7 @@ export default function AlumniTestimonials() {
 
   return (
     <section className="max-w-7xl mx-auto px-6 md:px-8 py-16 relative z-10 space-y-12">
+      {!embedded && (
       <div className="text-center max-w-2xl mx-auto space-y-3">
         <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-maroon-50 border border-maroon-100 text-[10px] font-black text-maroon-700 uppercase tracking-widest">
           <Sparkles size={11} className="fill-current animate-pulse" /> Alumni Voices
@@ -114,9 +120,10 @@ export default function AlumniTestimonials() {
           Read direct feedback and stories shared by verified graduates from our global alumni directory network.
         </p>
       </div>
+      )}
 
       <div className="columns-1 md:columns-2 lg:columns-3 gap-6 space-y-6">
-        {testimonials.map((test, idx) => (
+        {(embedded && !showAll ? testimonials.slice(0, 3) : testimonials).map((test, idx) => (
           <motion.div
             key={test.id}
             initial={{ opacity: 0, y: 30 }}
@@ -162,6 +169,17 @@ export default function AlumniTestimonials() {
           </motion.div>
         ))}
       </div>
+
+      {embedded && !showAll && testimonials.length > 3 && (
+        <div className="text-center pt-4">
+          <button
+            onClick={() => setShowAll(true)}
+            className="px-6 py-2.5 rounded-xl bg-white border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-50 transition-all duration-200 hover:scale-[1.02] active:scale-95 shadow-sm"
+          >
+            View All {testimonials.length} Testimonials
+          </button>
+        </div>
+      )}
     </section>
   );
 }

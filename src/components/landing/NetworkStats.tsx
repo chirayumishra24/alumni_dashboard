@@ -16,20 +16,22 @@ interface NetworkStatsProps {
     government: number;
     topCompanies: StatCompany[];
   };
+  embedded?: boolean;
 }
 
-export default function NetworkStats({ stats }: NetworkStatsProps) {
-  return (
-    <section id="stats" className="w-full bg-gradient-to-br from-navy-900 via-navy-950 to-slate-950 text-white shadow-2xl relative overflow-hidden border-y border-white/5 py-16 md:py-20 z-10 my-16">
+export default function NetworkStats({ stats, embedded = false }: NetworkStatsProps) {
+  const content = (
+    <>
       {/* Corner triangle decorations */}
       <div className="absolute top-0 left-0 w-44 h-full bg-maroon-500/5 [clip-path:polygon(0_0,0_100%,100%_100%)] opacity-30 pointer-events-none blur-sm" />
       <div className="absolute top-0 right-0 w-44 h-full bg-navy-500/5 [clip-path:polygon(0_0,100%_0,100%_100%)] pointer-events-none blur-sm" />
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-maroon-500/10 rounded-full blur-[120px] pointer-events-none" />
       
-      <div className="max-w-7xl mx-auto px-6 md:px-8 relative z-10 space-y-10">
+      <div className={`max-w-7xl mx-auto ${embedded ? '' : 'px-6 md:px-8'} relative z-10 space-y-10`}>
         
         <div className="relative z-10 space-y-10">
-          {/* Header */}
+          {/* Header — hidden in embedded mode */}
+          {!embedded && (
           <div className="text-center md:text-left space-y-3">
             <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-[9px] font-black text-amber-300 uppercase tracking-widest">
               <Sparkles size={10} fill="currentColor" className="animate-pulse" /> Network Placements & Impact
@@ -41,6 +43,7 @@ export default function NetworkStats({ stats }: NetworkStatsProps) {
               A consolidated summary of our verified alumni's institutional achievements and top international employer mappings.
             </p>
           </div>
+          )}
  
           {/* Core Stats */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 pt-8 border-t border-white/5">
@@ -117,6 +120,20 @@ export default function NetworkStats({ stats }: NetworkStatsProps) {
 
         </div>
       </div>
+    </>
+  );
+
+  if (embedded) {
+    return (
+      <div className="w-full bg-gradient-to-br from-navy-900 via-navy-950 to-slate-950 text-white shadow-2xl relative overflow-hidden border-y border-white/5 py-8 z-10 rounded-[2rem]">
+        {content}
+      </div>
+    );
+  }
+
+  return (
+    <section id="stats" className="w-full bg-gradient-to-br from-navy-900 via-navy-950 to-slate-950 text-white shadow-2xl relative overflow-hidden border-y border-white/5 py-16 md:py-20 z-10 my-16">
+      {content}
     </section>
   );
 }

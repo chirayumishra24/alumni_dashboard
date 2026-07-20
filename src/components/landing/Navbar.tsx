@@ -14,7 +14,7 @@ interface NavbarProps {
 
 export default function Navbar({ isSyncing, triggerSync, setShowRegModal, context = "dashboard" }: NavbarProps) {
   return (
-    <header className="sticky top-0 z-40 bg-white/70 backdrop-blur-md px-6 md:px-8 py-3.5 border-b border-slate-200/25">
+    <header className="sticky top-0 z-40 bg-white/70 backdrop-blur-md px-6 md:px-8 py-2.5 border-b border-slate-200/25">
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         <div className="flex items-center gap-3.5 select-none">
           <Logo size={42} showText={false} />
@@ -36,10 +36,8 @@ export default function Navbar({ isSyncing, triggerSync, setShowRegModal, contex
 
         {/* Quick Links for Landing Page */}
         <nav className="hidden md:flex items-center gap-6 text-xs font-black uppercase tracking-widest text-slate-500">
-          <a href="#directory" className="hover:text-slate-900 transition-colors">Directory</a>
-          <a href="#stats" className="hover:text-slate-900 transition-colors">Placements</a>
-          <a href="#features" className="hover:text-slate-900 transition-colors">Features</a>
-          <a href="#process" className="hover:text-slate-900 transition-colors">Vetting Process</a>
+          <a href="#explore" className="hover:text-slate-900 transition-colors">Explore</a>
+          <a href="#about" className="hover:text-slate-900 transition-colors">About</a>
         </nav>
 
         <div className="flex items-center gap-3">

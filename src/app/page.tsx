@@ -5,23 +5,13 @@ import React, { useState, useEffect } from "react";
 import { PlusCircle, X } from "lucide-react";
 import { uploadFileToStorage } from "@/lib/firebase";
 import Logo from "@/components/Logo";
-import { motion } from "framer-motion";
 
 // Import modular landing components
 import Navbar from "@/components/landing/Navbar";
 import HeroSection from "@/components/landing/HeroSection";
-import NetworkStats from "@/components/landing/NetworkStats";
-import FeaturesBento from "@/components/landing/FeaturesBento";
-import AudienceBenefits from "@/components/landing/AudienceBenefits";
-import SpotlightVideos from "@/components/landing/SpotlightVideos";
-import VerificationProcess from "@/components/landing/VerificationProcess";
+import ExploreHub from "@/components/landing/ExploreHub";
 import RegistrationModal from "@/components/landing/RegistrationModal";
-import PerspectiveSimulator, { AlumniProfile, MentorshipRequest } from "@/components/landing/PerspectiveSimulator";
-import AlumniTestimonials from "@/components/landing/AlumniTestimonials";
-import AlumniOfTheMonth from "@/components/landing/AlumniOfTheMonth";
-import IndustryDistribution from "@/components/landing/IndustryDistribution";
-import CountdownBanner from "@/components/landing/CountdownBanner";
-import ScrollProgress from "@/components/landing/ScrollProgress";
+import { AlumniProfile, MentorshipRequest } from "@/components/landing/PerspectiveSimulator";
 import BackToTop from "@/components/landing/BackToTop";
 
 export default function PublicAlumniPage() {
@@ -418,14 +408,10 @@ export default function PublicAlumniPage() {
 
   return (
     <div className="min-h-screen bg-[#FAF8F5] text-slate-800 relative overflow-hidden font-sans selection:bg-[#6b1d2f]/10 selection:text-[#6b1d2f]">
-      <ScrollProgress />
       
-      {/* Decorative Background Shapes */}
+      {/* Decorative Background Shapes (reduced) */}
       <div className="absolute top-[-100px] left-[-150px] bg-shape-maroon opacity-90 pointer-events-none" />
-      <div className="absolute top-[350px] right-[-250px] bg-shape-navy opacity-80 pointer-events-none" />
-      <div className="absolute top-[900px] left-[-200px] bg-shape-navy opacity-60 pointer-events-none" />
-      <div className="absolute bottom-[400px] right-[-150px] bg-shape-maroon opacity-70 pointer-events-none" />
-      <div className="absolute bottom-[-100px] left-[10%] bg-shape-navy opacity-50 pointer-events-none" />
+      <div className="absolute bottom-[200px] right-[-200px] bg-shape-navy opacity-60 pointer-events-none" />
 
       {/* Toast popup */}
       {toast && (
@@ -443,102 +429,58 @@ export default function PublicAlumniPage() {
         context={context}
       />
 
-      {/* Hero Showcase (with Globe/Map toggling) */}
+      {/* Compact Hero (with Globe/Map + inline stats) */}
       <HeroSection 
         alumni={alumni} 
         setShowRegModal={setShowRegModal} 
         context={context}
+        stats={stats}
       />
 
-      {/* Countdown Event Alert */}
-      <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-40px" }} transition={{ duration: 0.5 }}>
-        <CountdownBanner />
-      </motion.div>
-
-      {/* Placement & Academic Metrics */}
-      <motion.div initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-40px" }} transition={{ duration: 0.6 }}>
-        <NetworkStats stats={stats} />
-      </motion.div>
-
-      {/* Featured Alumni of the Month */}
-      <motion.div initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-40px" }} transition={{ duration: 0.6 }}>
-        <AlumniOfTheMonth />
-      </motion.div>
-
-      {/* Industry Sector Distribution */}
-      <motion.div initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-40px" }} transition={{ duration: 0.6 }}>
-        <IndustryDistribution />
-      </motion.div>
-
-      {/* Core Platform Features Bento Layout */}
-      <motion.div initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-40px" }} transition={{ duration: 0.6 }}>
-        <FeaturesBento />
-      </motion.div>
-
-      {/* Value Propositions contrast panels */}
-      <motion.div initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-40px" }} transition={{ duration: 0.6 }}>
-        <AudienceBenefits />
-      </motion.div>
-
-      {/* Video Success Spotlights */}
-      <motion.div initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-40px" }} transition={{ duration: 0.6 }}>
-        <SpotlightVideos setActiveVideoId={setActiveVideoId} />
-      </motion.div>
-
-      {/* Dynamic Vetting Process timeline */}
-      <motion.div initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-40px" }} transition={{ duration: 0.6 }}>
-        <VerificationProcess />
-      </motion.div>
-
-      {/* Wall of Testimonials / Social Proof */}
-      <motion.div initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-40px" }} transition={{ duration: 0.6 }}>
-        <AlumniTestimonials />
-      </motion.div>
-
-      {/* Interactive Perspectives Simulator Workstations */}
-      <motion.div initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-40px" }} transition={{ duration: 0.6 }}>
-        <PerspectiveSimulator
-          viewMode={viewMode}
-          setViewMode={setViewMode}
-          alumni={alumni}
-          loading={loading}
-          searchQuery={searchQuery}
-          setSearchQuery={setSearchQuery}
-          schoolFilter={schoolFilter}
-          setSchoolFilter={setSchoolFilter}
-          batchFilter={batchFilter}
-          setBatchFilter={setBatchFilter}
-          batchYears={batchYears}
-          filteredAlumni={filteredAlumni}
-          paginatedAlumni={paginatedAlumni}
-          selectedAlumni={selectedAlumni}
-          setSelectedAlumni={setSelectedAlumni}
-          currentPage={currentPage}
-          setCurrentPage={setCurrentPage}
-          totalPages={totalPages}
-          selectedMentorForReq={selectedMentorForReq}
-          setSelectedMentorForReq={setSelectedMentorForReq}
-          studentReqForm={studentReqForm}
-          setStudentReqForm={setStudentReqForm}
-          submittingMentorshipReq={submittingMentorshipReq}
-          handleRequestMentorship={handleRequestMentorship}
-          simulatedMentor={simulatedMentor}
-          setSimulatedMentor={setSimulatedMentor}
-          mentorships={mentorships}
-          loadingMentorships={loadingMentorships}
-          actionInProgress={actionInProgress}
-          handleUpdateMentorshipStatus={handleUpdateMentorshipStatus}
-          context={context}
-        />
-      </motion.div>
+      {/* Explore Hub — Tabbed container for Directory, Insights, Spotlight, Community */}
+      <ExploreHub
+        stats={stats}
+        viewMode={viewMode}
+        setViewMode={setViewMode}
+        alumni={alumni}
+        loading={loading}
+        searchQuery={searchQuery}
+        setSearchQuery={setSearchQuery}
+        schoolFilter={schoolFilter}
+        setSchoolFilter={setSchoolFilter}
+        batchFilter={batchFilter}
+        setBatchFilter={setBatchFilter}
+        batchYears={batchYears}
+        filteredAlumni={filteredAlumni}
+        paginatedAlumni={paginatedAlumni}
+        selectedAlumni={selectedAlumni}
+        setSelectedAlumni={setSelectedAlumni}
+        currentPage={currentPage}
+        setCurrentPage={setCurrentPage}
+        totalPages={totalPages}
+        selectedMentorForReq={selectedMentorForReq}
+        setSelectedMentorForReq={setSelectedMentorForReq}
+        studentReqForm={studentReqForm}
+        setStudentReqForm={setStudentReqForm}
+        submittingMentorshipReq={submittingMentorshipReq}
+        handleRequestMentorship={handleRequestMentorship}
+        simulatedMentor={simulatedMentor}
+        setSimulatedMentor={setSimulatedMentor}
+        mentorships={mentorships}
+        loadingMentorships={loadingMentorships}
+        actionInProgress={actionInProgress}
+        handleUpdateMentorshipStatus={handleUpdateMentorshipStatus}
+        context={context}
+        setActiveVideoId={setActiveVideoId}
+      />
 
       {/* CTA Bottom Banner */}
-      <section className="max-w-7xl mx-auto px-6 md:px-8 mt-16 md:mt-24 relative z-10">
-        <div className="bg-maroon-700 rounded-[2.5rem] p-12 text-center text-white relative overflow-hidden shadow-2xl border border-white/10">
+      <section id="about" className="max-w-7xl mx-auto px-6 md:px-8 mt-8 md:mt-12 relative z-10">
+        <div className="bg-maroon-700 rounded-[2.5rem] p-10 text-center text-white relative overflow-hidden shadow-2xl border border-white/10">
           <div className="absolute -top-24 -left-24 w-96 h-96 bg-maroon-500/10 rounded-full blur-3xl" />
           <div className="absolute -bottom-24 -right-24 w-96 h-96 bg-maroon-500/10 rounded-full blur-3xl" />
           
-          <div className="relative z-10 space-y-6 max-w-2xl mx-auto">
+          <div className="relative z-10 space-y-5 max-w-2xl mx-auto">
             <div className="inline-flex -space-x-2 justify-center mb-2">
               <img className="w-10 h-10 rounded-full border-2 border-white object-cover shadow" src="https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?auto=format&fit=crop&q=80&w=120" alt="alumni" />
               <img className="w-10 h-10 rounded-full border-2 border-white object-cover shadow" src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=120" alt="alumni" />
@@ -570,7 +512,7 @@ export default function PublicAlumniPage() {
       </section>
 
       {/* Footer Details */}
-      <footer className="bg-slate-900 border-t border-slate-800 pt-16 pb-8 mt-20 relative z-10 text-slate-400 text-left">
+      <footer className="bg-slate-900 border-t border-slate-800 pt-10 pb-6 mt-12 relative z-10 text-slate-400 text-left">
         <div className="max-w-7xl mx-auto px-6 md:px-8 grid grid-cols-1 md:grid-cols-4 gap-10">
           
           <div className="space-y-4">
@@ -623,7 +565,7 @@ export default function PublicAlumniPage() {
                 </span>
               </li>
               <li>
-                <a href="#directory" className="hover:text-white transition-colors">
+                <a href="#explore" className="hover:text-white transition-colors">
                   Browse Directory
                 </a>
               </li>
@@ -643,7 +585,7 @@ export default function PublicAlumniPage() {
 
         </div>
 
-        <div className="max-w-7xl mx-auto px-6 md:px-8 pt-8 mt-12 border-t border-slate-800 flex flex-col md:flex-row items-center justify-between gap-4 text-[11px] text-slate-500 font-medium font-sans">
+        <div className="max-w-7xl mx-auto px-6 md:px-8 pt-8 mt-10 border-t border-slate-800 flex flex-col md:flex-row items-center justify-between gap-4 text-[11px] text-slate-500 font-medium font-sans">
           <p>© 2026 CCGS Educational Group. All rights reserved.</p>
           <div className="flex items-center gap-6">
             <a href="#" className="hover:text-slate-350 transition-colors">Privacy Policy</a>

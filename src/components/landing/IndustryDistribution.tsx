@@ -22,7 +22,11 @@ const DEFAULT_INDUSTRIES: IndustryItem[] = [
   { name: "Research & Higher Ed", count: 8, percentage: 5, icon: <GraduationCap size={16} />, color: "from-cyan-500 to-sky-600" }
 ];
 
-export default function IndustryDistribution() {
+interface IndustryDistributionProps {
+  embedded?: boolean;
+}
+
+export default function IndustryDistribution({ embedded = false }: IndustryDistributionProps) {
   const [industries, setIndustries] = useState<IndustryItem[]>(DEFAULT_INDUSTRIES);
 
   useEffect(() => {
@@ -84,6 +88,41 @@ export default function IndustryDistribution() {
     };
     calculateStats();
   }, []);
+
+  if (embedded) {
+    return (
+      <div className="bg-white border border-slate-200/60 rounded-[2rem] p-6 md:p-8 shadow-sm relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-64 h-64 bg-slate-50 rounded-full blur-3xl pointer-events-none" />
+        <div className="space-y-6">
+          {industries.map((ind, idx) => (
+            <div key={idx} className="space-y-2.5">
+              <div className="flex items-center justify-between text-xs font-bold text-slate-800">
+                <div className="flex items-center gap-2">
+                  <div className="p-1.5 bg-slate-50 rounded-lg text-slate-500 border border-slate-100">
+                    {ind.icon}
+                  </div>
+                  <span>{ind.name}</span>
+                </div>
+                <div className="flex items-baseline gap-1.5">
+                  <span className="text-slate-400 font-semibold text-[10px]">{ind.count} profiles</span>
+                  <span className="text-sm font-black text-slate-900">{ind.percentage}%</span>
+                </div>
+              </div>
+              <div className="w-full h-3 bg-slate-100 rounded-full overflow-hidden border border-slate-200/20">
+                <motion.div
+                  initial={{ width: 0 }}
+                  whileInView={{ width: `${ind.percentage}%` }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 1, ease: "easeOut", delay: idx * 0.1 }}
+                  className={`h-full bg-gradient-to-r ${ind.color} rounded-full`}
+                />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <section className="max-w-7xl mx-auto px-6 md:px-8 py-16 relative z-10 text-left">

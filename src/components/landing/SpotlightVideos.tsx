@@ -35,11 +35,13 @@ const ALUMNI_VIDEOS_R2L = [
 
 interface SpotlightVideosProps {
   setActiveVideoId: (id: string | null) => void;
+  embedded?: boolean;
 }
 
-export default function SpotlightVideos({ setActiveVideoId }: SpotlightVideosProps) {
+export default function SpotlightVideos({ setActiveVideoId, embedded = false }: SpotlightVideosProps) {
   return (
-    <section className="py-6 space-y-6 relative z-10 max-w-[100vw] overflow-hidden">
+    <section className={`${embedded ? 'py-2' : 'py-6'} space-y-6 relative z-10 max-w-[100vw] overflow-hidden`}>
+      {!embedded && (
       <div className="max-w-7xl mx-auto px-6 md:px-8 text-center md:text-left">
         <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-900/5 border border-slate-900/10 text-[10px] font-bold text-slate-700 uppercase tracking-wider mb-2">
           <Video size={12} className="text-slate-655 animate-pulse" /> Alumni Success Spotlights
@@ -51,6 +53,7 @@ export default function SpotlightVideos({ setActiveVideoId }: SpotlightVideosPro
           Muted previews from CCHS &amp; CCWS graduates sharing career pathways, startup journeys, and industry insights. Click to play.
         </p>
       </div>
+      )}
 
       {/* Continuous Video marquee tracks with Fading Mask */}
       <div className="marquee-container marquee-mask py-2 space-y-4">
@@ -95,7 +98,8 @@ export default function SpotlightVideos({ setActiveVideoId }: SpotlightVideosPro
           ))}
         </div>
 
-        {/* Row 2: Right to Left */}
+        {/* Row 2: Right to Left — hidden in embedded mode */}
+        {!embedded && (
         <div className="marquee-track-right gap-4">
           {[...ALUMNI_VIDEOS_R2L, ...ALUMNI_VIDEOS_R2L].map((video, idx) => (
             <div 
@@ -134,6 +138,7 @@ export default function SpotlightVideos({ setActiveVideoId }: SpotlightVideosPro
             </div>
           ))}
         </div>
+        )}
 
       </div>
     </section>
